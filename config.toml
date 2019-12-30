@@ -1,10 +1,10 @@
-title = "Notre-Dame de Paris"
-baseURL = "https://example.com"
-languageCode = "en-us"
+title = "张胜东的博客"
+baseURL = "https://www.zhangshengdong.com"
+languageCode = "zh-cn"
 theme = "ananke"
 
-MetaDataFormat = "yaml"
-DefaultContentLanguage = "en"
+#MetaDataFormat = "yaml"
+DefaultContentLanguage = "zh"
 SectionPagesMenu = "main"
 Paginate = 3 # this is set low for demonstrating with dummy content. Set to a higher number
 googleAnalytics = ""
