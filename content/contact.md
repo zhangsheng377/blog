@@ -26,11 +26,6 @@ menu: main
     <textarea name="message"></textarea>
   </label>
   <br></br>
-  <label>
-    Your file:
-    <input type="file" name="upload">
-  </label>
-  <br></br>
 
   <button type="submit">Send</button>
 </form>
