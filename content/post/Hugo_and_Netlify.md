@@ -1,6 +1,8 @@
 ---
 title: "使用Hugo和Netlify建立静态博客，并托管在Github上"
 date: 2019-12-30T23:56:52+08:00
+draft: false
+show_reading_time: true
 ---
 ## 使用Hugo建立静态博客
 
