@@ -13,7 +13,7 @@ show_reading_time: true
 3. cd blog/
 4. git submodule add <https://github.com/budparr/gohugo-theme-ananke.git> themes/ananke
 5. echo 'theme = "ananke"' >> config.toml
-6. hugo new posts/my-first-post.md
+6. hugo new post/my-first-post.md
     * 注意：直接这样生成的页面头，是带有 draft: true 标记的，要想正式发布需要去掉该标记。
     * PS：建议从第5步开始，就直接将theme里exampleSite里的文件拷出来，作为初始文件，后续在其上改动、新增，即可。
 7. hugo server
