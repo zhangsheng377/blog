@@ -1,12 +1,10 @@
 ---
-title: "Download TS"
+title: "下载网课的ts视频"
 date: 2020-04-21T02:01:04+08:00
 draft: false
 show_reading_time: true
 ---
-## 下载网课的ts视频
 
------------------------------------------
 原本准备用爬虫，开多线程，去下载一个个ts片段，最后用ffmpeg合成完整的ts视频的。
 
 ```python
