@@ -11,14 +11,18 @@ show_reading_time: true
 1. sudo apt install hugo
 2. hugo new site blog
 3. cd blog/
-4. git submodule add <https://github.com/budparr/gohugo-theme-ananke.git> themes/ananke
-5. echo 'theme = "ananke"' >> config.toml
+4. ~~git submodule add <https://github.com/budparr/gohugo-theme-ananke.git> themes/ananke~~
+
+   git submodule add <https://github.com/olOwOlo/hugo-theme-even> themes/even
+5. ~~echo 'theme = "ananke"' >> config.toml~~
+
+   echo 'theme = "even"' >> config.toml
 6. hugo new post/my-first-post.md
     * 注意：直接这样生成的页面头，是带有 draft: true 标记的，要想正式发布需要去掉该标记。
     * PS：建议从第5步开始，就直接将theme里exampleSite里的文件拷出来，作为初始文件，后续在其上改动、新增，即可。
 7. hugo server
 8. 接下来就可以随便玩一会儿，反正都是用markdown写作的
-9. 还可以研究研究配置文件configure.toml，以及主题theme的配置
+9. 还可以研究研究配置文件config.toml，以及主题theme的配置
 
 ## 上传至Github
 
@@ -38,12 +42,13 @@ show_reading_time: true
 4. 配置域名DNS
 5. 启用SSL证书
 6. 启用IPV6
+7. **使用高版本hugo时,需要在netlify的deploy上配置hugo版本号:HUGO_VERSION,0.68.3**
 
 ## 日常写作
 
 ---------------------------------------------------------
 
-1. 使用hugo new posts/xxx.md生成新页面之后(注意去除页面头的 draft: true 标记)，使用 hugo 在public文件夹里生成静态页面
+1. 使用hugo new post/xxx.md生成新页面之后(注意改掉页面头的 draft: true 标记)，使用 hugo 在public文件夹里生成静态页面
 2. 使用git上传代码
 3. Netlify自动部署，更新网站
 
