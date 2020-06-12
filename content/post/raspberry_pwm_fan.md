@@ -1,5 +1,5 @@
 ---
-title: "Raspberry_pwm_fan"
+title: "树莓派使用pwm控制风扇"
 date: 2020-06-06T23:56:26+08:00
 lastmod: 2020-06-06T23:56:26+08:00
 draft: false
@@ -78,7 +78,36 @@ Oops - unable to determine board type... model: 17
 <http://wiringpi.com/wiringpi-updated-to-2-52-for-the-raspberry-pi-4b/>
 
 ## 使用 Python 的 RPi.GPIO 模块进行 pwm 输出
+```python
+# 设置接口定义模式
+GPIO.setmode(GPIO.BCM)
+# 设置GPIO口
+GPIO.setup(FAN_GPIO, GPIO.OUT, initial=GPIO.HIGH)
+# 初始化PWM的频率，frequency=50Hz
+pwm = GPIO.PWM(FAN_GPIO, 50)
+# 为防止风扇卡死，开机全速运行n秒
+pwm.start(100)
+# 修改pwm频率
+pwm.ChangeFrequency(para_freq)
+# 修改pwm占空比
+pwm.ChangeDutyCycle(para_duty)
+# 关闭pwm
+pwm.stop()
+# 清理GPIO资源
+GPIO.cleanup()
+```
 
-## 使用 xxx 读取 cpu 负载（读取温度？）
+## 读取 cpu 温度
+```shell
+vcgencmd measure_temp
+cat /sys/class/thermal/thermal_zone0/temp
+```
+```python
+def get_cpu_temp():
+    with open('/sys/class/thermal/thermal_zone0/temp') as f:
+        cpu_temp = int(f.read())
+    return cpu_temp
+```
 
-## 最终代码
+## 开关三极管电路
+![https://www.jianshu.com/p/f8dc705eae21](/images/pwm.webp)
