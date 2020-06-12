@@ -5,7 +5,7 @@ lastmod: 2020-05-23T10:39:27+08:00
 draft: false
 keywords: []
 description: ""
-tags: []
+tags: [linux]
 categories: []
 author: ""
 

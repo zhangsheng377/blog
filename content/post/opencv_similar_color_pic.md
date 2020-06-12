@@ -5,7 +5,7 @@ lastmod: 2020-05-16T02:50:01+08:00
 draft: false
 keywords: []
 description: ""
-tags: []
+tags: [opencv, python, ml]
 categories: []
 author: ""
 

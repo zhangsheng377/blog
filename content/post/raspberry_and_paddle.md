@@ -5,7 +5,7 @@ lastmod: 2020-05-17T01:47:08+08:00
 draft: false
 keywords: []
 description: ""
-tags: []
+tags: [树莓派, paddle, python]
 categories: []
 author: ""
 

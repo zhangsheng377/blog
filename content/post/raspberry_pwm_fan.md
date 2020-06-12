@@ -5,7 +5,7 @@ lastmod: 2020-06-06T23:56:26+08:00
 draft: false
 keywords: []
 description: ""
-tags: []
+tags: [树莓派, GPIO, python, 电路]
 categories: []
 author: ""
 

@@ -5,7 +5,7 @@ lastmod: 2020-06-06T23:45:21+08:00
 draft: false
 keywords: []
 description: ""
-tags: []
+tags: [树莓派, linux, shell]
 categories: []
 author: ""
 
