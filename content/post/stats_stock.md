@@ -98,7 +98,7 @@ matplotlib.use('Agg')
 
 只需把 002581.SZ 这样的股票代码发送至公众号，即可获得该只股票股价的时序分解图，分别是趋势图、周期图和误差图。
 
-![微信公众号二维码](/image/qrcode_for_gh_52186fb6ad9e_258.jpg)
+![微信公众号二维码](/images/qrcode_for_gh_52186fb6ad9e_258.jpg)
 
 ## 代码开源地址
 
@@ -108,4 +108,4 @@ matplotlib.use('Agg')
 
 如果各位觉得该项目帮到了您的话，还请不吝打赏，谢谢！
 
-![微信收款二维码](/image/money_weixin_20200719212002.png)
+![微信收款二维码](/images/money_weixin_20200719212002.png)
