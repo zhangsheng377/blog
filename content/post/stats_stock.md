@@ -52,6 +52,10 @@ sequenceDiagrams:
 5. 树莓派利用花生壳作内网穿透，对外提供服务。
 6. 树莓派上部署微信公众号服务器，对用户提供便捷服务。
 
+## 输出的图片
+
+![时序分解股票](/images/stats_stock.png)
+
 ## 进度
 
 现在已完成使用tushare获取指定股票历史数据、使用statsmodels进行时序分解、使用matplotlib出三合一图。
