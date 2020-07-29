@@ -75,10 +75,45 @@ COPY raspi.list /etc/apt/sources.list.d/raspi.list
 
 RUN apt update && \
     apt upgrade
+RUN apt install libcurl4
+
+CMD ["/bin/bash"]
 ```
 
 ```shell
 docker build -t zhangsheng377/raspberry_base .
 ```
 
-## 未完待续。。。
+## 进入自己制作的镜像的bash界面
+
+若是上述dockerfile中没有加
+> CMD ["/bin/bash"]
+
+则需要在 docker run 时指定command:
+
+```shell
+docker run -ti zhangsheng377/raspberry_base /bin/bash
+```
+
+否则，只需:
+
+```shell
+docker run -ti zhangsheng377/raspberry_base
+```
+
+## 更新镜像
+
+```dockerfile
+FROM zhangsheng377/raspberry_base
+ENTRYPOINT []
+
+RUN apt install apt-utils
+
+CMD ["/bin/bash"]
+```
+
+```shell
+docker build -t zhangsheng377/raspberry_base -f Dockerfile .
+```
+
+## 未完待续
