@@ -76,6 +76,7 @@ COPY raspi.list /etc/apt/sources.list.d/raspi.list
 RUN apt update && \
     apt upgrade
 RUN apt install libcurl4
+RUN apt install apt-utils
 
 CMD ["/bin/bash"]
 ```
@@ -107,7 +108,8 @@ docker run -ti zhangsheng377/raspberry_base
 FROM zhangsheng377/raspberry_base
 ENTRYPOINT []
 
-RUN apt install apt-utils
+RUN apt update && \
+    apt upgrade
 
 CMD ["/bin/bash"]
 ```
