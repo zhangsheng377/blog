@@ -118,4 +118,12 @@ CMD ["/bin/bash"]
 docker build -t zhangsheng377/raspberry_base -f Dockerfile .
 ```
 
+可利用最后的CMD实现程序功能的自启动
+
+// TODO: 最后，实现docker的对外地址、后台运行和守护进程，就可以了。
+
+## Github地址
+
+<https://github.com/zhangsheng377/docker>
+
 ## 未完待续
