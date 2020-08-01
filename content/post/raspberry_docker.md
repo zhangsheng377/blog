@@ -118,9 +118,17 @@ CMD ["/bin/bash"]
 docker build -t zhangsheng377/raspberry_base -f Dockerfile .
 ```
 
-可利用最后的CMD实现程序功能的自启动
+## 对外端口、后台运行
 
-// TODO: 最后，实现docker的对外地址、后台运行和守护进程，就可以了。
+```shell
+docker run -d -p 5000:5000 --restart always zhangsheng377/stats_stock
+```
+
+其中:
+
+* -d 为后台运行
+* -p 为开放的端口范围
+* --restart always 为重启策略
 
 ## Github地址
 

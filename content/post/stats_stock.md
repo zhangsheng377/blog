@@ -108,6 +108,12 @@ matplotlib.use('Agg')
 
 <https://github.com/zhangsheng377/stats_stock>
 
+## docker
+
+目前，已把该树莓派镜像部署至docker，这样就不用screen暴力的在后台运行及监控了。
+
+<https://github.com/zhangsheng377/docker/tree/master/stats_stock>
+
 ## 打赏
 
 如果各位觉得该项目帮到了您的话，还请不吝打赏，谢谢！
