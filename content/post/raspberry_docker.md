@@ -130,6 +130,10 @@ docker run -d -p 5000:5000 --restart always zhangsheng377/stats_stock
 * -p 为开放的端口范围
 * --restart always 为重启策略
 
+## 下一步计划
+
+- [ ] 学习Docker Compose
+
 ## Github地址
 
 <https://github.com/zhangsheng377/docker>
