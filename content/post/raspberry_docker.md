@@ -121,7 +121,8 @@ docker build -t zhangsheng377/raspberry_base -f Dockerfile .
 ## 对外端口、后台运行
 
 ```shell
-docker run -d -p 5000:5000 --restart always zhangsheng377/stats_stock
+# docker run -d -p 5000:5000 --restart always zhangsheng377/stats_stock
+docker run -d -p 5000:5000 -v /etc/timezone:/etc/timezone:ro -v /etc/localtime:/etc/localtime:ro --restart always zhangsheng377/stats_stock
 ```
 
 其中:
