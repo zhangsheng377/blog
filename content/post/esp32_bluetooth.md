@@ -66,6 +66,8 @@ sequenceDiagrams:
 
 ![ds18b20](/images/ds18b20_esp32_single_normal.png)
 
+![muitl_ds18b20](/images/ds18b20_esp32_multiple.png)
+
 ## 手机软件
 
 由于我不会做安卓软件，现在只是使用一款“蓝牙串口”的app直接发送指令，控制硬件。
