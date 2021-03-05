@@ -78,20 +78,44 @@ sequenceDiagrams:
 //and also demonstrate that SerialBT have the same functionalities of a normal Serial
 
 #include "BluetoothSerial.h"
+#include <OneWire.h>
+#include <DallasTemperature.h>
 
 #if !defined(CONFIG_BT_ENABLED) || !defined(CONFIG_BLUEDROID_ENABLED)
 #error Bluetooth is not enabled! Please run `make menuconfig` to and enable it
 #endif
 
+// 数据输出脚接开发板数字引脚
+#define ONE_WIRE_BUS 17
+#define PWM_PIN 16
+
 BluetoothSerial SerialBT;
+OneWire oneWire(ONE_WIRE_BUS);
+DallasTemperature sensors(&oneWire);
+
 char START_FLAG = '$';
 char END_FLAG = '#';
 int TEMPERATURE_MIN = 0;
 int TEMPERATURE_MAX = 50;
 
+int target_temperature = 0; // 1精度，*10存储
+int current_temperature = 0; // 0.1精度，*10存储
+
+// use first channel of 16 channels (started from zero)
+#define LEDC_CHANNEL 0
+// use 8 bit precission for LEDC timer
+// 分辨率，即最大可写值为2^k-1，当为8时就是255
+#define LEDC_TIMER_BIT 8
+// use 5000 Hz as a LEDC base frequency
+#define LEDC_BASE_FREQ 5000
+
 void setup() {
   Serial.begin(115200);
   SerialBT.begin("ESP32test"); //Bluetooth device name
+  sensors.begin();
+  // Setup timer and attach timer to a pin
+  ledcSetup(LEDC_CHANNEL, LEDC_BASE_FREQ, LEDC_TIMER_BIT);
+  ledcAttachPin(PWM_PIN, LEDC_CHANNEL);
   Serial.println("The device started, now you can pair it with bluetooth!");
 }
 
@@ -105,9 +129,8 @@ void SerialBT_sendMsg(String msg) {
 int NONE = 0;
 int START = 1;
 int pre_status = NONE;
-
 int num = 0;
-void loop() {
+void update_target_temperature() {
   if (SerialBT.available()) {
     char msg_char = SerialBT.read();
     if (msg_char == START_FLAG) {
@@ -115,7 +138,8 @@ void loop() {
       pre_status = START;
     } else if (msg_char == END_FLAG && pre_status == START) {
       if (num >= TEMPERATURE_MIN && num <= TEMPERATURE_MAX) {
-        String msg = String("set temperature to " + String(num) + "\n");
+        target_temperature = num * 10;
+        String msg = String("set temperature to " + String(target_temperature / 10.0) + "\n");
         SerialBT_sendMsg(msg);
       }
       num = 0;
@@ -126,12 +150,40 @@ void loop() {
       num = 0;
       pre_status = NONE;
     }
+  }
+}
 
-    // SerialBT_sendMsg(String(String(msg_char) + "\n"));
+void update_current_temperature() {
+  sensors.requestTemperatures(); // 发送命令获取温度
+  int tmp_temperature = int(sensors.getTempCByIndex(0) * 10);
+  if (tmp_temperature != current_temperature) {
+    current_temperature = tmp_temperature;
+    Serial.print("Temperature for the device 1 (index 0) is: ");
+    Serial.println(current_temperature / 10.0);
+    SerialBT_sendMsg(String("temperature is " + String(current_temperature / 10.0) + "\n"));
+  }
+}
+
+void set_heater_pwm() {
+  int tmp_current_temperature = min(current_temperature, target_temperature);
+  tmp_current_temperature = max(tmp_current_temperature, TEMPERATURE_MIN);
+  int pwm = 0;
+
+  if (target_temperature > tmp_current_temperature && target_temperature > TEMPERATURE_MIN) {
+    pwm = 1.0 * (target_temperature - tmp_current_temperature) / (target_temperature - TEMPERATURE_MIN) * 255;
   }
 
-  
-    
+  ledcWrite(LEDC_CHANNEL, pwm); // LEDC_TIMER_BIT分辨率设置为8时，最大duty为2^8-1=255
+  Serial.print("pwm is: ");
+  Serial.println(pwm);
+}
+
+void loop() {
+  update_target_temperature();
+
+  update_current_temperature();
+
+  set_heater_pwm();
 
   delay(20);
 }
