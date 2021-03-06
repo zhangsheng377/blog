@@ -82,15 +82,20 @@ def batch_iter(data_path, batch_size=64, shuffle=True):
     """生成批次数据"""
     handled_data_iter = get_handled_data_iterator(data_path)
     while True:
+        data_list = []
+        for _ in range(batch_size):
+            data = next(handled_data_iter)
+            data_list.append(data)
+        if shuffle:
+            random.shuffle(data_list)
+        
         pad_sequences_list = []
         label_one_hot_list = []
-        for _ in range(batch_size):
-            pad_sequences, label_one_hot = next(handled_data_iter)
+        for data in data_list:
+            pad_sequences, label_one_hot = data
             pad_sequences_list.append(pad_sequences.tolist())
             label_one_hot_list.append(label_one_hot.tolist())
-        if shuffle:
-            random.shuffle(pad_sequences_list)
-            random.shuffle(label_one_hot_list)
+
         yield np.array(pad_sequences_list), np.array(label_one_hot_list)
 
 it = batch_iter(data_path, batch_size=2)
