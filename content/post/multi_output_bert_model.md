@@ -86,6 +86,7 @@ def get_model(label_list):
  
     bert_output = bert_model([input_indices, input_segments])
     bert_cls = Lambda(lambda x: x[:, 0])(bert_output) # 取出[CLS]对应的向量用来做分类
+    # 也可以直接maxpooling(bert_output)
     output = Dense(len(label_list), activation='softmax')(bert_cls)
  
     model = Model([input_indices, input_segments], output)
