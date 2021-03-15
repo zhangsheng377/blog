@@ -953,8 +953,50 @@ model.fit(
     Epoch 1/10
          7/167215 [..............................] - ETA: 1829:52:33 - loss: 3.1260 - dense_loss: 1.4949 - dense_1_loss: 1.6311 - dense_accuracy: 0.6429 - dense_1_accuracy: 0.3571 
 
-
 ```python
-
+model.save_weights("trained_model/muilt_keras_bert_THUCNews_final.weights")
 ```
 
+## 模型加载及测试
+
+### load_weights
+
+```python
+model_test = get_model(categories, second_label_list)
+```
+
+    Model: "functional_5"
+    __________________________________________________________________________________________________
+    Layer (type)                    Output Shape         Param #     Connected to                     
+    ==================================================================================================
+    input_1 (InputLayer)            [(None, 512)]        0                                            
+    __________________________________________________________________________________________________
+    input_2 (InputLayer)            [(None, 512)]        0                                            
+    __________________________________________________________________________________________________
+    functional_3 (Functional)       (None, 512, 768)     101677056   input_1[0][0]                    
+                                                                    input_2[0][0]                    
+    __________________________________________________________________________________________________
+    lambda (Lambda)                 (None, 768)          0           functional_3[0][0]               
+    __________________________________________________________________________________________________
+    dense (Dense)                   (None, 14)           10766       lambda[0][0]                     
+    __________________________________________________________________________________________________
+    dense_1 (Dense)                 (None, 3)            2307        lambda[0][0]                     
+    ==================================================================================================
+    Total params: 101,690,129
+    Trainable params: 101,690,129
+    Non-trainable params: 0
+    __________________________________________________________________________________________________
+    None
+
+```python
+model_test.load_weights("trained_model/muilt_keras_bert_THUCNews_final.weights")
+```
+
+    <tensorflow.python.training.tracking.util.CheckpointLoadStatus at 0x7f7ebc61afa0>
+
+```python
+dev_dataset_iterator = batch_iter(r"data/keras_bert_dev.txt", cat_to_id, tokenizer, second_label_list, batch_size)
+model_test.evaluate_generator(generator=dev_dataset_iterator, steps=2)
+```
+
+    [1.4928178787231445, 0.014190525747835636, 1.4786274433135986, 1.0, 0.25]
