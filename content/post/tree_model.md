@@ -5,7 +5,7 @@ lastmod: 2021-03-16T02:09:58+08:00
 draft: false
 keywords: []
 description: ""
-tags: [树模型, 决策树]
+tags: [树模型, 决策树, ID3, C4.5, CART]
 categories: []
 author: ""
 
