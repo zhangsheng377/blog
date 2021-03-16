@@ -989,12 +989,22 @@ model_test = get_model(categories, second_label_list)
     None
 
 ```python
+batch_size = 2
+dev_dataset_iterator = batch_iter(r"data/keras_bert_dev.txt", cat_to_id, tokenizer, second_label_list, batch_size)
+model_test.evaluate_generator(generator=dev_dataset_iterator, steps=2)
+```
+
+	[6.884261608123779, 4.25980806350708, 2.624453544616699, 0.0, 0.0]
+
+
+```python
 model_test.load_weights("trained_model/muilt_keras_bert_THUCNews_final.weights")
 ```
 
     <tensorflow.python.training.tracking.util.CheckpointLoadStatus at 0x7f7ebc61afa0>
 
 ```python
+batch_size = 2
 dev_dataset_iterator = batch_iter(r"data/keras_bert_dev.txt", cat_to_id, tokenizer, second_label_list, batch_size)
 model_test.evaluate_generator(generator=dev_dataset_iterator, steps=2)
 ```
