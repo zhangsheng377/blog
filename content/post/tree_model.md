@@ -38,8 +38,6 @@ sequenceDiagrams:
   enable: false
   options: ""
 
-markup: mmark
-
 ---
 
 # 树模型
