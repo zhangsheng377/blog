@@ -48,7 +48,7 @@ sequenceDiagrams:
 
 决策树可以说是树模型中最基础，也是最有名的模型，它可以被认为是一堆if-then的规则集合。
 
-![决策树](C:\Users\43587\Desktop\code\blog\static\images\c2cec3fdfc0392456a6ac4258694a4c27d1e2538.png)
+![决策树](http://images.cnitblog.com/i/618186/201406/242042454555259.png)
 
 比如这张图，人们该如何去判断是否应该出去玩。
 
