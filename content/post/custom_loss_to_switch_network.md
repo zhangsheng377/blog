@@ -50,32 +50,78 @@ sequenceDiagrams:
 
 所以想到，利用一个类似mask的特殊标签取值，来控制启用哪个子网络去训练。具体实现措施准备把另一个子网络的loss置0，以此不让其训练。
 
+
+
 ## 自定义loss函数
 
-由于标签值是0、1，所以将 -1 设置为mask值，将y_true中的 -1 值，替换为y_pred中的对应值，以此使其对应样本的loss为0。
+由于标签值是0、1，所以将 -1 设置为mask值。若y_true中为 -1 ，则将对应位置的y_true和y_pred替换为0，以此使其对应样本的loss为0。
 
 最后，由于标签是0、1，所以采用 binary_crossentropy 作为损失函数：
 
 ```python
-def mycrossentropy(y_true, y_pred):
-    assert len(y_true.shape) == 2
-    y_true_np = y_true.numpy()
-    y_pred_np = y_pred.numpy()
-    tmp = y_pred_np.copy()
-    for i in range(y_true.shape[0]):
-        for j in range(y_true.shape[1]):
-            if y_true_np[i][j] != -1:
-                tmp[i][j] = y_true_np[i][j]
+def transform_y(y_true, y_pred):
+    mask_value = tf.constant(-1)
+    mask_y_true = tf.not_equal(tf.cast(y_true, dtype=tf.int32), tf.cast(mask_value, dtype=tf.int32))
+#     print(f"mask_y_true:{mask_y_true}")
+#     y_true_ = tf.cond(tf.equal(y_true, mask_value), lambda: 0, lambda: y_true)
+    y_true_ = tf.cast(y_true, dtype=tf.int32) * tf.cast(mask_y_true, dtype=tf.int32)
+    y_pred_ = tf.cast(y_pred, dtype=tf.float32) * tf.cast(mask_y_true, dtype=tf.float32)
+#     print(f"y_true_:{y_true_}, y_pred_:{y_pred_}")
     
-    tmp_tensor = tf.Variable(tmp)
+    return y_true_, y_pred_
 
-    loss = binary_crossentropy(tmp_tensor, y_pred)
+
+def my_binary_crossentropy(y_true, y_pred):
+#     print(f"y_true:{y_true}, y_pred:{y_pred}")
+    
+    y_true, y_pred = transform_y(y_true, y_pred)
+#     print(f"y_true_:{y_true}, y_pred_:{y_pred}")
+
+    loss = binary_crossentropy(y_true, y_pred)
+#     print(f"loss:{loss}")
     return loss
+
+
+def tarnsform_metrics(y_true, y_pred):
+    y_true_, y_pred_ = y_true.numpy(), y_pred.numpy()
+    for i in range(y_true_.shape[0]):
+        for j in range(y_true_.shape[1]):
+            if y_true_[i][j] == -1:
+                y_true_[i][j] = 0
+                y_pred_[i][j] = 0
+            if y_pred_[i][j] > 0.5:
+                y_pred_[i][j] = 1
+            else:
+                y_pred_[i][j] = 0
+    return y_true_, y_pred_
+
+
+def my_binary_accuracy(y_true, y_pred):
+#     print("my_binary_accuracy")
+#     print(f"y_true:{y_true}, y_pred:{y_pred}")
+    
+    y_true_, y_pred_ = tarnsform_metrics(y_true, y_pred)
+#     print(f"y_true_:{y_true_}, y_pred_:{y_pred_}")
+
+    accuracy = binary_accuracy(y_true_, y_pred_)
+    return accuracy
+
+
+def my_f1_score(y_true, y_pred):
+#     print("my_f1_score")
+#     print(f"y_true:{y_true}, y_pred:{y_pred}")
+    
+    y_true_, y_pred_ = tarnsform_metrics(y_true, y_pred)
+#     print(f"y_true_:{y_true_}, y_pred_:{y_pred_}")
+
+    return f1_score(y_true_, y_pred_, average='macro')
 ```
+
+
 
 ## 模型定义
 
-在编译模型时指定自定义loss函数，keras会自动对两个输出目标分别使用该自定义loss函数，最后模型算的是这两个loss之和：
+在编译模型时指定自定义loss函数，keras 会自动对两个输出目标分别使用该自定义loss函数，最后模型算的是这两个loss之和：
 
 ```python
 def get_model():
@@ -92,18 +138,29 @@ def get_model():
     bert_cls = Lambda(lambda x: x[:, 0])(projection_logits) # 取出[CLS]对应的向量用来做分类
     
     dropout_A = Dropout(0.5)(bert_cls)
-    output_A = Dense(2, activation='sigmoid')(dropout_A)
+    output_A = Dense(1, activation='sigmoid')(dropout_A)
     
     dropout_B = Dropout(0.5)(bert_cls)
-    output_B = Dense(2, activation='sigmoid')(dropout_B)
+    output_B = Dense(1, activation='sigmoid')(dropout_B)
  
     model = Model([input_ids, input_token_type_ids, input_attention_mask], [output_A, output_B])
-    model.compile(loss=mycrossentropy,
+    model.compile(
+                  loss=my_binary_crossentropy,
+#                   loss='binary_crossentropy',
+#                   loss=binary_crossentropy,
                   optimizer=Adam(1e-5),    #用足够小的学习率
-                  metrics=['accuracy'])
+                  metrics=[my_binary_accuracy, my_f1_score]
+#                   metrics='accuracy'
+                 )
     print(model.summary())
     return model
 ```
+
+
+
+## TIP：
+
+1. 在处理数据时，若labelB\=\=1，则labelA=1；若labelA\=\=0，则labelB=0 。
 
 
 
@@ -121,17 +178,20 @@ def get_model():
 
 ```python
 import os
+# os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 import sys
 import re
 from collections import Counter
 import random
+import json
 
 from tqdm import tqdm
 import numpy as np
 import tensorflow.keras as keras
 import tensorflow as tf
 tf.config.run_functions_eagerly(True)
-from keras.metrics import top_k_categorical_accuracy
+tf.get_logger().setLevel(tf.compat.v1.logging.ERROR)
+from keras.metrics import top_k_categorical_accuracy, binary_accuracy
 from keras.layers import *
 from keras.callbacks import *
 from keras.models import Model, load_model
@@ -144,6 +204,7 @@ from transformers import (
     TFBertForPreTraining,
     TFBertModel,
 )
+from sklearn.metrics import confusion_matrix, f1_score, precision_score, recall_score
 ```
 
 
@@ -165,7 +226,7 @@ tf.__version__
 
 
 ```python
-data_path = "sohu2021_open_data/"
+data_path = "sohu2021_open_data_clean/"
 text_max_length = 512
 bert_path = r"../chinese_L-12_H-768_A-12"
 ```
@@ -329,7 +390,7 @@ def get_sample_num(data_path, file_name):
 train_sample_count = get_sample_num(data_path, "train.txt")
 ```
 
-    59638it [00:04, 12249.30it/s]
+    59638it [00:04, 13354.07it/s]
 
 
 
@@ -337,7 +398,7 @@ train_sample_count = get_sample_num(data_path, "train.txt")
 dev_sample_count = get_sample_num(data_path, "valid.txt")
 ```
 
-    9940it [00:00, 12439.17it/s]
+    9940it [00:00, 13041.43it/s]
 
 
 
@@ -693,6 +754,10 @@ def get_data_iterator(data_path, file_name):
         
         label_dict = {key:-1 for key in label_type_to_id.keys()}
         label_dict[label_name] = label_to_id[data[label_name]]
+        if label_dict['labelA'] == 0:
+            label_dict['labelB'] = 0
+        if label_dict['labelB'] == 1:
+            label_dict['labelA'] = 1
 
         yield data['source'], data['target'], label_dict['labelA'], label_dict['labelB']
 ```
@@ -710,10 +775,7 @@ next(it)
 
 
 
-    ('陈立农、小鬼亮相腾讯音乐娱乐盛典红毯金发贵公子+红发脏辫鬼少帅出特色',
-     '今日，腾讯音乐娱乐盛典在澳门举行，虽然坤坤今天没有走红毯，但依旧存在感满分，前辈任贤齐谈及欣赏的后辈时cue到了坤坤，“蔡徐坤，他这么帅气，他也努力在创作。”新生代团体Boystory也表示期待“蔡徐坤哥哥”的舞台。 从乐坛前辈到新生代团体，坤坤简直老少通杀，国民度爆表，他不在江湖，江湖却处处有他的传说，期待今晚蔡徐坤的精彩舞台！ 直播【戳这里】   下载「爱豆App」了解偶像的最新动态 下载「爱豆App」了解偶像的最新动态',
-     -1,
-     0)
+    ('谁能打破科比81分纪录？奥尼尔给出5个候选人，补充利拉德比尔！', 'NBA现役能入名人堂的球星很多，但是能被立铜像只有2人', 0, 0)
 
 
 
@@ -722,7 +784,7 @@ next(it)
 get_sample_num(data_path, "train.txt")
 ```
 
-    59638it [00:04, 12109.11it/s]
+    59638it [00:04, 11996.58it/s]
 
 
 
@@ -811,13 +873,13 @@ next(it)
 
 
 
-    ([array([[ 101,  686, 4518, ..., 4507, 1102,  102],
-             [ 101,  122, 3299, ..., 8024, 1506,  102]]),
-      array([[0, 0, 0, ..., 1, 1, 1],
+    ([array([[ 101, 5381, 5273, ...,    0,    0,    0],
+             [ 101, 3297, 6818, ..., 8024, 4125,  102]]),
+      array([[0, 0, 0, ..., 0, 0, 0],
              [0, 0, 0, ..., 1, 1, 1]]),
-      array([[1, 1, 1, ..., 1, 1, 1],
+      array([[1, 1, 1, ..., 0, 0, 0],
              [1, 1, 1, ..., 1, 1, 1]])],
-     [array([ 0, -1], dtype=int32), array([-1,  0], dtype=int32)])
+     [array([-1,  1], dtype=int32), array([ 0, -1], dtype=int32)])
 
 
 
@@ -825,23 +887,70 @@ next(it)
 
 
 ```python
-def mycrossentropy(y_true, y_pred):
-#     print(y_true)
-    assert len(y_true.shape) == 2
-    y_true_np = y_true.numpy()
-    y_pred_np = y_pred.numpy()
-    tmp = y_pred_np.copy()
-    for i in range(y_true.shape[0]):
-        for j in range(y_true.shape[1]):
-            if y_true_np[i][j] != -1:
-                tmp[i][j] = y_true_np[i][j]
-#     print(y_true_np, y_pred_np, tmp)
+def transform_y(y_true, y_pred):
+    mask_value = tf.constant(-1)
+    mask_y_true = tf.not_equal(tf.cast(y_true, dtype=tf.int32), tf.cast(mask_value, dtype=tf.int32))
+#     print(f"mask_y_true:{mask_y_true}")
+#     y_true_ = tf.cond(tf.equal(y_true, mask_value), lambda: 0, lambda: y_true)
+    y_true_ = tf.cast(y_true, dtype=tf.int32) * tf.cast(mask_y_true, dtype=tf.int32)
+    y_pred_ = tf.cast(y_pred, dtype=tf.float32) * tf.cast(mask_y_true, dtype=tf.float32)
+#     print(f"y_true_:{y_true_}, y_pred_:{y_pred_}")
     
-    tmp_tensor = tf.Variable(tmp)
-#     print(tmp_tensor)
+    return y_true_, y_pred_
+```
 
-    loss = binary_crossentropy(tmp_tensor, y_pred)
+
+```python
+def my_binary_crossentropy(y_true, y_pred):
+#     print(f"y_true:{y_true}, y_pred:{y_pred}")
+    
+    y_true, y_pred = transform_y(y_true, y_pred)
+#     print(f"y_true_:{y_true}, y_pred_:{y_pred}")
+
+    loss = binary_crossentropy(y_true, y_pred)
+#     print(f"loss:{loss}")
     return loss
+```
+
+
+```python
+def tarnsform_metrics(y_true, y_pred):
+    y_true_, y_pred_ = y_true.numpy(), y_pred.numpy()
+    for i in range(y_true_.shape[0]):
+        for j in range(y_true_.shape[1]):
+            if y_true_[i][j] == -1:
+                y_true_[i][j] = 0
+                y_pred_[i][j] = 0
+            if y_pred_[i][j] > 0.5:
+                y_pred_[i][j] = 1
+            else:
+                y_pred_[i][j] = 0
+    return y_true_, y_pred_
+```
+
+
+```python
+def my_binary_accuracy(y_true, y_pred):
+#     print("my_binary_accuracy")
+#     print(f"y_true:{y_true}, y_pred:{y_pred}")
+    
+    y_true_, y_pred_ = tarnsform_metrics(y_true, y_pred)
+#     print(f"y_true_:{y_true_}, y_pred_:{y_pred_}")
+
+    accuracy = binary_accuracy(y_true_, y_pred_)
+    return accuracy
+```
+
+
+```python
+def my_f1_score(y_true, y_pred):
+#     print("my_f1_score")
+#     print(f"y_true:{y_true}, y_pred:{y_pred}")
+    
+    y_true_, y_pred_ = tarnsform_metrics(y_true, y_pred)
+#     print(f"y_true_:{y_true_}, y_pred_:{y_pred_}")
+
+    return f1_score(y_true_, y_pred_, average='macro')
 ```
 
 
@@ -860,15 +969,20 @@ def get_model():
     bert_cls = Lambda(lambda x: x[:, 0])(projection_logits) # 取出[CLS]对应的向量用来做分类
     
     dropout_A = Dropout(0.5)(bert_cls)
-    output_A = Dense(2, activation='sigmoid')(dropout_A)
+    output_A = Dense(1, activation='sigmoid')(dropout_A)
     
     dropout_B = Dropout(0.5)(bert_cls)
-    output_B = Dense(2, activation='sigmoid')(dropout_B)
+    output_B = Dense(1, activation='sigmoid')(dropout_B)
  
     model = Model([input_ids, input_token_type_ids, input_attention_mask], [output_A, output_B])
-    model.compile(loss=mycrossentropy,
+    model.compile(
+                  loss=my_binary_crossentropy,
+#                   loss='binary_crossentropy',
+#                   loss=binary_crossentropy,
                   optimizer=Adam(1e-5),    #用足够小的学习率
-                  metrics=['accuracy'])
+                  metrics=[my_binary_accuracy, my_f1_score]
+#                   metrics='accuracy'
+                 )
     print(model.summary())
     return model
 ```
@@ -915,6 +1029,14 @@ model.save("trained_model/multi_keras_bert_sohu_final.model")
     - This IS NOT expected if you are initializing TFBertForPreTraining from a PyTorch model that you expect to be exactly identical (e.g. initializing a TFBertForSequenceClassification model from a BertForSequenceClassification model).
     All the weights of TFBertForPreTraining were initialized from the PyTorch model.
     If your task is similar to the task the model of the checkpoint was trained on, you can already use TFBertForPreTraining for predictions without further training.
+
+
+    WARNING: AutoGraph could not transform <bound method Socket.send of <zmq.sugar.socket.Socket object at 0x7f74107b3460>> and will run it as-is.
+    Please report this to the TensorFlow team. When filing the bug, set the verbosity to 10 (on Linux, `export AUTOGRAPH_VERBOSITY=10`) and attach the full output.
+    Cause: module, class, method, function, traceback, frame, or code object was expected, got cython_function_or_method
+    To silence this warning, decorate the function with @tf.autograph.experimental.do_not_convert
+
+
     The parameter `return_dict` cannot be set in graph mode and will always be set to `True`.
     The parameters `output_attentions`, `output_hidden_states` and `use_cache` cannot be updated when calling a model.They have to be set to True/False in the config object (i.e.: `config=XConfig.from_pretrained('name', output_attentions=True)`).
     The parameter `return_dict` cannot be set in graph mode and will always be set to `True`.
@@ -940,63 +1062,31 @@ model.save("trained_model/multi_keras_bert_sohu_final.model")
     __________________________________________________________________________________________________
     dropout_38 (Dropout)            (None, 21128)        0           lambda[0][0]                     
     __________________________________________________________________________________________________
-    dense (Dense)                   (None, 2)            42258       dropout_37[0][0]                 
+    dense (Dense)                   (None, 1)            21129       dropout_37[0][0]                 
     __________________________________________________________________________________________________
-    dense_1 (Dense)                 (None, 2)            42258       dropout_38[0][0]                 
+    dense_1 (Dense)                 (None, 1)            21129       dropout_38[0][0]                 
     ==================================================================================================
-    Total params: 102,966,958
-    Trainable params: 102,966,958
+    Total params: 102,924,700
+    Trainable params: 102,924,700
     Non-trainable params: 0
     __________________________________________________________________________________________________
     None
     Epoch 1/2
-    WARNING:tensorflow:Gradients do not exist for variables ['tf_bert_for_pre_training/bert/pooler/dense/kernel:0', 'tf_bert_for_pre_training/bert/pooler/dense/bias:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/kernel:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/bias:0'] when minimizing the loss.
-    WARNING:tensorflow:Gradients do not exist for variables ['tf_bert_for_pre_training/bert/pooler/dense/kernel:0', 'tf_bert_for_pre_training/bert/pooler/dense/bias:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/kernel:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/bias:0'] when minimizing the loss.
-     1/10 [==>...........................] - ETA: 0s - loss: 3.8835 - dense_loss: 0.0451 - dense_1_loss: 3.8384 - dense_accuracy: 0.0000e+00 - dense_1_accuracy: 0.5000WARNING:tensorflow:Gradients do not exist for variables ['tf_bert_for_pre_training/bert/pooler/dense/kernel:0', 'tf_bert_for_pre_training/bert/pooler/dense/bias:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/kernel:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/bias:0'] when minimizing the loss.
-    WARNING:tensorflow:Gradients do not exist for variables ['tf_bert_for_pre_training/bert/pooler/dense/kernel:0', 'tf_bert_for_pre_training/bert/pooler/dense/bias:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/kernel:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/bias:0'] when minimizing the loss.
-     2/10 [=====>........................] - ETA: 1:51 - loss: 3.4529 - dense_loss: 0.2312 - dense_1_loss: 3.2217 - dense_accuracy: 0.0000e+00 - dense_1_accuracy: 0.7500WARNING:tensorflow:Gradients do not exist for variables ['tf_bert_for_pre_training/bert/pooler/dense/kernel:0', 'tf_bert_for_pre_training/bert/pooler/dense/bias:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/kernel:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/bias:0'] when minimizing the loss.
-    WARNING:tensorflow:Gradients do not exist for variables ['tf_bert_for_pre_training/bert/pooler/dense/kernel:0', 'tf_bert_for_pre_training/bert/pooler/dense/bias:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/kernel:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/bias:0'] when minimizing the loss.
-     3/10 [========>.....................] - ETA: 1:33 - loss: 3.5984 - dense_loss: 0.1565 - dense_1_loss: 3.4419 - dense_accuracy: 0.0000e+00 - dense_1_accuracy: 0.6667WARNING:tensorflow:Gradients do not exist for variables ['tf_bert_for_pre_training/bert/pooler/dense/kernel:0', 'tf_bert_for_pre_training/bert/pooler/dense/bias:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/kernel:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/bias:0'] when minimizing the loss.
-    WARNING:tensorflow:Gradients do not exist for variables ['tf_bert_for_pre_training/bert/pooler/dense/kernel:0', 'tf_bert_for_pre_training/bert/pooler/dense/bias:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/kernel:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/bias:0'] when minimizing the loss.
-     4/10 [===========>..................] - ETA: 1:20 - loss: 3.4786 - dense_loss: 0.1174 - dense_1_loss: 3.3611 - dense_accuracy: 0.0000e+00 - dense_1_accuracy: 0.7500WARNING:tensorflow:Gradients do not exist for variables ['tf_bert_for_pre_training/bert/pooler/dense/kernel:0', 'tf_bert_for_pre_training/bert/pooler/dense/bias:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/kernel:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/bias:0'] when minimizing the loss.
-    WARNING:tensorflow:Gradients do not exist for variables ['tf_bert_for_pre_training/bert/pooler/dense/kernel:0', 'tf_bert_for_pre_training/bert/pooler/dense/bias:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/kernel:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/bias:0'] when minimizing the loss.
-     5/10 [==============>...............] - ETA: 1:05 - loss: 2.7876 - dense_loss: 0.0943 - dense_1_loss: 2.6933 - dense_accuracy: 0.0000e+00 - dense_1_accuracy: 0.6000WARNING:tensorflow:Gradients do not exist for variables ['tf_bert_for_pre_training/bert/pooler/dense/kernel:0', 'tf_bert_for_pre_training/bert/pooler/dense/bias:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/kernel:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/bias:0'] when minimizing the loss.
-    WARNING:tensorflow:Gradients do not exist for variables ['tf_bert_for_pre_training/bert/pooler/dense/kernel:0', 'tf_bert_for_pre_training/bert/pooler/dense/bias:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/kernel:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/bias:0'] when minimizing the loss.
-     6/10 [=================>............] - ETA: 51s - loss: 2.9803 - dense_loss: 0.0930 - dense_1_loss: 2.8873 - dense_accuracy: 0.0000e+00 - dense_1_accuracy: 0.5833 WARNING:tensorflow:Gradients do not exist for variables ['tf_bert_for_pre_training/bert/pooler/dense/kernel:0', 'tf_bert_for_pre_training/bert/pooler/dense/bias:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/kernel:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/bias:0'] when minimizing the loss.
-    WARNING:tensorflow:Gradients do not exist for variables ['tf_bert_for_pre_training/bert/pooler/dense/kernel:0', 'tf_bert_for_pre_training/bert/pooler/dense/bias:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/kernel:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/bias:0'] when minimizing the loss.
-     7/10 [====================>.........] - ETA: 39s - loss: 2.5808 - dense_loss: 0.0807 - dense_1_loss: 2.5001 - dense_accuracy: 0.0000e+00 - dense_1_accuracy: 0.5000WARNING:tensorflow:Gradients do not exist for variables ['tf_bert_for_pre_training/bert/pooler/dense/kernel:0', 'tf_bert_for_pre_training/bert/pooler/dense/bias:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/kernel:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/bias:0'] when minimizing the loss.
-    WARNING:tensorflow:Gradients do not exist for variables ['tf_bert_for_pre_training/bert/pooler/dense/kernel:0', 'tf_bert_for_pre_training/bert/pooler/dense/bias:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/kernel:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/bias:0'] when minimizing the loss.
-     8/10 [=======================>......] - ETA: 27s - loss: 2.5830 - dense_loss: 0.3787 - dense_1_loss: 2.2043 - dense_accuracy: 0.0625 - dense_1_accuracy: 0.4375    WARNING:tensorflow:Gradients do not exist for variables ['tf_bert_for_pre_training/bert/pooler/dense/kernel:0', 'tf_bert_for_pre_training/bert/pooler/dense/bias:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/kernel:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/bias:0'] when minimizing the loss.
-    WARNING:tensorflow:Gradients do not exist for variables ['tf_bert_for_pre_training/bert/pooler/dense/kernel:0', 'tf_bert_for_pre_training/bert/pooler/dense/bias:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/kernel:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/bias:0'] when minimizing the loss.
-     9/10 [==========================>...] - ETA: 13s - loss: 2.3130 - dense_loss: 0.3367 - dense_1_loss: 1.9764 - dense_accuracy: 0.0556 - dense_1_accuracy: 0.3889WARNING:tensorflow:Gradients do not exist for variables ['tf_bert_for_pre_training/bert/pooler/dense/kernel:0', 'tf_bert_for_pre_training/bert/pooler/dense/bias:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/kernel:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/bias:0'] when minimizing the loss.
-    WARNING:tensorflow:Gradients do not exist for variables ['tf_bert_for_pre_training/bert/pooler/dense/kernel:0', 'tf_bert_for_pre_training/bert/pooler/dense/bias:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/kernel:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/bias:0'] when minimizing the loss.
-    10/10 [==============================] - ETA: 0s - loss: 2.1450 - dense_loss: 0.3110 - dense_1_loss: 1.8340 - dense_accuracy: 0.0500 - dense_1_accuracy: 0.4000 
-    Epoch 00001: val_loss did not improve from 3.28840
-    10/10 [==============================] - 143s 14s/step - loss: 2.1450 - dense_loss: 0.3110 - dense_1_loss: 1.8340 - dense_accuracy: 0.0500 - dense_1_accuracy: 0.4000 - val_loss: 0.4693 - val_dense_loss: 0.0943 - val_dense_1_loss: 0.3749 - val_dense_accuracy: 0.0000e+00 - val_dense_1_accuracy: 0.5000
+
+
+    /home/zsd-server/miniconda3/envs/my/lib/python3.8/site-packages/transformers/tokenization_utils_base.py:2162: FutureWarning: The `truncation_strategy` argument is deprecated and will be removed in a future version, use `truncation=True` to truncate examples to a max length. You can give a specific length with `max_length` (e.g. `max_length=45`) or leave max_length to None to truncate to the maximal input size of the model (e.g. 512 for Bert).  If you have pairs of inputs, you can give a specific truncation strategy selected among `truncation='only_first'` (will only truncate the first sentence in the pairs) `truncation='only_second'` (will only truncate the second sentence in the pairs) or `truncation='longest_first'` (will iteratively remove tokens from the longest sentence in the pairs).
+      warnings.warn(
+    /home/zsd-server/miniconda3/envs/my/lib/python3.8/site-packages/tensorflow/python/data/ops/dataset_ops.py:3349: UserWarning: Even though the tf.config.experimental_run_functions_eagerly option is set, this option does not apply to tf.data functions. tf.data functions are still traced and executed as graphs.
+      warnings.warn(
+
+
+    10/10 [==============================] - ETA: 0s - loss: 2.9102 - dense_loss: 0.7665 - dense_1_loss: 2.1437 - dense_my_binary_accuracy: 0.8500 - dense_my_f1_score: 0.8000 - dense_1_my_binary_accuracy: 0.6500 - dense_1_my_f1_score: 0.5667
+    Epoch 00001: val_loss improved from -inf to 1.98809, saving model to trained_model/multi_keras_bert_sohu.hdf5
+    10/10 [==============================] - 111s 11s/step - loss: 2.9102 - dense_loss: 0.7665 - dense_1_loss: 2.1437 - dense_my_binary_accuracy: 0.8500 - dense_my_f1_score: 0.8000 - dense_1_my_binary_accuracy: 0.6500 - dense_1_my_f1_score: 0.5667 - val_loss: 1.9881 - val_dense_loss: 1.9870 - val_dense_1_loss: 0.0011 - val_dense_my_binary_accuracy: 0.7500 - val_dense_my_f1_score: 0.6667 - val_dense_1_my_binary_accuracy: 1.0000 - val_dense_1_my_f1_score: 1.0000
     Epoch 2/2
-    WARNING:tensorflow:Gradients do not exist for variables ['tf_bert_for_pre_training/bert/pooler/dense/kernel:0', 'tf_bert_for_pre_training/bert/pooler/dense/bias:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/kernel:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/bias:0'] when minimizing the loss.
-    WARNING:tensorflow:Gradients do not exist for variables ['tf_bert_for_pre_training/bert/pooler/dense/kernel:0', 'tf_bert_for_pre_training/bert/pooler/dense/bias:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/kernel:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/bias:0'] when minimizing the loss.
-     1/10 [==>...........................] - ETA: 0s - loss: 0.5968 - dense_loss: 0.2761 - dense_1_loss: 0.3207 - dense_accuracy: 0.0000e+00 - dense_1_accuracy: 0.5000WARNING:tensorflow:Gradients do not exist for variables ['tf_bert_for_pre_training/bert/pooler/dense/kernel:0', 'tf_bert_for_pre_training/bert/pooler/dense/bias:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/kernel:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/bias:0'] when minimizing the loss.
-    WARNING:tensorflow:Gradients do not exist for variables ['tf_bert_for_pre_training/bert/pooler/dense/kernel:0', 'tf_bert_for_pre_training/bert/pooler/dense/bias:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/kernel:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/bias:0'] when minimizing the loss.
-     2/10 [=====>........................] - ETA: 46s - loss: 0.4425 - dense_loss: 0.1785 - dense_1_loss: 0.2639 - dense_accuracy: 0.0000e+00 - dense_1_accuracy: 0.5000WARNING:tensorflow:Gradients do not exist for variables ['tf_bert_for_pre_training/bert/pooler/dense/kernel:0', 'tf_bert_for_pre_training/bert/pooler/dense/bias:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/kernel:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/bias:0'] when minimizing the loss.
-    WARNING:tensorflow:Gradients do not exist for variables ['tf_bert_for_pre_training/bert/pooler/dense/kernel:0', 'tf_bert_for_pre_training/bert/pooler/dense/bias:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/kernel:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/bias:0'] when minimizing the loss.
-     3/10 [========>.....................] - ETA: 54s - loss: 1.5856 - dense_loss: 0.1768 - dense_1_loss: 1.4089 - dense_accuracy: 0.0000e+00 - dense_1_accuracy: 0.5000WARNING:tensorflow:Gradients do not exist for variables ['tf_bert_for_pre_training/bert/pooler/dense/kernel:0', 'tf_bert_for_pre_training/bert/pooler/dense/bias:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/kernel:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/bias:0'] when minimizing the loss.
-    WARNING:tensorflow:Gradients do not exist for variables ['tf_bert_for_pre_training/bert/pooler/dense/kernel:0', 'tf_bert_for_pre_training/bert/pooler/dense/bias:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/kernel:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/bias:0'] when minimizing the loss.
-     4/10 [===========>..................] - ETA: 53s - loss: 1.5564 - dense_loss: 0.4666 - dense_1_loss: 1.0898 - dense_accuracy: 0.1250 - dense_1_accuracy: 0.3750    WARNING:tensorflow:Gradients do not exist for variables ['tf_bert_for_pre_training/bert/pooler/dense/kernel:0', 'tf_bert_for_pre_training/bert/pooler/dense/bias:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/kernel:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/bias:0'] when minimizing the loss.
-    WARNING:tensorflow:Gradients do not exist for variables ['tf_bert_for_pre_training/bert/pooler/dense/kernel:0', 'tf_bert_for_pre_training/bert/pooler/dense/bias:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/kernel:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/bias:0'] when minimizing the loss.
-     5/10 [==============>...............] - ETA: 48s - loss: 1.2798 - dense_loss: 0.3747 - dense_1_loss: 0.9051 - dense_accuracy: 0.1000 - dense_1_accuracy: 0.4000WARNING:tensorflow:Gradients do not exist for variables ['tf_bert_for_pre_training/bert/pooler/dense/kernel:0', 'tf_bert_for_pre_training/bert/pooler/dense/bias:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/kernel:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/bias:0'] when minimizing the loss.
-    WARNING:tensorflow:Gradients do not exist for variables ['tf_bert_for_pre_training/bert/pooler/dense/kernel:0', 'tf_bert_for_pre_training/bert/pooler/dense/bias:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/kernel:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/bias:0'] when minimizing the loss.
-     6/10 [=================>............] - ETA: 40s - loss: 1.1164 - dense_loss: 0.3158 - dense_1_loss: 0.8006 - dense_accuracy: 0.0833 - dense_1_accuracy: 0.3333WARNING:tensorflow:Gradients do not exist for variables ['tf_bert_for_pre_training/bert/pooler/dense/kernel:0', 'tf_bert_for_pre_training/bert/pooler/dense/bias:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/kernel:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/bias:0'] when minimizing the loss.
-    WARNING:tensorflow:Gradients do not exist for variables ['tf_bert_for_pre_training/bert/pooler/dense/kernel:0', 'tf_bert_for_pre_training/bert/pooler/dense/bias:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/kernel:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/bias:0'] when minimizing the loss.
-     7/10 [====================>.........] - ETA: 30s - loss: 1.1638 - dense_loss: 0.4592 - dense_1_loss: 0.7046 - dense_accuracy: 0.1429 - dense_1_accuracy: 0.2857WARNING:tensorflow:Gradients do not exist for variables ['tf_bert_for_pre_training/bert/pooler/dense/kernel:0', 'tf_bert_for_pre_training/bert/pooler/dense/bias:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/kernel:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/bias:0'] when minimizing the loss.
-    WARNING:tensorflow:Gradients do not exist for variables ['tf_bert_for_pre_training/bert/pooler/dense/kernel:0', 'tf_bert_for_pre_training/bert/pooler/dense/bias:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/kernel:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/bias:0'] when minimizing the loss.
-     8/10 [=======================>......] - ETA: 21s - loss: 1.4686 - dense_loss: 0.8514 - dense_1_loss: 0.6172 - dense_accuracy: 0.2500 - dense_1_accuracy: 0.2500WARNING:tensorflow:Gradients do not exist for variables ['tf_bert_for_pre_training/bert/pooler/dense/kernel:0', 'tf_bert_for_pre_training/bert/pooler/dense/bias:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/kernel:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/bias:0'] when minimizing the loss.
-    WARNING:tensorflow:Gradients do not exist for variables ['tf_bert_for_pre_training/bert/pooler/dense/kernel:0', 'tf_bert_for_pre_training/bert/pooler/dense/bias:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/kernel:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/bias:0'] when minimizing the loss.
-     9/10 [==========================>...] - ETA: 10s - loss: 1.3400 - dense_loss: 0.7723 - dense_1_loss: 0.5677 - dense_accuracy: 0.2222 - dense_1_accuracy: 0.2222WARNING:tensorflow:Gradients do not exist for variables ['tf_bert_for_pre_training/bert/pooler/dense/kernel:0', 'tf_bert_for_pre_training/bert/pooler/dense/bias:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/kernel:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/bias:0'] when minimizing the loss.
-    WARNING:tensorflow:Gradients do not exist for variables ['tf_bert_for_pre_training/bert/pooler/dense/kernel:0', 'tf_bert_for_pre_training/bert/pooler/dense/bias:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/kernel:0', 'tf_bert_for_pre_training/nsp___cls/seq_relationship/bias:0'] when minimizing the loss.
-    10/10 [==============================] - ETA: 0s - loss: 1.2521 - dense_loss: 0.7218 - dense_1_loss: 0.5304 - dense_accuracy: 0.2000 - dense_1_accuracy: 0.2000 
-    Epoch 00002: val_loss improved from 3.28840 to 4.79835, saving model to trained_model/multi_keras_bert_sohu.hdf5
-    10/10 [==============================] - 120s 12s/step - loss: 1.2521 - dense_loss: 0.7218 - dense_1_loss: 0.5304 - dense_accuracy: 0.2000 - dense_1_accuracy: 0.2000 - val_loss: 4.7983 - val_dense_loss: 1.7329 - val_dense_1_loss: 3.0654 - val_dense_accuracy: 0.5000 - val_dense_1_accuracy: 0.5000
+    10/10 [==============================] - ETA: 0s - loss: 3.0176 - dense_loss: 2.8052 - dense_1_loss: 0.2125 - dense_my_binary_accuracy: 0.7500 - dense_my_f1_score: 0.7000 - dense_1_my_binary_accuracy: 0.9000 - dense_1_my_f1_score: 0.8667 
+    Epoch 00002: val_loss improved from 1.98809 to 2.56778, saving model to trained_model/multi_keras_bert_sohu.hdf5
+    10/10 [==============================] - 114s 11s/step - loss: 3.0176 - dense_loss: 2.8052 - dense_1_loss: 0.2125 - dense_my_binary_accuracy: 0.7500 - dense_my_f1_score: 0.7000 - dense_1_my_binary_accuracy: 0.9000 - dense_1_my_f1_score: 0.8667 - val_loss: 2.5678 - val_dense_loss: 2.5678 - val_dense_1_loss: 7.7785e-06 - val_dense_my_binary_accuracy: 0.5000 - val_dense_my_f1_score: 0.3333 - val_dense_1_my_binary_accuracy: 1.0000 - val_dense_1_my_f1_score: 1.0000
 
 
     The parameter `return_dict` cannot be set in graph mode and will always be set to `True`.
@@ -1072,13 +1162,11 @@ model.save("trained_model/multi_keras_bert_sohu_final.model")
     The parameter `return_dict` cannot be set in graph mode and will always be set to `True`.
     The parameters `output_attentions`, `output_hidden_states` and `use_cache` cannot be updated when calling a model.They have to be set to True/False in the config object (i.e.: `config=XConfig.from_pretrained('name', output_attentions=True)`).
     The parameter `return_dict` cannot be set in graph mode and will always be set to `True`.
-
-
-    INFO:tensorflow:Assets written to: trained_model/multi_keras_bert_sohu_final.model/assets
 
 
 
 ```python
+dev_dataset_iterator = batch_iter(data_path, "valid.txt", tokenizer, batch_size=1)
 data = next(dev_dataset_iterator)
 model.predict(data[0]), data[1]
 ```
@@ -1086,11 +1174,9 @@ model.predict(data[0]), data[1]
 
 
 
-    ([array([[0.00140512, 0.9738952 ],
-             [0.00388548, 0.92772067]], dtype=float32),
-      array([[4.7793665e-06, 9.8906010e-02],
-             [6.6167116e-04, 2.2251016e-01]], dtype=float32)],
-     [array([-1,  1], dtype=int32), array([ 0, -1], dtype=int32)])
+    ([array([[0.00284165]], dtype=float32),
+      array([[3.6964306e-05]], dtype=float32)],
+     [array([1], dtype=int32), array([-1], dtype=int32)])
 
 
 
