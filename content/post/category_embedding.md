@@ -1,7 +1,7 @@
 ---
 title: "将类别特征通过Embedding层映射并进行拼接"
-date: 2021-03-31T01:14:58+08:00
-lastmod: 2021-03-31T01:14:58+08:00
+date: 2021-04-28T02:53:58+08:00
+lastmod: 2021-04-28T02:53:58+08:00
 draft: false
 keywords: []
 description: ""
