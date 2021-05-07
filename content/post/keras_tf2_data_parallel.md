@@ -1089,8 +1089,10 @@ for epoch in range(epochs):
         
         loss_ = tf.cast(bin_loss, dtype=tf.float32) * tf.cast(weight, dtype=tf.float32)
     #     print(f"loss_: {loss_}")
+        loss_abs = tf.abs(loss_)
+    #     print(f"loss_abs: {loss_abs}")
 
-        return loss_
+    return loss_abs
     ```
 
 
