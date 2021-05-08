@@ -122,6 +122,6 @@ menu: main
 -------------------------------------------------------------------
 -------------------------------------------------------------------
 
-[pdf版简历](/resume_20210414.pdf)
+[pdf版简历](/resume_20210509.pdf)
 
 本科时期的旧博客:<a href="http://zhangshengdong29.lofter.com/view" target="_blank"> http://zhangshengdong29.lofter.com/view </a>
