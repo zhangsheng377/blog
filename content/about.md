@@ -101,7 +101,9 @@ menu: main
 
   6. 日常分享技术总结，并在内网发博客 10 余篇，累计 UV 阅读量 3000 多人。
 
-  7. 参加 科赛Kesci 的 「二分类算法」提供银行精准营销解决方案 比赛，**取得全球100+名次**，获得一张100美元AWS代金券。
+* **个人项目**：
+
+  1. 参加 科赛Kesci 的 「二分类算法」提供银行精准营销解决方案 比赛，**取得全球100+名次**，获得一张100美元AWS代金券。
 
 ### 华为 消费者云服务HiCloud开发部 `2020.5-至今`
 
@@ -117,11 +119,13 @@ menu: main
 
   4. 同时做过 文章地域模型、时效模型、负面文章模型、友商吹捧文章模型等，主管NLP领域的分类模型。
 
-  5. 编写股票监控平台。采用docker部署爬虫模块、量化指标算法模块、订阅分发模块等，完成爬取股票数据存入通用数据库接口，并缓存至redis；算法模块处理数据，将报警信息存入redis；订阅分发模块监控到有报警信息后主动向微信订阅用户推送；同时部署有微信服务器，完成与微信用户的交互。[https://www.zhangshengdong.com/post/monitor_stock_system/](https://www.zhangshengdong.com/post/monitor_stock_system/)
+* **个人项目**：
+
+  1. 编写股票监控平台。采用docker部署爬虫模块、量化指标算法模块、订阅分发模块等，完成爬取股票数据存入通用数据库接口，并缓存至redis；算法模块处理数据，将报警信息存入redis；订阅分发模块监控到有报警信息后主动向微信订阅用户推送；同时部署有微信服务器，完成与微信用户的交互。[https://www.zhangshengdong.com/post/monitor_stock_system/](https://www.zhangshengdong.com/post/monitor_stock_system/)
 
 -------------------------------------------------------------------
 -------------------------------------------------------------------
 
-[pdf版简历](/resume_20210509.pdf)
+[pdf版简历](/resume_20210818.pdf)
 
 本科时期的旧博客:<a href="http://zhangshengdong29.lofter.com/view" target="_blank"> http://zhangshengdong29.lofter.com/view </a>
