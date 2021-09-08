@@ -64,7 +64,7 @@ copyright = ""            # default: author.name ↓        # 默认为下面配
   description = "张胜东的博客"
 
   # paginate of archives, tags and categories             # 归档、标签、分类每页显示的文章数目，建议修改为一个较大的值
-  archivePaginate = 5
+  archivePaginate = 50
 
   # show 'xx Posts In Total' in archive page ?            # 是否在归档页显示文章的总数
   showArchiveCount = true
@@ -100,9 +100,9 @@ copyright = ""            # default: author.name ↓        # 默认为下面配
   livereUID = ""            # LiveRe UID                  # 来必力
 
   baiduPush = false        # baidu push                  # 百度
-  baiduAnalytics = ""      # Baidu Analytics
-  baiduVerification = ""   # Baidu Verification
-  googleVerification = ""  # Google Verification         # 谷歌
+  baiduAnalytics = "c602db2501643f661d9789f9e9707386"      # Baidu Analytics
+  baiduVerification = "qWR9jJPJ9e"   # Baidu Verification
+  googleVerification = "s9FkJZw4X2alyC8-nsdZgiPHBwX6uqr1QVNxRaGfDKY"  # Google Verification         # 谷歌
 
   # Link custom CSS and JS assets
   #   (relative to /static/css and /static/js respectively)
@@ -110,6 +110,9 @@ copyright = ""            # default: author.name ↓        # 默认为下面配
   customJS = []
 
   uglyURLs = false          # please keep same with uglyurls setting
+
+  # Show language selector for multilingual site.
+  showLanguageSelector = true
 
   [params.publicCDN]        # load these files from public cdn                          # 启用公共CDN，需自行定义
     enable = true
@@ -141,10 +144,10 @@ copyright = ""            # default: author.name ↓        # 默认为下面配
     repo = ""               # The repo to store comments
 
   [params.gitalk]           # Gitalk is a comment system based on GitHub issues. see https://github.com/gitalk/gitalk
-    owner = ""              # Your GitHub ID
-    repo = ""               # The repo to store comments
-    clientId = ""           # Your client ID
-    clientSecret = ""       # Your client secret
+    owner = "zhangsheng377"              # Your GitHub ID
+    repo = "https://github.com/zhangsheng377/blog"               # The repo to store comments
+    clientId = "f1e7fb96ce7056caa8c3"           # Your client ID
+    clientSecret = "b54496e9533ed7b673ec5297ec26bb98e9b94f42"       # Your client secret
 
   # Valine.
   # You can get your appid and appkey from https://leancloud.cn
@@ -201,6 +204,13 @@ copyright = ""            # default: author.name ↓        # 默认为下面配
     anonymizeIP = true      # 12.214.31.144 -> 12.214.31.0
   [privacy.youtube]
     privacyEnhanced = true
+
+# see https://gohugo.io/getting-started/configuration-markup
+[markup]
+  [markup.tableOfContents]
+    startLevel = 1
+  [markup.goldmark.renderer]
+    unsafe = true
 
 # 将下面这段配置取消注释可以使 hugo 生成 .md 文件
 # Uncomment these options to make hugo output .md files.
