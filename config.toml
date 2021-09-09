@@ -94,8 +94,8 @@ copyright = ""            # default: author.name ↓        # 默认为下面配
   linkToMarkDown = false    # Only effective when hugo will output .md files.           # 链接到markdown原始文件（仅当允许hugo生成markdown文件时有效）
   contentCopyright = ''     # e.g. '<a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank">CC BY-NC-ND 4.0</a>'
 
-  changyanAppid = "cyvEeXl8A"        # Changyan app id             # 畅言
-  changyanAppkey = "prod_a81dff57bcc2251a5f98180dc0138c4f"       # Changyan app key
+  changyanAppid = ""        # Changyan app id             # 畅言
+  changyanAppkey = ""       # Changyan app key
 
   livereUID = ""            # LiveRe UID                  # 来必力
 
@@ -144,10 +144,10 @@ copyright = ""            # default: author.name ↓        # 默认为下面配
     repo = ""               # The repo to store comments
 
   [params.gitalk]           # Gitalk is a comment system based on GitHub issues. see https://github.com/gitalk/gitalk
-    owner = ""              # Your GitHub ID
-    repo = ""               # The repo to store comments
-    clientId = ""           # Your client ID
-    clientSecret = ""       # Your client secret
+    owner = "zhangsheng377"              # Your GitHub ID
+    repo = "https://github.com/zhangsheng377/blog"               # The repo to store comments
+    clientId = "f1e7fb96ce7056caa8c3"           # Your client ID
+    clientSecret = "b54496e9533ed7b673ec5297ec26bb98e9b94f42"       # Your client secret
 
   # Valine.
   # You can get your appid and appkey from https://leancloud.cn
