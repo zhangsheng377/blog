@@ -112,9 +112,9 @@ comment: false
 
 * **主要项目**：
 
-  1. 优质文章模型（浏览器每日精选栏目）：将文章embedding，拼接上文章的各结构特征（段落、字数、图片数等），接上输出层子网络，判断文章优质与否。
+  1. 优质文章模型（浏览器每日精选栏目）：经bert得文章embedding(即文章的语义信息)，再拼接上文章的结构信息（段落、字数、图片数、来源、作者等，经过embedding和标准化），接上双塔网络，判断文章优质与否，以及属于哪个优质类别。
 
-  2. 层次文章分类模型：设计多任务的Bert模型，利用各层次分类之间天然的关联性，同时学习多个label，在学习阶段就即可自动进行层次分类校准。推断时，获取各层分类类别的概率，采用beam search，进行有限度的扩展搜索。
+  2. 层次文章分类模型：根据各层次分类之间天然的关联性，同时学习多个label，设计多任务的Bert模型（将一级分类网络的最后一级输出，拼上之前bert输出的embedding，再进二级分类网络，以此类推），在学习阶段就即可自动进行层次分类校准。并且，在推断时，可以获取各层分类类别的概率，采用beam search，进行有限度的扩展搜索。
 
   3. 搜索直达功能的排序模型：打通FTRL模型上线，在产品诞生之初快速赋能；后切换到DCN模型，自动进行特征交叉；现转向ESMM模型，多任务，同时训练 CTR 和 CVR 指标，以期真正提升 CTCVR 业务指标。
 
@@ -122,11 +122,11 @@ comment: false
 
 * **个人项目**：
 
-  1. 编写股票监控平台。采用docker部署爬虫模块、量化指标算法模块、订阅分发模块等，完成爬取股票数据存入通用数据库接口，并缓存至redis；算法模块处理数据，将报警信息存入redis；订阅分发模块监控到有报警信息后主动向微信订阅用户推送；同时部署有微信服务器，完成与微信用户的交互。[https://www.zhangshengdong.com/post/monitor_stock_system/](https://www.zhangshengdong.com/post/monitor_stock_system/)
+  1. 编写股票监控平台。采用docker部署爬虫模块、量化指标算法模块、订阅分发模块等，各模块之间使用rabbitmq和redis，以及mongodb连接。爬虫模块爬取股票数据存入通用数据库接口（mongodb），并缓存至redis；算法模块监控rabbitmq，从而处理数据并将报警信息存入redis；订阅分发模块监控到有报警信息后主动向微信订阅用户推送；同时部署有微信服务器，完成与微信用户的交互。[https://www.zhangshengdong.com/post/monitor_stock_system/](https://www.zhangshengdong.com/post/monitor_stock_system/)
 
 -------------------------------------------------------------------
 -------------------------------------------------------------------
 
-[pdf版简历](/resume_20210818.pdf)
+[pdf版简历](/resume_20220119.pdf)
 
 本科时期的旧博客:<a href="http://zhangshengdong29.lofter.com/view" target="_blank"> http://zhangshengdong29.lofter.com/view </a>
