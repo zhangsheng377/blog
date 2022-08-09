@@ -89,11 +89,11 @@ services:
 于是，我用Check酱监控了b站up主的更新(主要是虽然b站有动态-投稿，可以只看关注的up主更新的视频，但等我发现这个功能时，我已经把2000个关注都点满了。。。)，以及京东商品的价格，还有微信公众号的更新。
 
 这边借用官方的图：
-![Check酱浏览器插件](https://gitee.com/easychen/checkchan-dist/raw/master/image/20220521132637.png)
+![Check酱浏览器插件](https://github.com/easychen/checkchan-dist/blob/master/image/20220526194209.png)
 
 然后配置Server酱，将监控信息发送到钉钉机器人通道：
-![Check酱配置Server酱](https://gitee.com/easychen/checkchan-dist/raw/master/image/20220521224002.png)
-![钉钉机器人通道](https://gitee.com/easychen/checkchan-dist/raw/master/image/20220521224356.png)
+![Check酱配置Server酱](https://github.com/easychen/checkchan-dist/blob/master/image/20220521224002.png)
+![钉钉机器人通道](https://github.com/easychen/checkchan-dist/blob/master/image/20220521224356.png)
 ![钉钉机器人](/images/checkchan_dingding.jpg)
 
 现在看起来一切都很完美，但很快我就发现cookie是有时效的，所以我隔几天就要去登录一下。这样显然就麻烦了。
