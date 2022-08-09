@@ -86,7 +86,7 @@ services:
       - "x:x" # 云端
 ```
 
-于是，我用Check酱监控了b站up主的更新，以及京东商品的价格。
+于是，我用Check酱监控了b站up主的更新(主要是虽然b站有动态-投稿，可以只看关注的up主更新的视频，但等我发现这个功能时，我已经把2000个关注都点满了。。。)，以及京东商品的价格，还有微信公众号的更新。
 
 这边借用官方的图：
 ![Check酱浏览器插件](https://gitee.com/easychen/checkchan-dist/raw/master/image/20220521132637.png)
