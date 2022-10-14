@@ -114,7 +114,7 @@ copyright = ""            # default: author.name ↓        # 默认为下面配
   # Show language selector for multilingual site.
   showLanguageSelector = true
 
-  [footer]
+  [params.footer]
     customText = "<a href="https://beian.miit.gov.cn/" target="_blank">苏ICP备15009593号-1</a>"
 
   [params.publicCDN]        # load these files from public cdn                          # 启用公共CDN，需自行定义
