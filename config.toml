@@ -92,7 +92,7 @@ copyright = ""            # default: author.name ↓        # 默认为下面配
 
   postMetaInFooter = true   # contain author, lastMod, markdown link, license           # 包含作者，上次修改时间，markdown链接，许可信息
   linkToMarkDown = false    # Only effective when hugo will output .md files.           # 链接到markdown原始文件（仅当允许hugo生成markdown文件时有效）
-  contentCopyright = '<a href="https://beian.miit.gov.cn/" target="_blank">苏ICP备15009593号-1</a>'     # e.g. '<a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank">CC BY-NC-ND 4.0</a>'
+  contentCopyright = ''     # e.g. '<a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank">CC BY-NC-ND 4.0</a>'
 
   changyanAppid = ""        # Changyan app id             # 畅言
   changyanAppkey = ""       # Changyan app key
@@ -113,6 +113,9 @@ copyright = ""            # default: author.name ↓        # 默认为下面配
 
   # Show language selector for multilingual site.
   showLanguageSelector = true
+
+  [footer]
+    customText = "<a href="https://beian.miit.gov.cn/" target="_blank">苏ICP备15009593号-1</a>"
 
   [params.publicCDN]        # load these files from public cdn                          # 启用公共CDN，需自行定义
     enable = true
