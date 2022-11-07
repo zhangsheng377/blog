@@ -83,7 +83,7 @@ sequenceDiagrams:
 
 修改 /etc/cups/cupsd.conf :
 
-在\<location\/\>之上，插入：
+在location之上，插入：
 
 ```shell
 WebInterface Yes
@@ -92,7 +92,7 @@ ServerAlias *
 
 WebInterface表示允许从网上打印；
 
-ServerAlias * 表示允许所有域名
+ServerAlias \* 表示允许所有域名
 
 ## 效果
 
