@@ -79,6 +79,21 @@ sequenceDiagrams:
 
 然后，不要自己编译foo2zjs，直接在apt里搜索foo2zjs，发现，哈，竟然有两个foo2zjs的包：printer-driver-foo2zjs、printer-driver-foo2zjs-common。于是，直接装上这两个包再试试，哈，成功啦！
 
+### 允许外网访问
+
+修改 /etc/cups/cupsd.conf :
+
+在\<location\/\>之上，插入：
+
+```shell
+WebInterface Yes
+ServerAlias *
+```
+
+WebInterface表示允许从网上打印；
+
+ServerAlias * 表示允许所有域名
+
 ## 效果
 
 服务器网页上：
