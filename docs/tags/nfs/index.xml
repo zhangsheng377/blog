@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>nfs on 张胜东的博客</title>
+    <link>https://www.zhangshengdong.com/tags/nfs/</link>
+    <description>Recent content in nfs on 张胜东的博客</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>&lt;a href=&#34;https://beian.miit.gov.cn/&#34; target=&#34;_blank&#34;&gt;苏ICP备15009593号-1&lt;/a&gt;</copyright>
+    <lastBuildDate>Sat, 20 Nov 2021 17:51:58 +0800</lastBuildDate>
+    
+	<atom:link href="https://www.zhangshengdong.com/tags/nfs/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>esxi虚拟机安装黑群晖,nfs挂载</title>
+      <link>https://www.zhangshengdong.com/post/esxi_dms/</link>
+      <pubDate>Sat, 20 Nov 2021 17:51:58 +0800</pubDate>
+      
+      <guid>https://www.zhangshengdong.com/post/esxi_dms/</guid>
+      <description>背景 之前用esxi安装虚拟机的时候，因为贪图性能，所以一直用的是厚置备硬盘格式。直到前不久，对我的服务器虚拟机清理了一堆冗余文件后，发现es</description>
+    </item>
+    
+  </channel>
+</rss>

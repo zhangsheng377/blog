@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>stock on 张胜东的博客</title>
+    <link>https://www.zhangshengdong.com/tags/stock/</link>
+    <description>Recent content in stock on 张胜东的博客</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>&lt;a href=&#34;https://beian.miit.gov.cn/&#34; target=&#34;_blank&#34;&gt;苏ICP备15009593号-1&lt;/a&gt;</copyright>
+    <lastBuildDate>Sun, 05 Apr 2020 16:33:37 +0800</lastBuildDate>
+    
+	<atom:link href="https://www.zhangshengdong.com/tags/stock/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>與情预测股票</title>
+      <link>https://www.zhangshengdong.com/post/emotion-predict-stock/</link>
+      <pubDate>Sun, 05 Apr 2020 16:33:37 +0800</pubDate>
+      
+      <guid>https://www.zhangshengdong.com/post/emotion-predict-stock/</guid>
+      <description>项目地址: https://github.com/zhangsheng377/emotion-predict-stock 已完成项 使用爬虫爬取股民对于股票的评论。(目前是爬取雪球网上人们对于小米公司的评论) 对人们的评论做情感分析，得到评论的情感得分。</description>
+    </item>
+    
+  </channel>
+</rss>

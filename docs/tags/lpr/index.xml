@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>lpr on 张胜东的博客</title>
+    <link>https://www.zhangshengdong.com/tags/lpr/</link>
+    <description>Recent content in lpr on 张胜东的博客</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>&lt;a href=&#34;https://beian.miit.gov.cn/&#34; target=&#34;_blank&#34;&gt;苏ICP备15009593号-1&lt;/a&gt;</copyright>
+    <lastBuildDate>Fri, 18 Nov 2022 22:49:58 +0800</lastBuildDate>
+    
+	<atom:link href="https://www.zhangshengdong.com/tags/lpr/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>远程打印文件</title>
+      <link>https://www.zhangshengdong.com/post/lpr_remote/</link>
+      <pubDate>Fri, 18 Nov 2022 22:49:58 +0800</pubDate>
+      
+      <guid>https://www.zhangshengdong.com/post/lpr_remote/</guid>
+      <description>背景 之前弄了个网络打印机服务器cups，是可以添加打印机然后发起打印的，而手机、电脑却又只支持在局域网内添加打印机，所以一旦我在外面的话，就</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>中间层 on 张胜东的博客</title>
+    <link>https://www.zhangshengdong.com/tags/%E4%B8%AD%E9%97%B4%E5%B1%82/</link>
+    <description>Recent content in 中间层 on 张胜东的博客</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>&lt;a href=&#34;https://beian.miit.gov.cn/&#34; target=&#34;_blank&#34;&gt;苏ICP备15009593号-1&lt;/a&gt;</copyright>
+    <lastBuildDate>Thu, 29 Apr 2021 01:52:58 +0800</lastBuildDate>
+    
+	<atom:link href="https://www.zhangshengdong.com/tags/%E4%B8%AD%E9%97%B4%E5%B1%82/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>获取模型的中间层输出</title>
+      <link>https://www.zhangshengdong.com/post/choose_layer_output/</link>
+      <pubDate>Thu, 29 Apr 2021 01:52:58 +0800</pubDate>
+      
+      <guid>https://www.zhangshengdong.com/post/choose_layer_output/</guid>
+      <description>背景 最近在疯狂搭模型，突然有人来问我要我模型的中间层输出的embedding，于是，我就研究了一下怎么获取模型的中间层输出。 代码实现 1 2 3 4</description>
+    </item>
+    
+  </channel>
+</rss>

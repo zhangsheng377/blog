@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>使用Hugo和Netlify建立静态博客，并托管在Github上 - 张胜东的博客</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="张胜东" /><meta name="description" content="使用Hugo建立静态博客 sudo apt install hugo hugo new site blog cd blog/ git submodule add https://github.com/budparr/gohugo-theme-ananke.git themes/ananke git submodule add https://github.com/olOwOlo/hugo-theme-even themes/even echo &amp;lsquo;theme = &amp;ldquo;ananke&amp;rdquo;&amp;rsquo; &amp;raquo; config.toml echo &amp;lsquo;theme = &amp;ldquo;even&amp;rdquo;&amp;rsquo; &amp;raquo; config.toml hugo new post/my-first-post.md 注意：直接这样生成的页面头，是带有 draft: true 标记的，" /><meta name="keywords" content="张胜东, 博客, 编程" />
+
+
+<meta name="baidu-site-verification" content="qWR9jJPJ9e" />
+<meta name="google-site-verification" content="s9FkJZw4X2alyC8-nsdZgiPHBwX6uqr1QVNxRaGfDKY" />
+
+
+<meta name="generator" content="Hugo 0.68.3 with theme even" />
+
+
+<link rel="canonical" href="https://www.zhangshengdong.com/post/hugo_and_netlify/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<link href="/sass/main.min.2e81bbed97b8b282c1aeb57488cc71c8d8c8ec559f3931531bd396bf31e0d4dd.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="使用Hugo和Netlify建立静态博客，并托管在Github上" />
+<meta property="og:description" content="使用Hugo建立静态博客 sudo apt install hugo hugo new site blog cd blog/ git submodule add https://github.com/budparr/gohugo-theme-ananke.git themes/ananke git submodule add https://github.com/olOwOlo/hugo-theme-even themes/even echo &lsquo;theme = &ldquo;ananke&rdquo;&rsquo; &raquo; config.toml echo &lsquo;theme = &ldquo;even&rdquo;&rsquo; &raquo; config.toml hugo new post/my-first-post.md 注意：直接这样生成的页面头，是带有 draft: true 标记的，" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://www.zhangshengdong.com/post/hugo_and_netlify/" />
+<meta property="article:published_time" content="2019-12-30T23:56:52+08:00" />
+<meta property="article:modified_time" content="2021-09-09T04:13:14+08:00" />
+<meta itemprop="name" content="使用Hugo和Netlify建立静态博客，并托管在Github上">
+<meta itemprop="description" content="使用Hugo建立静态博客 sudo apt install hugo hugo new site blog cd blog/ git submodule add https://github.com/budparr/gohugo-theme-ananke.git themes/ananke git submodule add https://github.com/olOwOlo/hugo-theme-even themes/even echo &lsquo;theme = &ldquo;ananke&rdquo;&rsquo; &raquo; config.toml echo &lsquo;theme = &ldquo;even&rdquo;&rsquo; &raquo; config.toml hugo new post/my-first-post.md 注意：直接这样生成的页面头，是带有 draft: true 标记的，">
+<meta itemprop="datePublished" content="2019-12-30T23:56:52&#43;08:00" />
+<meta itemprop="dateModified" content="2021-09-09T04:13:14&#43;08:00" />
+<meta itemprop="wordCount" content="867">
+
+
+
+<meta itemprop="keywords" content="hugo,netlify,github," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="使用Hugo和Netlify建立静态博客，并托管在Github上"/>
+<meta name="twitter:description" content="使用Hugo建立静态博客 sudo apt install hugo hugo new site blog cd blog/ git submodule add https://github.com/budparr/gohugo-theme-ananke.git themes/ananke git submodule add https://github.com/olOwOlo/hugo-theme-even themes/even echo &lsquo;theme = &ldquo;ananke&rdquo;&rsquo; &raquo; config.toml echo &lsquo;theme = &ldquo;even&rdquo;&rsquo; &raquo; config.toml hugo new post/my-first-post.md 注意：直接这样生成的页面头，是带有 draft: true 标记的，"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">张胜东的博客</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">About</li>
+      </a>
+  </ul>
+
+  
+
+
+</nav>
+
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">张胜东的博客</a>
+</div>
+
+
+
+
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about/">About</a>
+      </li>
+  </ul>
+</nav>
+
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">使用Hugo和Netlify建立静态博客，并托管在Github上</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2019-12-30 </span>
+        
+          <span class="more-meta"> 约 867 字 </span>
+          <span class="more-meta"> 预计阅读 2 分钟 </span>
+        <span id="busuanzi_container_page_pv" class="more-meta"> <span id="busuanzi_value_page_pv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> 次阅读 </span>
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#使用hugo建立静态博客">使用Hugo建立静态博客</a></li>
+        <li><a href="#上传至github">上传至Github</a></li>
+        <li><a href="#使用netlify进行配置和管理博客">使用Netlify进行配置和管理博客</a></li>
+        <li><a href="#日常写作">日常写作</a>
+          <ul>
+            <li><a href="#后记">后记</a></li>
+            <li><a href="#20200511后记">2020.05.11后记</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <h2 id="使用hugo建立静态博客">使用Hugo建立静态博客</h2>
+<hr>
+<ol>
+<li>
+<p>sudo apt install hugo</p>
+</li>
+<li>
+<p>hugo new site blog</p>
+</li>
+<li>
+<p>cd blog/</p>
+</li>
+<li>
+<p><del>git submodule add <a href="https://github.com/budparr/gohugo-theme-ananke.git">https://github.com/budparr/gohugo-theme-ananke.git</a> themes/ananke</del></p>
+<p>git submodule add <a href="https://github.com/olOwOlo/hugo-theme-even">https://github.com/olOwOlo/hugo-theme-even</a> themes/even</p>
+</li>
+<li>
+<p><del>echo &lsquo;theme = &ldquo;ananke&rdquo;&rsquo; &raquo; config.toml</del></p>
+<p>echo &lsquo;theme = &ldquo;even&rdquo;&rsquo; &raquo; config.toml</p>
+</li>
+<li>
+<p>hugo new post/my-first-post.md</p>
+<ul>
+<li>注意：直接这样生成的页面头，是带有 draft: true 标记的，要想正式发布需要去掉该标记。</li>
+<li>PS：建议从第5步开始，就直接将theme里exampleSite里的文件拷出来，作为初始文件，后续在其上改动、新增，即可。</li>
+</ul>
+</li>
+<li>
+<p>hugo server</p>
+</li>
+<li>
+<p>接下来就可以随便玩一会儿，反正都是用markdown写作的</p>
+</li>
+<li>
+<p>还可以研究研究配置文件config.toml，以及主题theme的配置</p>
+</li>
+</ol>
+<h2 id="上传至github">上传至Github</h2>
+<hr>
+<ol>
+<li>git add .</li>
+<li>git commit -a</li>
+<li>git push</li>
+</ol>
+<h2 id="使用netlify进行配置和管理博客">使用Netlify进行配置和管理博客</h2>
+<hr>
+<ol>
+<li>按照官方教程选择Github的项目</li>
+<li>自动部署</li>
+<li>设置域名CNAME解析</li>
+<li>配置域名DNS</li>
+<li>启用SSL证书</li>
+<li>启用IPV6</li>
+<li><strong>使用高版本hugo时,需要在netlify的deploy上配置hugo版本号:HUGO_VERSION,0.68.3</strong></li>
+</ol>
+<h2 id="日常写作">日常写作</h2>
+<hr>
+<ol>
+<li>使用hugo new post/xxx.md生成新页面之后(注意改掉页面头的 draft: true 标记)，使用 hugo 在public文件夹里生成静态页面</li>
+<li>使用git上传代码</li>
+<li>Netlify自动部署，更新网站</li>
+</ol>
+<hr>
+<hr>
+<h3 id="后记">后记</h3>
+<p>尝试使用 NetlifyCms 的 one-click-hugo-cms ，但修改原始模板就要花费大量时间，并且 NetlifyCms 的后台功能并不像 WordPress 那样强大和方便，更像只是个用来写文章的网页编辑器。。。那我还不如用 Markdown 呢。。。</p>
+<p>所以，现在还是换回了这个直接用 Hugo 生成的博客，毕竟我要的只是个可以方便快捷写一些技术博客的地方。</p>
+<p>当然，或许以后可能会尝试通过加admin.html的方法来添加 NetlifyCms 后台吧～～</p>
+<hr>
+<hr>
+<h3 id="20200511后记">2020.05.11后记</h3>
+<p>在把原pdf简历改成markdown格式时，发现ananke主题的about页面默认是居中对齐的，且该主题基本找不到修改对齐方式的地方(起码不像even主题那样有$$方式可以随处设置)。。。</p>
+<p>所以，我就把主题换成了even。</p>
+<p>然而，even主题不支持低版本hugo。我的树莓派只能手动从GitHub上下载安装。然而，我的部署网站Netlify竟然又编译失败。。。折腾了一天才发现，对于高版本的hugo，需要在netlify的deploy上配置hugo版本号:HUGO_VERSION,0.68.3才行。</p>
+
+    </div>
+
+    
+<div class="post-reward">
+  <input type="checkbox" name="reward" id="reward" hidden />
+  <label class="reward-button" for="reward">赞赏支持</label>
+  <div class="qr-code">
+    
+    <label class="qr-code-image" for="reward">
+        <img class="image" src="/images/money_weixin_20200719212002.png">
+        <span>微信打赏</span>
+      </label>
+    <label class="qr-code-image" for="reward">
+        <img class="image" src="/images/alipay_20200801211208.png">
+        <span>支付宝打赏</span>
+      </label>
+  </div>
+</div><footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/hugo/">hugo</a>
+          <a href="/tags/netlify/">netlify</a>
+          <a href="/tags/github/">github</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/emotion-predict-stock/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">與情预测股票</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
+        
+      </nav>
+    </footer>
+  </article>
+        </div>
+        <div id="gitalk-container"></div>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js" crossorigin="anonymous"></script>
+    <script type="text/javascript">
+      var gitalk = new Gitalk({
+        id: '2019-12-30 23:56:52 \x2b0800 CST',
+        title: '使用Hugo和Netlify建立静态博客，并托管在Github上',
+        clientID: '5ea75f603117948d8d37',
+        clientSecret: '26c617c6bce9a975c2a65a68f1ca2a2cc7dde587',
+        repo: 'blog',
+        owner: 'zhangsheng377',
+        admin: ['zhangsheng377'],
+        body: decodeURI(location.href)
+      });
+      gitalk.render('gitalk-container');
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://github.com/gitalk/gitalk">comments powered by gitalk.</a></noscript>
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:435878393@qq.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://www.linkedin.com/in/zhangshengdong/" class="iconfont icon-linkedin" title="linkedin"></a>
+      <a href="https://github.com/zhangsheng377/" class="iconfont icon-github" title="github"></a>
+  <a href="https://www.zhangshengdong.com/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  <div class="busuanzi-footer">
+    <span id="busuanzi_container_site_pv"> 本站总访问量 <span id="busuanzi_value_site_pv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> 次 </span>
+      <span class="division">|</span>
+    <span id="busuanzi_container_site_uv"> 本站总访客数 <span id="busuanzi_value_site_uv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> 人 </span>
+  </div>
+
+  <span class="copyright-year">
+    &copy; 
+    2019 - 
+    2022<span class="heart"><i class="iconfont icon-heart"></i></span><span><a href="https://beian.miit.gov.cn/" target="_blank">苏ICP备15009593号-1</a></span>
+  </span>
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+
+
+
+<script type="text/javascript" src="/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js"></script>
+  <script type="text/javascript">
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        tags: 'ams',
+        }
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3.0.5/es5/tex-mml-chtml.js" integrity="sha256-HGLuEfFcsUJGhvB8cQ8nr0gai9EucOOaIxFw7qxmd+w=" crossorigin="anonymous"></script>
+
+<script id="baidu_analytics">
+  var _hmt = _hmt || [];
+  (function() {
+    if (window.location.hostname === 'localhost') return;
+    var hm = document.createElement("script"); hm.async = true;
+    hm.src = "https://hm.baidu.com/hm.js?c602db2501643f661d9789f9e9707386";
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(hm, s);
+  })();
+</script>
+
+
+
+
+
+
+</body>
+</html>

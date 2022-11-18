@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>CART on 张胜东的博客</title>
+    <link>https://www.zhangshengdong.com/tags/cart/</link>
+    <description>Recent content in CART on 张胜东的博客</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>&lt;a href=&#34;https://beian.miit.gov.cn/&#34; target=&#34;_blank&#34;&gt;苏ICP备15009593号-1&lt;/a&gt;</copyright>
+    <lastBuildDate>Tue, 16 Mar 2021 02:09:58 +0800</lastBuildDate>
+    
+	<atom:link href="https://www.zhangshengdong.com/tags/cart/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>树模型</title>
+      <link>https://www.zhangshengdong.com/post/tree_model/</link>
+      <pubDate>Tue, 16 Mar 2021 02:09:58 +0800</pubDate>
+      
+      <guid>https://www.zhangshengdong.com/post/tree_model/</guid>
+      <description>树模型 在各种机器学习的算法中，树模型可以说是最贴近于人类思维的模型，一切的树模型都是一种基于特征空间划分的，具有树形分支结构的模型。举个直观</description>
+    </item>
+    
+  </channel>
+</rss>

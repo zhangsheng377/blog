@@ -1,0 +1,2 @@
+User-agent: *
+Sitemap: https://www.zhangshengdong.com/sitemap.xml

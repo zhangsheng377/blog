@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>esxi虚拟机安装黑群晖,nfs挂载 - 张胜东的博客</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="张胜东" /><meta name="description" content="背景 之前用esxi安装虚拟机的时候，因为贪图性能，所以一直用的是厚置备硬盘格式。直到前不久，对我的服务器虚拟机清理了一堆冗余文件后，发现es" /><meta name="keywords" content="张胜东, 博客, 编程" />
+
+
+<meta name="baidu-site-verification" content="qWR9jJPJ9e" />
+<meta name="google-site-verification" content="s9FkJZw4X2alyC8-nsdZgiPHBwX6uqr1QVNxRaGfDKY" />
+
+
+<meta name="generator" content="Hugo 0.68.3 with theme even" />
+
+
+<link rel="canonical" href="https://www.zhangshengdong.com/post/esxi_dms/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<link href="/sass/main.min.2e81bbed97b8b282c1aeb57488cc71c8d8c8ec559f3931531bd396bf31e0d4dd.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="esxi虚拟机安装黑群晖,nfs挂载" />
+<meta property="og:description" content="背景 之前用esxi安装虚拟机的时候，因为贪图性能，所以一直用的是厚置备硬盘格式。直到前不久，对我的服务器虚拟机清理了一堆冗余文件后，发现es" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://www.zhangshengdong.com/post/esxi_dms/" />
+<meta property="article:published_time" content="2021-11-20T17:51:58+08:00" />
+<meta property="article:modified_time" content="2021-11-20T21:56:27+08:00" />
+<meta itemprop="name" content="esxi虚拟机安装黑群晖,nfs挂载">
+<meta itemprop="description" content="背景 之前用esxi安装虚拟机的时候，因为贪图性能，所以一直用的是厚置备硬盘格式。直到前不久，对我的服务器虚拟机清理了一堆冗余文件后，发现es">
+<meta itemprop="datePublished" content="2021-11-20T17:51:58&#43;08:00" />
+<meta itemprop="dateModified" content="2021-11-20T21:56:27&#43;08:00" />
+<meta itemprop="wordCount" content="2059">
+
+
+
+<meta itemprop="keywords" content="esxi,黑群晖,nfs," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="esxi虚拟机安装黑群晖,nfs挂载"/>
+<meta name="twitter:description" content="背景 之前用esxi安装虚拟机的时候，因为贪图性能，所以一直用的是厚置备硬盘格式。直到前不久，对我的服务器虚拟机清理了一堆冗余文件后，发现es"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">张胜东的博客</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">About</li>
+      </a>
+  </ul>
+
+  
+
+
+</nav>
+
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">张胜东的博客</a>
+</div>
+
+
+
+
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about/">About</a>
+      </li>
+  </ul>
+</nav>
+
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">esxi虚拟机安装黑群晖,nfs挂载</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2021-11-20 </span>
+        
+          <span class="more-meta"> 约 2059 字 </span>
+          <span class="more-meta"> 预计阅读 5 分钟 </span>
+        <span id="busuanzi_container_page_pv" class="more-meta"> <span id="busuanzi_value_page_pv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> 次阅读 </span>
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#背景">背景</a></li>
+        <li><a href="#nas选型和下载">nas选型和下载</a></li>
+        <li><a href="#修改sn和mac">修改sn和mac</a>
+          <ul>
+            <li><a href="#修改sn">修改sn</a></li>
+            <li><a href="#修改mac">修改mac</a></li>
+            <li><a href="#修改sata参数">修改sata参数</a></li>
+          </ul>
+        </li>
+        <li><a href="#转换引导文件">转换引导文件</a></li>
+        <li><a href="#安装黑群晖">安装黑群晖</a></li>
+        <li><a href="#开启nfs并挂载">开启nfs并挂载</a>
+          <ul>
+            <li><a href="#开启nfs">开启nfs</a></li>
+            <li><a href="#linux服务器上挂载nfs">linux服务器上挂载nfs</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <h2 id="背景">背景</h2>
+<p>之前用esxi安装虚拟机的时候，因为贪图性能，所以一直用的是厚置备硬盘格式。直到前不久，对我的服务器虚拟机清理了一堆冗余文件后，发现esxi不支持把磁盘缩小。。。</p>
+<p>就想着，要规范一下虚拟机磁盘的使用了。准备以后msata盘上只保留系统盘，然后挂载sata盘上的nfs当数据盘。</p>
+<p>所以，翻箱倒柜的找出来了一个大约是我初高中时候的sata机械硬盘，1t大小，先凑合用，双12再买固态。另外一点就是，试了一下esxi的共享磁盘，反正我的服务器虚拟机根本读不到。。。但是，单独开个虚拟机提供nfs有点浪费了，不如咱们再装个nas吧。</p>
+<h2 id="nas选型和下载">nas选型和下载</h2>
+<p>说干就干，一开始其实是排除黑群晖的，因为不能升级嘛。所以最开始实验的是<a href="http://www.u-nas.cn/">u-nas</a>，开源的，还不错。nfs还没试，反正smb和ftp都能连上。但有个问题是，连它自己的软件都找不到安装的nas啊。。。算了算了，还是试试久负盛名的群晖吧。</p>
+<p>找了一圈，多数教程都是没来由直接放上网盘去下载。说实话，哪怕是引导盘我也不敢直接运行私人的镜像啊，就算非要不可，也得找个用的人多的吧。所以，一路往上溯源，发现了<a href="https://xpenology.com/forum/">XPEnology</a>论坛。注册后，收到下载邮件，https://xpenology.com/forum/topic/12952-dsm-62-loader/?utm_source=newsletter_MailerLite&amp;utm_medium=email_MailerLite&amp;utm_campaign=welcome_to_the_xpenology_community&amp;utm_term=2021-11-18，最新的就是2018年更新的了，唉，算啦算啦，将就试试吧。</p>
+<p>选最新的1.04b版本的引导盘，对应6.2/6.21版本的ds918。下载，得到synoboot.img。</p>
+<h2 id="修改sn和mac">修改sn和mac</h2>
+<p>参考这篇教程https://post.smzdm.com/p/agd8l34w/。<strong>不修改sn的话，以后群晖自带的花生壳会用不了。</strong></p>
+<p>下载<a href="https://www.osforensics.com/tools/mount-disk-images.html">OSFMount</a>这个软件，加载刚才的synoboot.img，</p>
+<p><img src="https://qnam.smzdm.com/202102/20/603077edd7c5a8400.jpg_e1080.jpg" alt=""></p>
+<p>加载第一个15mb的分区。</p>
+<p><img src="https://qnam.smzdm.com/202102/20/6030785e09dc58700.jpg_e1080.jpg" alt=""></p>
+<p>去掉readonly选项。</p>
+<p>挂在成功后，后打开grub文件夹下的grub.cfg文件，</p>
+<h3 id="修改sn">修改sn</h3>
+<p>要用https://github.com/xpenogen/serial_generator去生成sn，或者直接用1330LWN287476、1130LWN707137、1230LWN103694、1130LWN624465、1330LWN542483，任选其一。</p>
+<h3 id="修改mac">修改mac</h3>
+<p>十六进制的，随便改吧。</p>
+<h3 id="修改sata参数">修改sata参数</h3>
+<p><img src="https://qnam.smzdm.com/202102/24/60352a8b842af5963.gif_e1080.jpg" alt=""></p>
+<p>set sata_args='DiskIdxMap=0c00 SataPortMap=24&rsquo;</p>
+<p>(好像没有用。。。)</p>
+<p>准备弄两个sata控制器，sata0上只放引导盘，sata1上才是数据盘。</p>
+<p>修改完成后，保存文件，OFSMount软件上选择对应的盘符，dismount，就可以得到修改后的synoboot.img了。</p>
+<h2 id="转换引导文件">转换引导文件</h2>
+<p>安装<a href="https://www.starwindsoftware.com/download-starwind-products#download">StarWind V2V Converter</a>，以进出都是local的方式，转换synoboot.img，转成esxi的vmdk格式。得到*.vmdk和*-flat.vmdk。</p>
+<h2 id="安装黑群晖">安装黑群晖</h2>
+<p>在esxi创建新虚拟机。linux，其他或更高版本64位(其实估计无所谓，随便选个64位的就行)。</p>
+<p>在选择配置时，删除硬盘、scsi、usb、光驱，再加上一个sata控制器，虚拟机选项中去掉uefi引导选项，上面可以选用efi。</p>
+<p>然后点击刚才创建的虚拟机，继续编辑。</p>
+<p>新增一个现有硬盘，选择刚才转换的vmdk文件(上传)，分配到sata0。</p>
+<p>新增一个新硬盘，给500g吧，厚置备延迟置零，分配到sata1。</p>
+<p>启动，选第三个启动项，vm的。</p>
+<p>进入http://find.synology.com/。搜索较慢，可能要2-3分钟才能出来。搜到后，一路下一步，直到安装镜像。</p>
+<p>一定要手动安装，提前选个6.2版本的918镜像下载下来。不然版本不对，安装会卡住或者无法重启。我用的是DSM_DS918+_23739.pat。</p>
+<p>等安装自动重启后，就是正常的新建账号，注意，一定要选dms有更新手动安装。</p>
+<p>跳过QuickConnect。</p>
+<p>然后进入后，新增存储空间，选自定义，性能改善，RAID的类型为JBOD，不要选上50mb的引导盘，Btrfs格式。</p>
+<p>可以启用自带的花生壳、Download Station，下载器可以配套上chrome插件<a href="https://chrome.google.com/webstore/detail/iaijiochiiocodhamehbpmdlobhgghgi">NAS Download Manager</a>。</p>
+<p>还可以启用VideoStation，貌似挺好，正在摸索。</p>
+<h2 id="开启nfs并挂载">开启nfs并挂载</h2>
+<h3 id="开启nfs">开启nfs</h3>
+<p>在群晖的控制面板-文件服务中开启nfs。</p>
+<p>在控制面板-共享文件夹中新增nfs文件夹，停用回收站，开启数据完整性检查，在这个文件夹的nfs权限中，服务器名写ip范围：192.168.10.250/24，启用异步、非特权端口、允许访问。记住装载路径：/volume1/nfs</p>
+<h3 id="linux服务器上挂载nfs">linux服务器上挂载nfs</h3>
+<p>sudo apt install nfs-common</p>
+<p>df 可以查看有没有被挂载</p>
+<p>mount -t nfs [Synology NAS IP 地址]:[共享文件夹装载路径] /[NFS 客户端装载点]</p>
+<p>sudo mount -t nfs 192.168.10.36:/volume1/nfs /mnt/nfs</p>
+<p>sudo chmod 777 /mnt/nfs</p>
+<p>卸载nfs：</p>
+<p>sudo umount /mnt/nfs</p>
+
+    </div>
+
+    
+<div class="post-reward">
+  <input type="checkbox" name="reward" id="reward" hidden />
+  <label class="reward-button" for="reward">赞赏支持</label>
+  <div class="qr-code">
+    
+    <label class="qr-code-image" for="reward">
+        <img class="image" src="/images/money_weixin_20200719212002.png">
+        <span>微信打赏</span>
+      </label>
+    <label class="qr-code-image" for="reward">
+        <img class="image" src="/images/alipay_20200801211208.png">
+        <span>支付宝打赏</span>
+      </label>
+  </div>
+</div><footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/esxi/">esxi</a>
+          <a href="/tags/%E9%BB%91%E7%BE%A4%E6%99%96/">黑群晖</a>
+          <a href="/tags/nfs/">nfs</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/checkchan_rss/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">利用check酱监控网页并生成rss</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
+        <a class="next" href="/post/pytorch_bert_mutil_target/">
+            <span class="next-text nav-default">pytorch版bert多目标多分类</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        <div id="gitalk-container"></div>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js" crossorigin="anonymous"></script>
+    <script type="text/javascript">
+      var gitalk = new Gitalk({
+        id: '2021-11-20 17:51:58 \x2b0800 CST',
+        title: 'esxi虚拟机安装黑群晖,nfs挂载',
+        clientID: '5ea75f603117948d8d37',
+        clientSecret: '26c617c6bce9a975c2a65a68f1ca2a2cc7dde587',
+        repo: 'blog',
+        owner: 'zhangsheng377',
+        admin: ['zhangsheng377'],
+        body: decodeURI(location.href)
+      });
+      gitalk.render('gitalk-container');
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://github.com/gitalk/gitalk">comments powered by gitalk.</a></noscript>
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:435878393@qq.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://www.linkedin.com/in/zhangshengdong/" class="iconfont icon-linkedin" title="linkedin"></a>
+      <a href="https://github.com/zhangsheng377/" class="iconfont icon-github" title="github"></a>
+  <a href="https://www.zhangshengdong.com/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  <div class="busuanzi-footer">
+    <span id="busuanzi_container_site_pv"> 本站总访问量 <span id="busuanzi_value_site_pv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> 次 </span>
+      <span class="division">|</span>
+    <span id="busuanzi_container_site_uv"> 本站总访客数 <span id="busuanzi_value_site_uv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> 人 </span>
+  </div>
+
+  <span class="copyright-year">
+    &copy; 
+    2019 - 
+    2022<span class="heart"><i class="iconfont icon-heart"></i></span><span><a href="https://beian.miit.gov.cn/" target="_blank">苏ICP备15009593号-1</a></span>
+  </span>
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script><script></script><script src="https://cdn.jsdelivr.net/npm/raphael@2.2.7/raphael.min.js" integrity="sha256-67By+NpOtm9ka1R6xpUefeGOY8kWWHHRAKlvaTJ7ONI=" crossorigin="anonymous"></script> <script src="https://cdn.jsdelivr.net/npm/flowchart.js@1.8.0/release/flowchart.min.js" integrity="sha256-zNGWjubXoY6rb5MnmpBNefO0RgoVYfle9p0tvOQM+6k=" crossorigin="anonymous"></script><script></script><script src="https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.js" integrity="sha256-4O4pS1SH31ZqrSO2A/2QJTVjTPqVe+jnYgOWUVr7EEc=" crossorigin="anonymous"></script> <script src="https://cdn.jsdelivr.net/npm/snapsvg@0.5.1/dist/snap.svg-min.js" integrity="sha256-oI+elz+sIm+jpn8F/qEspKoKveTc5uKeFHNNVexe6d8=" crossorigin="anonymous"></script> <script src="https://cdn.jsdelivr.net/npm/underscore@1.8.3/underscore-min.js" integrity="sha256-obZACiHd7gkOk9iIL/pimWMTJ4W/pBsKu+oZnSeBIek=" crossorigin="anonymous"></script> <script src="https://cdn.jsdelivr.net/gh/bramp/js-sequence-diagrams@2.0.1/dist/sequence-diagram-min.js" integrity="sha384-8748Vn52gHJYJI0XEuPB2QlPVNUkJlJn9tHqKec6J3q2r9l8fvRxrgn/E5ZHV0sP" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/bramp/js-sequence-diagrams@2.0.1/dist/sequence-diagram-min.css" integrity="sha384-6QbLKJMz5dS3adWSeINZe74uSydBGFbnzaAYmp+tKyq60S7H2p6V7g1TysM5lAaF" crossorigin="anonymous">
+
+
+
+<script type="text/javascript" src="/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js"></script>
+  <script type="text/javascript">
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        tags: 'ams',
+        }
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3.0.5/es5/tex-mml-chtml.js" integrity="sha256-HGLuEfFcsUJGhvB8cQ8nr0gai9EucOOaIxFw7qxmd+w=" crossorigin="anonymous"></script>
+
+<script id="baidu_analytics">
+  var _hmt = _hmt || [];
+  (function() {
+    if (window.location.hostname === 'localhost') return;
+    var hm = document.createElement("script"); hm.async = true;
+    hm.src = "https://hm.baidu.com/hm.js?c602db2501643f661d9789f9e9707386";
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(hm, s);
+  })();
+</script>
+
+
+
+
+
+
+</body>
+</html>

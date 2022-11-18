@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>shell on 张胜东的博客</title>
+    <link>https://www.zhangshengdong.com/tags/shell/</link>
+    <description>Recent content in shell on 张胜东的博客</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>&lt;a href=&#34;https://beian.miit.gov.cn/&#34; target=&#34;_blank&#34;&gt;苏ICP备15009593号-1&lt;/a&gt;</copyright>
+    <lastBuildDate>Sat, 06 Jun 2020 23:45:21 +0800</lastBuildDate>
+    
+	<atom:link href="https://www.zhangshengdong.com/tags/shell/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>树莓派自启动</title>
+      <link>https://www.zhangshengdong.com/post/raspberry_autostart/</link>
+      <pubDate>Sat, 06 Jun 2020 23:45:21 +0800</pubDate>
+      
+      <guid>https://www.zhangshengdong.com/post/raspberry_autostart/</guid>
+      <description>新建服务文件 1 sudo nano /usr/lib/systemd/system/xx_net.service 1 2 3 4 5 6 7 8 9 10 11 12 13 14 [Unit] Description=xx_net [Service] Type=oneshot ExecStart=/home/pi/Desktop/XX-Net/start [Install] WantedBy=multi-user.target 指定服务自启动 1 sudo systemctl enable xx_net.service</description>
+    </item>
+    
+  </channel>
+</rss>

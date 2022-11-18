@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>在树莓派上搭建docker - 张胜东的博客</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="张胜东" /><meta name="description" content="起因 总是听人说在树莓派上使用docker多好多好，近日，自己推演了一番，发现的确不错，起码隔离效果挺好。要知道，树莓派由于是arm架构，所以" /><meta name="keywords" content="张胜东, 博客, 编程" />
+
+
+<meta name="baidu-site-verification" content="qWR9jJPJ9e" />
+<meta name="google-site-verification" content="s9FkJZw4X2alyC8-nsdZgiPHBwX6uqr1QVNxRaGfDKY" />
+
+
+<meta name="generator" content="Hugo 0.68.3 with theme even" />
+
+
+<link rel="canonical" href="https://www.zhangshengdong.com/post/raspberry_docker/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<link href="/sass/main.min.2e81bbed97b8b282c1aeb57488cc71c8d8c8ec559f3931531bd396bf31e0d4dd.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="在树莓派上搭建docker" />
+<meta property="og:description" content="起因 总是听人说在树莓派上使用docker多好多好，近日，自己推演了一番，发现的确不错，起码隔离效果挺好。要知道，树莓派由于是arm架构，所以" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://www.zhangshengdong.com/post/raspberry_docker/" />
+<meta property="article:published_time" content="2020-07-28T23:58:13+08:00" />
+<meta property="article:modified_time" content="2021-09-09T04:13:14+08:00" />
+<meta itemprop="name" content="在树莓派上搭建docker">
+<meta itemprop="description" content="起因 总是听人说在树莓派上使用docker多好多好，近日，自己推演了一番，发现的确不错，起码隔离效果挺好。要知道，树莓派由于是arm架构，所以">
+<meta itemprop="datePublished" content="2020-07-28T23:58:13&#43;08:00" />
+<meta itemprop="dateModified" content="2021-09-09T04:13:14&#43;08:00" />
+<meta itemprop="wordCount" content="509">
+
+
+
+<meta itemprop="keywords" content="树莓派,docker," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="在树莓派上搭建docker"/>
+<meta name="twitter:description" content="起因 总是听人说在树莓派上使用docker多好多好，近日，自己推演了一番，发现的确不错，起码隔离效果挺好。要知道，树莓派由于是arm架构，所以"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">张胜东的博客</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">About</li>
+      </a>
+  </ul>
+
+  
+
+
+</nav>
+
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">张胜东的博客</a>
+</div>
+
+
+
+
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about/">About</a>
+      </li>
+  </ul>
+</nav>
+
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">在树莓派上搭建docker</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2020-07-28 </span>
+        
+          <span class="more-meta"> 约 509 字 </span>
+          <span class="more-meta"> 预计阅读 2 分钟 </span>
+        <span id="busuanzi_container_page_pv" class="more-meta"> <span id="busuanzi_value_page_pv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> 次阅读 </span>
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#起因">起因</a></li>
+        <li><a href="#安装过程">安装过程</a></li>
+        <li><a href="#安装监控">安装监控</a></li>
+        <li><a href="#添加用户进组">添加用户进组</a></li>
+        <li><a href="#制作自己的base镜像">制作自己的base镜像</a></li>
+        <li><a href="#进入自己制作的镜像的bash界面">进入自己制作的镜像的bash界面</a></li>
+        <li><a href="#更新镜像">更新镜像</a></li>
+        <li><a href="#对外端口后台运行">对外端口、后台运行</a></li>
+        <li><a href="#下一步计划">下一步计划</a></li>
+        <li><a href="#github地址">Github地址</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <h2 id="起因">起因</h2>
+<p>总是听人说在树莓派上使用docker多好多好，近日，自己推演了一番，发现的确不错，起码隔离效果挺好。要知道，树莓派由于是arm架构，所以更多pip包只能以apt python3-xxx的形式安装在系统里(用venv会各种错，安装错、使用时错，痛不欲生)。所以，就想试试用docker隔离，把我之前的<a href="/post/stats_stock">时序分解股票</a>，做成微服务放上去。</p>
+<h2 id="安装过程">安装过程</h2>
+<ol>
+<li>使用<a href="https://mirrors.tuna.tsinghua.edu.cn/help/docker-ce/">清华源</a>，安装docker-ce。</li>
+<li>使用<a href="https://cr.console.aliyun.com/cn-hangzhou/instances/mirrors">阿里镜像</a>，代理docker-hub。</li>
+</ol>
+<h2 id="安装监控">安装监控</h2>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">sudo docker run -d -p 9000:9000 --name portainer --restart always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ce
+</code></pre></td></tr></table>
+</div>
+</div><h2 id="添加用户进组">添加用户进组</h2>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">sudo usermod -aG docker <span class="nv">$USER</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>把用户加进docker组里，之后新终端里就不需要用sudo docker了。</p>
+<h2 id="制作自己的base镜像">制作自己的base镜像</h2>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-dockerfile" data-lang="dockerfile"><span class="k">FROM</span><span class="s"> resin/rpi-raspbian:latest</span><span class="err">
+</span><span class="err"></span><span class="k">ENTRYPOINT</span> <span class="p">[]</span><span class="err">
+</span><span class="err">
+</span><span class="err"></span><span class="k">RUN</span> rm /etc/apt/sources.list<span class="err">
+</span><span class="err"></span><span class="k">COPY</span> sources.list /etc/apt/sources.list<span class="err">
+</span><span class="err"></span><span class="k">RUN</span> rm /etc/apt/sources.list.d/raspi.list<span class="err">
+</span><span class="err"></span><span class="k">COPY</span> raspi.list /etc/apt/sources.list.d/raspi.list<span class="err">
+</span><span class="err">
+</span><span class="err"></span><span class="k">RUN</span> apt update <span class="o">&amp;&amp;</span> <span class="se">\
+</span><span class="se"></span>    apt upgrade<span class="err">
+</span><span class="err"></span><span class="k">RUN</span> apt install libcurl4<span class="err">
+</span><span class="err"></span><span class="k">RUN</span> apt install apt-utils<span class="err">
+</span><span class="err">
+</span><span class="err"></span><span class="k">CMD</span> <span class="p">[</span><span class="s2">&#34;/bin/bash&#34;</span><span class="p">]</span><span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">docker build -t zhangsheng377/raspberry_base .
+</code></pre></td></tr></table>
+</div>
+</div><h2 id="进入自己制作的镜像的bash界面">进入自己制作的镜像的bash界面</h2>
+<p>若是上述dockerfile中没有加</p>
+<blockquote>
+<p>CMD [&quot;/bin/bash&rdquo;]</p>
+</blockquote>
+<p>则需要在 docker run 时指定command:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">docker run -ti zhangsheng377/raspberry_base /bin/bash
+</code></pre></td></tr></table>
+</div>
+</div><p>否则，只需:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">docker run -ti zhangsheng377/raspberry_base
+</code></pre></td></tr></table>
+</div>
+</div><h2 id="更新镜像">更新镜像</h2>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-dockerfile" data-lang="dockerfile"><span class="k">FROM</span><span class="s"> zhangsheng377/raspberry_base</span><span class="err">
+</span><span class="err"></span><span class="k">ENTRYPOINT</span> <span class="p">[]</span><span class="err">
+</span><span class="err">
+</span><span class="err"></span><span class="k">RUN</span> apt update <span class="o">&amp;&amp;</span> <span class="se">\
+</span><span class="se"></span>    apt upgrade<span class="err">
+</span><span class="err">
+</span><span class="err"></span><span class="k">CMD</span> <span class="p">[</span><span class="s2">&#34;/bin/bash&#34;</span><span class="p">]</span><span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">docker build -t zhangsheng377/raspberry_base -f Dockerfile .
+</code></pre></td></tr></table>
+</div>
+</div><h2 id="对外端口后台运行">对外端口、后台运行</h2>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="c1"># docker run -d -p 5000:5000 --restart always zhangsheng377/stats_stock</span>
+docker run -d -p 5000:5000 -v /etc/timezone:/etc/timezone:ro -v /etc/localtime:/etc/localtime:ro --restart always zhangsheng377/stats_stock
+</code></pre></td></tr></table>
+</div>
+</div><p>其中:</p>
+<ul>
+<li>-d 为后台运行</li>
+<li>-p 为开放的端口范围</li>
+<li>&ndash;restart always 为重启策略</li>
+</ul>
+<h2 id="下一步计划">下一步计划</h2>
+<ul>
+<li><input disabled="" type="checkbox"> 学习Docker Compose</li>
+</ul>
+<h2 id="github地址">Github地址</h2>
+<p><a href="https://github.com/zhangsheng377/docker">https://github.com/zhangsheng377/docker</a></p>
+
+    </div>
+
+    
+<div class="post-reward">
+  <input type="checkbox" name="reward" id="reward" hidden />
+  <label class="reward-button" for="reward">赞赏支持</label>
+  <div class="qr-code">
+    
+    <label class="qr-code-image" for="reward">
+        <img class="image" src="/images/money_weixin_20200719212002.png">
+        <span>微信打赏</span>
+      </label>
+    <label class="qr-code-image" for="reward">
+        <img class="image" src="/images/alipay_20200801211208.png">
+        <span>支付宝打赏</span>
+      </label>
+  </div>
+</div><footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/%E6%A0%91%E8%8E%93%E6%B4%BE/">树莓派</a>
+          <a href="/tags/docker/">docker</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/docker_timezone/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">docker定义时区</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
+        <a class="next" href="/post/linux_simhei_ttf/">
+            <span class="next-text nav-default">在linux上装中文字体</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        <div id="gitalk-container"></div>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js" crossorigin="anonymous"></script>
+    <script type="text/javascript">
+      var gitalk = new Gitalk({
+        id: '2020-07-28 23:58:13 \x2b0800 CST',
+        title: '在树莓派上搭建docker',
+        clientID: '5ea75f603117948d8d37',
+        clientSecret: '26c617c6bce9a975c2a65a68f1ca2a2cc7dde587',
+        repo: 'blog',
+        owner: 'zhangsheng377',
+        admin: ['zhangsheng377'],
+        body: decodeURI(location.href)
+      });
+      gitalk.render('gitalk-container');
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://github.com/gitalk/gitalk">comments powered by gitalk.</a></noscript>
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:435878393@qq.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://www.linkedin.com/in/zhangshengdong/" class="iconfont icon-linkedin" title="linkedin"></a>
+      <a href="https://github.com/zhangsheng377/" class="iconfont icon-github" title="github"></a>
+  <a href="https://www.zhangshengdong.com/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  <div class="busuanzi-footer">
+    <span id="busuanzi_container_site_pv"> 本站总访问量 <span id="busuanzi_value_site_pv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> 次 </span>
+      <span class="division">|</span>
+    <span id="busuanzi_container_site_uv"> 本站总访客数 <span id="busuanzi_value_site_uv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> 人 </span>
+  </div>
+
+  <span class="copyright-year">
+    &copy; 
+    2019 - 
+    2022<span class="heart"><i class="iconfont icon-heart"></i></span><span><a href="https://beian.miit.gov.cn/" target="_blank">苏ICP备15009593号-1</a></span>
+  </span>
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+
+
+
+<script type="text/javascript" src="/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js"></script>
+  <script type="text/javascript">
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        tags: 'ams',
+        }
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3.0.5/es5/tex-mml-chtml.js" integrity="sha256-HGLuEfFcsUJGhvB8cQ8nr0gai9EucOOaIxFw7qxmd+w=" crossorigin="anonymous"></script>
+
+<script id="baidu_analytics">
+  var _hmt = _hmt || [];
+  (function() {
+    if (window.location.hostname === 'localhost') return;
+    var hm = document.createElement("script"); hm.async = true;
+    hm.src = "https://hm.baidu.com/hm.js?c602db2501643f661d9789f9e9707386";
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(hm, s);
+  })();
+</script>
+
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>keras on 张胜东的博客</title>
+    <link>https://www.zhangshengdong.com/tags/keras/</link>
+    <description>Recent content in keras on 张胜东的博客</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>&lt;a href=&#34;https://beian.miit.gov.cn/&#34; target=&#34;_blank&#34;&gt;苏ICP备15009593号-1&lt;/a&gt;</copyright>
+    <lastBuildDate>Fri, 07 May 2021 20:19:58 +0800</lastBuildDate>
+    
+	<atom:link href="https://www.zhangshengdong.com/tags/keras/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>keras_tf2数据并行</title>
+      <link>https://www.zhangshengdong.com/post/keras_tf2_data_parallel/</link>
+      <pubDate>Fri, 07 May 2021 20:19:58 +0800</pubDate>
+      
+      <guid>https://www.zhangshengdong.com/post/keras_tf2_data_parallel/</guid>
+      <description>背景 一直都想去搭一个并行模型，即使用多gpu共同计算的模型。今天终于把keras+tf2下的数据并行模式调通啦~~ 关键点 1 2 3 4 5 6 import os os.environ[&amp;#34;CUDA_VISIBLE_DEVICES&amp;#34;] =</description>
+    </item>
+    
+    <item>
+      <title>使用tfrecord构建数据集</title>
+      <link>https://www.zhangshengdong.com/post/tfrecord/</link>
+      <pubDate>Wed, 05 May 2021 02:42:58 +0800</pubDate>
+      
+      <guid>https://www.zhangshengdong.com/post/tfrecord/</guid>
+      <description>背景 最近在打比赛，听说tfrecord的格式可以以二进制的方式高效存储数据，并利用protobuf协议读取数据，所以就想着把训练代码改成tf</description>
+    </item>
+    
+    <item>
+      <title>获取模型的中间层输出</title>
+      <link>https://www.zhangshengdong.com/post/choose_layer_output/</link>
+      <pubDate>Thu, 29 Apr 2021 01:52:58 +0800</pubDate>
+      
+      <guid>https://www.zhangshengdong.com/post/choose_layer_output/</guid>
+      <description>背景 最近在疯狂搭模型，突然有人来问我要我模型的中间层输出的embedding，于是，我就研究了一下怎么获取模型的中间层输出。 代码实现 1 2 3 4</description>
+    </item>
+    
+    <item>
+      <title>将类别特征通过Embedding层映射并进行拼接</title>
+      <link>https://www.zhangshengdong.com/post/category_embedding/</link>
+      <pubDate>Wed, 28 Apr 2021 02:53:58 +0800</pubDate>
+      
+      <guid>https://www.zhangshengdong.com/post/category_embedding/</guid>
+      <description>背景 最近有一道题，想把类别特征也放到模型里去，跟bert输出拼接到一起。 所以便设计了，使用Embedding层，将类别特征的词表映射到X维向</description>
+    </item>
+    
+    <item>
+      <title>用自定义损失函数实现选择启用不同子网络</title>
+      <link>https://www.zhangshengdong.com/post/custom_loss_to_switch_network/</link>
+      <pubDate>Wed, 31 Mar 2021 01:14:58 +0800</pubDate>
+      
+      <guid>https://www.zhangshengdong.com/post/custom_loss_to_switch_network/</guid>
+      <description>背景 最近发现有一道题，还挺有意思的。题目大意是，每条训练样本是一个文章对，labelA标签标识这两篇文章相似，labelB标签标识这两篇文章</description>
+    </item>
+    
+    <item>
+      <title>用transformers实现多输出、参数共享的bert模型</title>
+      <link>https://www.zhangshengdong.com/post/multi_output_bert_model_with_transformers/</link>
+      <pubDate>Sat, 27 Mar 2021 00:57:58 +0800</pubDate>
+      
+      <guid>https://www.zhangshengdong.com/post/multi_output_bert_model_with_transformers/</guid>
+      <description>背景 在nlp领域，预训练模型bert可谓是红得发紫。 但现在能搜到的大多数都是pytorch写的框架，而且大多都是单输出模型。 所以，本文以 有相</description>
+    </item>
+    
+    <item>
+      <title>用keras实现textcnn</title>
+      <link>https://www.zhangshengdong.com/post/keras_textcnn/</link>
+      <pubDate>Mon, 08 Mar 2021 00:56:58 +0800</pubDate>
+      
+      <guid>https://www.zhangshengdong.com/post/keras_textcnn/</guid>
+      <description>本文主要参考是的： https://blog.csdn.net/asialee_bird/article/details/88813385 基础版CNN 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 def get_model(): K.clear_session() model = Sequential() model.add(Embedding(len(vocab) + 1, 300, input_length=50)) #使用Embeeding层将每个词编码转换</description>
+    </item>
+    
+    <item>
+      <title>用keras_bert实现多输出、参数共享模型</title>
+      <link>https://www.zhangshengdong.com/post/multi_output_bert_model/</link>
+      <pubDate>Sat, 06 Mar 2021 19:29:58 +0800</pubDate>
+      
+      <guid>https://www.zhangshengdong.com/post/multi_output_bert_model/</guid>
+      <description>背景 在nlp领域，预训练模型bert可谓是红得发紫。 但现在能搜到的大多数都是pytorch写的框架，而且大多都是单输出模型。 所以，本文以 有相</description>
+    </item>
+    
+  </channel>
+</rss>

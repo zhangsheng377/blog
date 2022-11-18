@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>多输出 on 张胜东的博客</title>
+    <link>https://www.zhangshengdong.com/tags/%E5%A4%9A%E8%BE%93%E5%87%BA/</link>
+    <description>Recent content in 多输出 on 张胜东的博客</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>&lt;a href=&#34;https://beian.miit.gov.cn/&#34; target=&#34;_blank&#34;&gt;苏ICP备15009593号-1&lt;/a&gt;</copyright>
+    <lastBuildDate>Sat, 27 Mar 2021 00:57:58 +0800</lastBuildDate>
+    
+	<atom:link href="https://www.zhangshengdong.com/tags/%E5%A4%9A%E8%BE%93%E5%87%BA/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>用transformers实现多输出、参数共享的bert模型</title>
+      <link>https://www.zhangshengdong.com/post/multi_output_bert_model_with_transformers/</link>
+      <pubDate>Sat, 27 Mar 2021 00:57:58 +0800</pubDate>
+      
+      <guid>https://www.zhangshengdong.com/post/multi_output_bert_model_with_transformers/</guid>
+      <description>背景 在nlp领域，预训练模型bert可谓是红得发紫。 但现在能搜到的大多数都是pytorch写的框架，而且大多都是单输出模型。 所以，本文以 有相</description>
+    </item>
+    
+    <item>
+      <title>用keras_bert实现多输出、参数共享模型</title>
+      <link>https://www.zhangshengdong.com/post/multi_output_bert_model/</link>
+      <pubDate>Sat, 06 Mar 2021 19:29:58 +0800</pubDate>
+      
+      <guid>https://www.zhangshengdong.com/post/multi_output_bert_model/</guid>
+      <description>背景 在nlp领域，预训练模型bert可谓是红得发紫。 但现在能搜到的大多数都是pytorch写的框架，而且大多都是单输出模型。 所以，本文以 有相</description>
+    </item>
+    
+  </channel>
+</rss>

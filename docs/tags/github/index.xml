@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>github on 张胜东的博客</title>
+    <link>https://www.zhangshengdong.com/tags/github/</link>
+    <description>Recent content in github on 张胜东的博客</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>&lt;a href=&#34;https://beian.miit.gov.cn/&#34; target=&#34;_blank&#34;&gt;苏ICP备15009593号-1&lt;/a&gt;</copyright>
+    <lastBuildDate>Mon, 30 Dec 2019 23:56:52 +0800</lastBuildDate>
+    
+	<atom:link href="https://www.zhangshengdong.com/tags/github/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>使用Hugo和Netlify建立静态博客，并托管在Github上</title>
+      <link>https://www.zhangshengdong.com/post/hugo_and_netlify/</link>
+      <pubDate>Mon, 30 Dec 2019 23:56:52 +0800</pubDate>
+      
+      <guid>https://www.zhangshengdong.com/post/hugo_and_netlify/</guid>
+      <description>使用Hugo建立静态博客 sudo apt install hugo hugo new site blog cd blog/ git submodule add https://github.com/budparr/gohugo-theme-ananke.git themes/ananke git submodule add https://github.com/olOwOlo/hugo-theme-even themes/even echo &amp;lsquo;theme = &amp;ldquo;ananke&amp;rdquo;&amp;rsquo; &amp;raquo; config.toml echo &amp;lsquo;theme = &amp;ldquo;even&amp;rdquo;&amp;rsquo; &amp;raquo; config.toml hugo new post/my-first-post.md 注意：直接这样生成的页面头，是带有 draft: true 标记的，</description>
+    </item>
+    
+  </channel>
+</rss>

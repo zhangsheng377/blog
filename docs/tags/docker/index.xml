@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>docker on 张胜东的博客</title>
+    <link>https://www.zhangshengdong.com/tags/docker/</link>
+    <description>Recent content in docker on 张胜东的博客</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>&lt;a href=&#34;https://beian.miit.gov.cn/&#34; target=&#34;_blank&#34;&gt;苏ICP备15009593号-1&lt;/a&gt;</copyright>
+    <lastBuildDate>Sun, 31 Jan 2021 22:25:58 +0800</lastBuildDate>
+    
+	<atom:link href="https://www.zhangshengdong.com/tags/docker/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>docker log太占空间</title>
+      <link>https://www.zhangshengdong.com/post/docker_log/</link>
+      <pubDate>Sun, 31 Jan 2021 22:25:58 +0800</pubDate>
+      
+      <guid>https://www.zhangshengdong.com/post/docker_log/</guid>
+      <description>起因 最近发现服务器的空间总是不够，把exsi的所有资源都给了server虚拟机后，才一周磁盘就又被占满了。 查找大文件、大目录 从根目录开始，使</description>
+    </item>
+    
+    <item>
+      <title>docker定义时区</title>
+      <link>https://www.zhangshengdong.com/post/docker_timezone/</link>
+      <pubDate>Sun, 15 Nov 2020 02:28:13 +0800</pubDate>
+      
+      <guid>https://www.zhangshengdong.com/post/docker_timezone/</guid>
+      <description>起因 由于我们用的docker镜像基本都是utc时间，而中国是+8时区，所以在本地化时就很比较麻烦。这样，就需要一种可以定义docker时区的</description>
+    </item>
+    
+    <item>
+      <title>在树莓派上搭建docker</title>
+      <link>https://www.zhangshengdong.com/post/raspberry_docker/</link>
+      <pubDate>Tue, 28 Jul 2020 23:58:13 +0800</pubDate>
+      
+      <guid>https://www.zhangshengdong.com/post/raspberry_docker/</guid>
+      <description>起因 总是听人说在树莓派上使用docker多好多好，近日，自己推演了一番，发现的确不错，起码隔离效果挺好。要知道，树莓派由于是arm架构，所以</description>
+    </item>
+    
+  </channel>
+</rss>

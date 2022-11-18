@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Categories on 张胜东的博客</title>
+    <link>https://www.zhangshengdong.com/categories/</link>
+    <description>Recent content in Categories on 张胜东的博客</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>&lt;a href=&#34;https://beian.miit.gov.cn/&#34; target=&#34;_blank&#34;&gt;苏ICP备15009593号-1&lt;/a&gt;</copyright>
+    <lastBuildDate>Fri, 18 Nov 2022 22:49:58 +0800</lastBuildDate>
+    
+	<atom:link href="https://www.zhangshengdong.com/categories/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>工程</title>
+      <link>https://www.zhangshengdong.com/categories/%E5%B7%A5%E7%A8%8B/</link>
+      <pubDate>Fri, 18 Nov 2022 22:49:58 +0800</pubDate>
+      
+      <guid>https://www.zhangshengdong.com/categories/%E5%B7%A5%E7%A8%8B/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>

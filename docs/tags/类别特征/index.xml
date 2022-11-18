@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>类别特征 on 张胜东的博客</title>
+    <link>https://www.zhangshengdong.com/tags/%E7%B1%BB%E5%88%AB%E7%89%B9%E5%BE%81/</link>
+    <description>Recent content in 类别特征 on 张胜东的博客</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>&lt;a href=&#34;https://beian.miit.gov.cn/&#34; target=&#34;_blank&#34;&gt;苏ICP备15009593号-1&lt;/a&gt;</copyright>
+    <lastBuildDate>Wed, 28 Apr 2021 02:53:58 +0800</lastBuildDate>
+    
+	<atom:link href="https://www.zhangshengdong.com/tags/%E7%B1%BB%E5%88%AB%E7%89%B9%E5%BE%81/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>将类别特征通过Embedding层映射并进行拼接</title>
+      <link>https://www.zhangshengdong.com/post/category_embedding/</link>
+      <pubDate>Wed, 28 Apr 2021 02:53:58 +0800</pubDate>
+      
+      <guid>https://www.zhangshengdong.com/post/category_embedding/</guid>
+      <description>背景 最近有一道题，想把类别特征也放到模型里去，跟bert输出拼接到一起。 所以便设计了，使用Embedding层，将类别特征的词表映射到X维向</description>
+    </item>
+    
+  </channel>
+</rss>

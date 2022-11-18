@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>linux on 张胜东的博客</title>
+    <link>https://www.zhangshengdong.com/tags/linux/</link>
+    <description>Recent content in linux on 张胜东的博客</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>&lt;a href=&#34;https://beian.miit.gov.cn/&#34; target=&#34;_blank&#34;&gt;苏ICP备15009593号-1&lt;/a&gt;</copyright>
+    <lastBuildDate>Wed, 22 Jul 2020 01:28:50 +0800</lastBuildDate>
+    
+	<atom:link href="https://www.zhangshengdong.com/tags/linux/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>在linux上装中文字体</title>
+      <link>https://www.zhangshengdong.com/post/linux_simhei_ttf/</link>
+      <pubDate>Wed, 22 Jul 2020 01:28:50 +0800</pubDate>
+      
+      <guid>https://www.zhangshengdong.com/post/linux_simhei_ttf/</guid>
+      <description>起因 最近要在树莓派上用python matplotlib画图，但发现显示不了中文。一指定字体才发现，simhei字体没装。 解决方案 从windo</description>
+    </item>
+    
+    <item>
+      <title>树莓派自启动</title>
+      <link>https://www.zhangshengdong.com/post/raspberry_autostart/</link>
+      <pubDate>Sat, 06 Jun 2020 23:45:21 +0800</pubDate>
+      
+      <guid>https://www.zhangshengdong.com/post/raspberry_autostart/</guid>
+      <description>新建服务文件 1 sudo nano /usr/lib/systemd/system/xx_net.service 1 2 3 4 5 6 7 8 9 10 11 12 13 14 [Unit] Description=xx_net [Service] Type=oneshot ExecStart=/home/pi/Desktop/XX-Net/start [Install] WantedBy=multi-user.target 指定服务自启动 1 sudo systemctl enable xx_net.service</description>
+    </item>
+    
+    <item>
+      <title>Linux挂载exfat格式U盘</title>
+      <link>https://www.zhangshengdong.com/post/linux_mount_exfat/</link>
+      <pubDate>Sat, 23 May 2020 10:39:27 +0800</pubDate>
+      
+      <guid>https://www.zhangshengdong.com/post/linux_mount_exfat/</guid>
+      <description>安装exfat组件 1 sudo apt install exfat-utils 查看U盘位置 1 sudo fdisk -l 挂载U盘 1 sudo mount.exfat-fuse /dev/sdb1 /mnt/usb 卸载U盘 1 sudo umount /dev/sdb1</description>
+    </item>
+    
+  </channel>
+</rss>

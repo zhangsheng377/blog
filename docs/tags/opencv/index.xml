@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>opencv on 张胜东的博客</title>
+    <link>https://www.zhangshengdong.com/tags/opencv/</link>
+    <description>Recent content in opencv on 张胜东的博客</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>&lt;a href=&#34;https://beian.miit.gov.cn/&#34; target=&#34;_blank&#34;&gt;苏ICP备15009593号-1&lt;/a&gt;</copyright>
+    <lastBuildDate>Sat, 16 May 2020 02:50:01 +0800</lastBuildDate>
+    
+	<atom:link href="https://www.zhangshengdong.com/tags/opencv/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Opencv判断颜色相似的图片</title>
+      <link>https://www.zhangshengdong.com/post/opencv_similar_color_pic/</link>
+      <pubDate>Sat, 16 May 2020 02:50:01 +0800</pubDate>
+      
+      <guid>https://www.zhangshengdong.com/post/opencv_similar_color_pic/</guid>
+      <description>问题描述 有一个项目，大体是要判断一下一篇文章内的配图突不突兀。 素材准备 所以就从网上随便找了4张图： 可以看出，前3张图片从颜色上、从阅读感受上</description>
+    </item>
+    
+  </channel>
+</rss>

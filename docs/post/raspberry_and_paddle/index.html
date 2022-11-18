@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>树莓派上使用paddle预训练模型 - 张胜东的博客</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="张胜东" /><meta name="description" content="树莓派安装paddlelite; x86电脑上安装paddlehub，并将paddlehub中的预训练模型转换为paddlelite格式，使之" /><meta name="keywords" content="张胜东, 博客, 编程" />
+
+
+<meta name="baidu-site-verification" content="qWR9jJPJ9e" />
+<meta name="google-site-verification" content="s9FkJZw4X2alyC8-nsdZgiPHBwX6uqr1QVNxRaGfDKY" />
+
+
+<meta name="generator" content="Hugo 0.68.3 with theme even" />
+
+
+<link rel="canonical" href="https://www.zhangshengdong.com/post/raspberry_and_paddle/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<link href="/sass/main.min.2e81bbed97b8b282c1aeb57488cc71c8d8c8ec559f3931531bd396bf31e0d4dd.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="树莓派上使用paddle预训练模型" />
+<meta property="og:description" content="树莓派安装paddlelite; x86电脑上安装paddlehub，并将paddlehub中的预训练模型转换为paddlelite格式，使之" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://www.zhangshengdong.com/post/raspberry_and_paddle/" />
+<meta property="article:published_time" content="2020-05-17T01:47:08+08:00" />
+<meta property="article:modified_time" content="2021-09-09T04:13:14+08:00" />
+<meta itemprop="name" content="树莓派上使用paddle预训练模型">
+<meta itemprop="description" content="树莓派安装paddlelite; x86电脑上安装paddlehub，并将paddlehub中的预训练模型转换为paddlelite格式，使之">
+<meta itemprop="datePublished" content="2020-05-17T01:47:08&#43;08:00" />
+<meta itemprop="dateModified" content="2021-09-09T04:13:14&#43;08:00" />
+<meta itemprop="wordCount" content="821">
+
+
+
+<meta itemprop="keywords" content="树莓派,paddle,python," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="树莓派上使用paddle预训练模型"/>
+<meta name="twitter:description" content="树莓派安装paddlelite; x86电脑上安装paddlehub，并将paddlehub中的预训练模型转换为paddlelite格式，使之"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">张胜东的博客</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">About</li>
+      </a>
+  </ul>
+
+  
+
+
+</nav>
+
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">张胜东的博客</a>
+</div>
+
+
+
+
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about/">About</a>
+      </li>
+  </ul>
+</nav>
+
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">树莓派上使用paddle预训练模型</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2020-05-17 </span>
+        
+          <span class="more-meta"> 约 821 字 </span>
+          <span class="more-meta"> 预计阅读 2 分钟 </span>
+        <span id="busuanzi_container_page_pv" class="more-meta"> <span id="busuanzi_value_page_pv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> 次阅读 </span>
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#树莓派编译安装paddlelite"><strong>树莓派编译安装paddlelite</strong></a></li>
+        <li><a href="#x86电脑上将paddlehub的预训练模型转为paddlelite格式"><strong>x86电脑上将paddlehub的预训练模型转为paddlelite格式</strong></a>
+          <ul>
+            <li><a href="#安装paddlehubpaddlepaddle">安装paddlehub、paddlepaddle</a></li>
+            <li><a href="#测试paddlehub预训练模型">测试paddlehub预训练模型</a></li>
+            <li><a href="#下载opt转换工具">下载opt转换工具</a></li>
+            <li><a href="#下载paddlehub预训练模型并转换">下载paddlehub预训练模型并转换</a></li>
+          </ul>
+        </li>
+        <li><a href="#在树莓派上测试转换后的预训练模型"><strong>在树莓派上测试转换后的预训练模型</strong></a></li>
+        <li><a href="#后记"><strong>后记</strong></a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <p>树莓派安装paddlelite;
+x86电脑上安装paddlehub，并将paddlehub中的预训练模型转换为paddlelite格式，使之能在树莓派上运行。</p>
+<h2 id="树莓派编译安装paddlelite"><strong>树莓派编译安装paddlelite</strong></h2>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">sudo apt install patchelf cmake
+sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 <span class="m">150</span>
+
+git clone https://github.com/PaddlePaddle/Paddle-Lite.git
+<span class="nb">cd</span> Paddle-Lite
+sudo ./lite/tools/build.sh <span class="se">\
+</span><span class="se"></span>  --build_extra<span class="o">=</span>ON <span class="se">\
+</span><span class="se"></span>  --arm_os<span class="o">=</span>armlinux <span class="se">\
+</span><span class="se"></span>  --arm_abi<span class="o">=</span>armv7hf <span class="se">\
+</span><span class="se"></span>  --arm_lang<span class="o">=</span>gcc <span class="se">\
+</span><span class="se"></span>  --build_python<span class="o">=</span>ON <span class="se">\
+</span><span class="se"></span>  full_publish
+
+<span class="nb">cd</span> build.lite.armlinux.armv7hf.gcc/inference_lite_lib.armlinux.armv7hf/python/install
+sudo python3 setup.py install
+</code></pre></td></tr></table>
+</div>
+</div><p>具体源码编译时的参数说明，大家可参考：<a href="https://paddlepaddle.github.io/Paddle-Lite/v2.2.0/source_compile/#%E6%9C%AC%E5%9C%B0%E7%BC%96%E8%AF%91%E7%9B%B4%E6%8E%A5%E5%9C%A8rk3399%E6%88%96%E6%A0%91%E8%8E%93%E6%B4%BE%E4%B8%8A%E7%BC%96%E8%AF%91">https://paddlepaddle.github.io/Paddle-Lite/v2.2.0/source_compile/#本地编译直接在rk3399或树莓派上编译</a></p>
+<h2 id="x86电脑上将paddlehub的预训练模型转为paddlelite格式"><strong>x86电脑上将paddlehub的预训练模型转为paddlelite格式</strong></h2>
+<h3 id="安装paddlehubpaddlepaddle">安装paddlehub、paddlepaddle</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">python -m pip install paddlehub
+python -m pip install paddlepaddle
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="测试paddlehub预训练模型">测试paddlehub预训练模型</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">paddlehub</span> <span class="kn">as</span> <span class="nn">hub</span>
+
+<span class="n">senta</span> <span class="o">=</span> <span class="n">hub</span><span class="o">.</span><span class="n">Module</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&#34;senta_gru&#34;</span><span class="p">)</span>
+<span class="n">test_text</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&#34;这家餐厅很好吃&#34;</span><span class="p">,</span> <span class="s2">&#34;这部电影真的很差劲&#34;</span><span class="p">]</span>
+
+<span class="n">results</span> <span class="o">=</span> <span class="n">senta</span><span class="o">.</span><span class="n">sentiment_classify</span><span class="p">(</span><span class="n">texts</span><span class="o">=</span><span class="n">test_text</span><span class="p">,</span> <span class="n">use_gpu</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;text&#39;</span><span class="p">])</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;sentiment_label&#39;</span><span class="p">])</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;sentiment_key&#39;</span><span class="p">])</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;positive_probs&#39;</span><span class="p">])</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;negative_probs&#39;</span><span class="p">])</span>
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="下载opt转换工具">下载opt转换工具</h3>
+<p><a href="https://paddlepaddle.github.io/Paddle-Lite/v2.2.0/model_optimize_tool/">https://paddlepaddle.github.io/Paddle-Lite/v2.2.0/model_optimize_tool/</a></p>
+<h3 id="下载paddlehub预训练模型并转换">下载paddlehub预训练模型并转换</h3>
+<p>下载预训练模型压缩包：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">hub download senta_gru
+</code></pre></td></tr></table>
+</div>
+</div><p>解压，放置在 saved_models/senta_gru 下，</p>
+<p>转换模型：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">./opt --model_dir<span class="o">=</span>senta_gru/infer_model --valid_targets<span class="o">=</span>arm --optimize_out_type<span class="o">=</span>naive_buffer --optimize_out<span class="o">=</span>saved_models/senta_gru
+</code></pre></td></tr></table>
+</div>
+</div><p>PS: 查看opt转换工具所支持的模型算子：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-shell" data-lang="shell">./opt --print_model_ops<span class="o">=</span><span class="nb">true</span> --valid_targets<span class="o">=</span>arm --model_dir<span class="o">=</span>senta_gru/infer_model
+</code></pre></td></tr></table>
+</div>
+</div><h2 id="在树莓派上测试转换后的预训练模型"><strong>在树莓派上测试转换后的预训练模型</strong></h2>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">paddlelite.lite</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">config</span> <span class="o">=</span> <span class="n">MobileConfig</span><span class="p">()</span>
+<span class="n">config</span><span class="o">.</span><span class="n">set_model_dir</span><span class="p">(</span><span class="s2">&#34;model&#34;</span><span class="p">)</span>
+
+<span class="c1"># (2) 创建predictor</span>
+<span class="n">predictor</span> <span class="o">=</span> <span class="n">create_paddle_predictor</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+<span class="s1">&#39;&#39;&#39;
+</span><span class="s1">......
+</span><span class="s1">&#39;&#39;&#39;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>然后就出现段错误了。。。</p>
+<hr>
+<h2 id="后记"><strong>后记</strong></h2>
+<p>之后开始各种找原因，也想到可能是由于漏转换了什么而导致的。。。</p>
+<p>也反复找了资料，但由于paddle还尚未稳定，甚至连官方网站里的demo都已过时，接口都已变动得消失不见了。。。</p>
+<p>所以最终只好暂时放弃。</p>
+<p>可能 paddlepaddle 和 paddlehub ，作为百度paddle框架的主力，迭代速度快、完成度也还行，属于比较可用。但其他的组件可能优先级就比较低了，文档也不同步，实在是造成了很大的困扰。</p>
+<p>毕竟已经占用了一整天的时间了，还要抽空学习推荐系统，和完成我的與情预测股票项目，所以paddlelite项目就只能等百度paddle稳定了再启动吧。</p>
+
+    </div>
+
+    
+<div class="post-reward">
+  <input type="checkbox" name="reward" id="reward" hidden />
+  <label class="reward-button" for="reward">赞赏支持</label>
+  <div class="qr-code">
+    
+    <label class="qr-code-image" for="reward">
+        <img class="image" src="/images/money_weixin_20200719212002.png">
+        <span>微信打赏</span>
+      </label>
+    <label class="qr-code-image" for="reward">
+        <img class="image" src="/images/alipay_20200801211208.png">
+        <span>支付宝打赏</span>
+      </label>
+  </div>
+</div><footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/%E6%A0%91%E8%8E%93%E6%B4%BE/">树莓派</a>
+          <a href="/tags/paddle/">paddle</a>
+          <a href="/tags/python/">python</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/linux_mount_exfat/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">Linux挂载exfat格式U盘</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
+        <a class="next" href="/post/opencv_similar_color_pic/">
+            <span class="next-text nav-default">Opencv判断颜色相似的图片</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        <div id="gitalk-container"></div>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js" crossorigin="anonymous"></script>
+    <script type="text/javascript">
+      var gitalk = new Gitalk({
+        id: '2020-05-17 01:47:08 \x2b0800 CST',
+        title: '树莓派上使用paddle预训练模型',
+        clientID: '5ea75f603117948d8d37',
+        clientSecret: '26c617c6bce9a975c2a65a68f1ca2a2cc7dde587',
+        repo: 'blog',
+        owner: 'zhangsheng377',
+        admin: ['zhangsheng377'],
+        body: decodeURI(location.href)
+      });
+      gitalk.render('gitalk-container');
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://github.com/gitalk/gitalk">comments powered by gitalk.</a></noscript>
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:435878393@qq.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://www.linkedin.com/in/zhangshengdong/" class="iconfont icon-linkedin" title="linkedin"></a>
+      <a href="https://github.com/zhangsheng377/" class="iconfont icon-github" title="github"></a>
+  <a href="https://www.zhangshengdong.com/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  <div class="busuanzi-footer">
+    <span id="busuanzi_container_site_pv"> 本站总访问量 <span id="busuanzi_value_site_pv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> 次 </span>
+      <span class="division">|</span>
+    <span id="busuanzi_container_site_uv"> 本站总访客数 <span id="busuanzi_value_site_uv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> 人 </span>
+  </div>
+
+  <span class="copyright-year">
+    &copy; 
+    2019 - 
+    2022<span class="heart"><i class="iconfont icon-heart"></i></span><span><a href="https://beian.miit.gov.cn/" target="_blank">苏ICP备15009593号-1</a></span>
+  </span>
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+
+
+
+<script type="text/javascript" src="/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js"></script>
+  <script type="text/javascript">
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        tags: 'ams',
+        }
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3.0.5/es5/tex-mml-chtml.js" integrity="sha256-HGLuEfFcsUJGhvB8cQ8nr0gai9EucOOaIxFw7qxmd+w=" crossorigin="anonymous"></script>
+
+<script id="baidu_analytics">
+  var _hmt = _hmt || [];
+  (function() {
+    if (window.location.hostname === 'localhost') return;
+    var hm = document.createElement("script"); hm.async = true;
+    hm.src = "https://hm.baidu.com/hm.js?c602db2501643f661d9789f9e9707386";
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(hm, s);
+  })();
+</script>
+
+
+
+
+
+
+</body>
+</html>

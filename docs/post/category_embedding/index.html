@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>将类别特征通过Embedding层映射并进行拼接 - 张胜东的博客</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="张胜东" /><meta name="description" content="背景 最近有一道题，想把类别特征也放到模型里去，跟bert输出拼接到一起。 所以便设计了，使用Embedding层，将类别特征的词表映射到X维向" /><meta name="keywords" content="张胜东, 博客, 编程" />
+
+
+<meta name="baidu-site-verification" content="qWR9jJPJ9e" />
+<meta name="google-site-verification" content="s9FkJZw4X2alyC8-nsdZgiPHBwX6uqr1QVNxRaGfDKY" />
+
+
+<meta name="generator" content="Hugo 0.68.3 with theme even" />
+
+
+<link rel="canonical" href="https://www.zhangshengdong.com/post/category_embedding/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<link href="/sass/main.min.2e81bbed97b8b282c1aeb57488cc71c8d8c8ec559f3931531bd396bf31e0d4dd.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="将类别特征通过Embedding层映射并进行拼接" />
+<meta property="og:description" content="背景 最近有一道题，想把类别特征也放到模型里去，跟bert输出拼接到一起。 所以便设计了，使用Embedding层，将类别特征的词表映射到X维向" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://www.zhangshengdong.com/post/category_embedding/" />
+<meta property="article:published_time" content="2021-04-28T02:53:58+08:00" />
+<meta property="article:modified_time" content="2021-09-09T04:13:14+08:00" />
+<meta itemprop="name" content="将类别特征通过Embedding层映射并进行拼接">
+<meta itemprop="description" content="背景 最近有一道题，想把类别特征也放到模型里去，跟bert输出拼接到一起。 所以便设计了，使用Embedding层，将类别特征的词表映射到X维向">
+<meta itemprop="datePublished" content="2021-04-28T02:53:58&#43;08:00" />
+<meta itemprop="dateModified" content="2021-09-09T04:13:14&#43;08:00" />
+<meta itemprop="wordCount" content="513">
+
+
+
+<meta itemprop="keywords" content="深度学习,类别特征,embedding,拼接,keras," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="将类别特征通过Embedding层映射并进行拼接"/>
+<meta name="twitter:description" content="背景 最近有一道题，想把类别特征也放到模型里去，跟bert输出拼接到一起。 所以便设计了，使用Embedding层，将类别特征的词表映射到X维向"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">张胜东的博客</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">About</li>
+      </a>
+  </ul>
+
+  
+
+
+</nav>
+
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">张胜东的博客</a>
+</div>
+
+
+
+
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about/">About</a>
+      </li>
+  </ul>
+</nav>
+
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">将类别特征通过Embedding层映射并进行拼接</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2021-04-28 </span>
+        
+          <span class="more-meta"> 约 513 字 </span>
+          <span class="more-meta"> 预计阅读 2 分钟 </span>
+        <span id="busuanzi_container_page_pv" class="more-meta"> <span id="busuanzi_value_page_pv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> 次阅读 </span>
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#背景">背景</a></li>
+        <li><a href="#代码实现">代码实现</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <h2 id="背景">背景</h2>
+<p>最近有一道题，想把类别特征也放到模型里去，跟bert输出拼接到一起。</p>
+<p>所以便设计了，使用Embedding层，将类别特征的词表映射到X维向量空间里。</p>
+<pre><code>keras.layers.Embedding(input_dim, output_dim, embeddings_initializer='uniform', embeddings_regularizer=None, activity_regularizer=None, embeddings_constraint=None, mask_zero=False, input_length=None)
+</code></pre>
+<p>其中，input_dim 是词表长度。</p>
+<p>同时，因为Embedding层的输出会带上扩展的层数，变成(batch_size, input_length, output_dim)。不方便拼接，所以还需要Flatten层，帮忙拉平。</p>
+<h2 id="代码实现">代码实现</h2>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="n">bert_path</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&#34;chinese_L-12_H-768_A-12&#34;</span>
+
+<span class="n">oriSource_count</span> <span class="o">=</span> <span class="mi">5574</span>
+<span class="n">category_count</span> <span class="o">=</span> <span class="mi">30</span>
+<span class="n">sorted_label_list</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span>
+</code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">def</span> <span class="nf">get_model</span><span class="p">():</span>
+    <span class="n">K</span><span class="o">.</span><span class="n">clear_session</span><span class="p">()</span>
+    
+    <span class="n">bert_model</span> <span class="o">=</span> <span class="n">TFBertModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">bert_path</span><span class="p">,</span> <span class="n">from_pt</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">trainable</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">bert_model</span><span class="o">.</span><span class="n">layers</span><span class="p">:</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">trainable</span> <span class="o">=</span> <span class="bp">True</span>
+    
+    <span class="n">input_bert_indices</span> <span class="o">=</span> <span class="n">Input</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="bp">None</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+    <span class="n">input_bert_segments</span> <span class="o">=</span> <span class="n">Input</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="bp">None</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+    <span class="n">bert_output</span> <span class="o">=</span> <span class="n">bert_model</span><span class="p">([</span><span class="n">input_bert_indices</span><span class="p">,</span> <span class="n">input_bert_segments</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">bert_cls</span> <span class="o">=</span> <span class="n">Lambda</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])(</span><span class="n">bert_output</span><span class="p">)</span>
+    
+    <span class="n">input_num_feature</span> <span class="o">=</span> <span class="n">Input</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,))</span>
+    
+    <span class="n">input_oriSource_index</span> <span class="o">=</span> <span class="n">Input</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,))</span>
+    <span class="n">oriSource_embedding</span> <span class="o">=</span> <span class="n">Embedding</span><span class="p">(</span><span class="n">oriSource_count</span><span class="p">,</span> <span class="mi">256</span><span class="p">)(</span><span class="n">input_oriSource_index</span><span class="p">)</span>
+    <span class="n">oriSource_emb</span> <span class="o">=</span> <span class="n">Flatten</span><span class="p">()(</span><span class="n">oriSource_embedding</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">oriSource_emb</span><span class="p">)</span>
+    
+    <span class="n">input_category_index</span> <span class="o">=</span> <span class="n">Input</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,))</span>
+    <span class="n">category_embedding</span> <span class="o">=</span> <span class="n">Embedding</span><span class="p">(</span><span class="n">category_count</span><span class="p">,</span> <span class="mi">32</span><span class="p">)(</span><span class="n">input_category_index</span><span class="p">)</span>
+    <span class="n">category_emb</span> <span class="o">=</span> <span class="n">Flatten</span><span class="p">()(</span><span class="n">category_embedding</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">category_emb</span><span class="p">)</span>
+    
+    <span class="n">emb</span> <span class="o">=</span> <span class="n">concatenate</span><span class="p">([</span><span class="n">bert_cls</span><span class="p">,</span> <span class="n">input_num_feature</span><span class="p">,</span> <span class="n">oriSource_emb</span><span class="p">,</span> <span class="n">category_emb</span><span class="p">])</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">emb</span><span class="p">)</span>
+    
+    <span class="n">d0</span> <span class="o">=</span> <span class="n">Dense</span><span class="p">(</span><span class="mi">1024</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s1">&#39;relu&#39;</span><span class="p">)(</span><span class="n">emb</span><span class="p">)</span>
+    <span class="n">d0_</span> <span class="o">=</span> <span class="n">Dropout</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)(</span><span class="n">d0</span><span class="p">)</span>
+    
+    <span class="n">d1</span> <span class="o">=</span> <span class="n">Dense</span><span class="p">(</span><span class="mi">256</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s1">&#39;relu&#39;</span><span class="p">)(</span><span class="n">d0_</span><span class="p">)</span>
+    <span class="n">d1_</span> <span class="o">=</span> <span class="n">Dropout</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)(</span><span class="n">d1</span><span class="p">)</span>
+    
+    <span class="n">output</span> <span class="o">=</span> <span class="n">Dense</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sorted_label_list</span><span class="p">),</span> <span class="n">activation</span><span class="o">=</span><span class="s1">&#39;softmax&#39;</span><span class="p">)(</span><span class="n">d1_</span><span class="p">)</span>
+    
+    <span class="n">model</span> <span class="o">=</span> <span class="n">Model</span><span class="p">([</span><span class="n">input_bert_indices</span><span class="p">,</span> <span class="n">input_bert_segments</span><span class="p">,</span> <span class="n">input_num_feature</span><span class="p">,</span> <span class="n">input_oriSource_index</span><span class="p">,</span> <span class="n">input_category_index</span><span class="p">],</span> <span class="n">output</span><span class="p">)</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">loss</span><span class="o">=</span><span class="s1">&#39;sparse_categorical_crossentropy&#39;</span><span class="p">,</span>
+                  <span class="n">optimizer</span><span class="o">=</span><span class="n">Adam</span><span class="p">(</span><span class="mf">1e-5</span><span class="p">),</span>
+                  <span class="n">metrics</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;accuracy&#39;</span><span class="p">]</span>
+                 <span class="p">)</span>
+    <span class="k">return</span> <span class="n">model</span>
+</code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="n">model</span> <span class="o">=</span> <span class="n">get_model</span><span class="p">()</span>
+<span class="n">model</span><span class="o">.</span><span class="n">summary</span><span class="p">()</span>
+</code></pre></td></tr></table>
+</div>
+</div><pre><code>KerasTensor(type_spec=TensorSpec(shape=(None, 256), dtype=tf.float32, name=None), name='flatten/Reshape:0', description=&quot;created by layer 'flatten'&quot;)
+KerasTensor(type_spec=TensorSpec(shape=(None, 32), dtype=tf.float32, name=None), name='flatten_1/Reshape:0', description=&quot;created by layer 'flatten_1'&quot;)
+KerasTensor(type_spec=TensorSpec(shape=(None, 1061), dtype=tf.float32, name=None), name='concatenate/concat:0', description=&quot;created by layer 'concatenate'&quot;)
+Model: &quot;model&quot;
+__________________________________________________________________________________________________
+Layer (type)                    Output Shape         Param #     Connected to                     
+==================================================================================================
+input_1 (InputLayer)            [(None, None)]       0                                            
+__________________________________________________________________________________________________
+input_2 (InputLayer)            [(None, None)]       0                                            
+__________________________________________________________________________________________________
+input_4 (InputLayer)            [(None, 1)]          0                                            
+__________________________________________________________________________________________________
+input_5 (InputLayer)            [(None, 1)]          0                                            
+__________________________________________________________________________________________________
+tf_bert_model (TFBertModel)     TFBaseModelOutputWit 102267648   input_1[0][0]                    
+                                                                input_2[0][0]                    
+__________________________________________________________________________________________________
+embedding (Embedding)           (None, 1, 256)       1426944     input_4[0][0]                    
+__________________________________________________________________________________________________
+embedding_1 (Embedding)         (None, 1, 32)        960         input_5[0][0]                    
+__________________________________________________________________________________________________
+lambda (Lambda)                 (None, 768)          0           tf_bert_model[0][0]              
+__________________________________________________________________________________________________
+input_3 (InputLayer)            [(None, 5)]          0                                            
+__________________________________________________________________________________________________
+flatten (Flatten)               (None, 256)          0           embedding[0][0]                  
+__________________________________________________________________________________________________
+flatten_1 (Flatten)             (None, 32)           0           embedding_1[0][0]                
+__________________________________________________________________________________________________
+concatenate (Concatenate)       (None, 1061)         0           lambda[0][0]                     
+                                                                input_3[0][0]                    
+                                                                flatten[0][0]                    
+                                                                flatten_1[0][0]                  
+__________________________________________________________________________________________________
+dense (Dense)                   (None, 1024)         1087488     concatenate[0][0]                
+__________________________________________________________________________________________________
+dropout_37 (Dropout)            (None, 1024)         0           dense[0][0]                      
+__________________________________________________________________________________________________
+dense_1 (Dense)                 (None, 256)          262400      dropout_37[0][0]                 
+__________________________________________________________________________________________________
+dropout_38 (Dropout)            (None, 256)          0           dense_1[0][0]                    
+__________________________________________________________________________________________________
+dense_2 (Dense)                 (None, 30)           7710        dropout_38[0][0]                 
+==================================================================================================
+Total params: 105,053,150
+Trainable params: 105,053,150
+Non-trainable params: 0
+__________________________________________________________________________________________________
+</code></pre>
+
+    </div>
+
+    
+<div class="post-reward">
+  <input type="checkbox" name="reward" id="reward" hidden />
+  <label class="reward-button" for="reward">赞赏支持</label>
+  <div class="qr-code">
+    
+    <label class="qr-code-image" for="reward">
+        <img class="image" src="/images/money_weixin_20200719212002.png">
+        <span>微信打赏</span>
+      </label>
+    <label class="qr-code-image" for="reward">
+        <img class="image" src="/images/alipay_20200801211208.png">
+        <span>支付宝打赏</span>
+      </label>
+  </div>
+</div><footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a>
+          <a href="/tags/%E7%B1%BB%E5%88%AB%E7%89%B9%E5%BE%81/">类别特征</a>
+          <a href="/tags/embedding/">embedding</a>
+          <a href="/tags/%E6%8B%BC%E6%8E%A5/">拼接</a>
+          <a href="/tags/keras/">keras</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/choose_layer_output/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">获取模型的中间层输出</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
+        <a class="next" href="/post/custom_loss_to_switch_network/">
+            <span class="next-text nav-default">用自定义损失函数实现选择启用不同子网络</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        <div id="gitalk-container"></div>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js" crossorigin="anonymous"></script>
+    <script type="text/javascript">
+      var gitalk = new Gitalk({
+        id: '2021-04-28 02:53:58 \x2b0800 CST',
+        title: '将类别特征通过Embedding层映射并进行拼接',
+        clientID: '5ea75f603117948d8d37',
+        clientSecret: '26c617c6bce9a975c2a65a68f1ca2a2cc7dde587',
+        repo: 'blog',
+        owner: 'zhangsheng377',
+        admin: ['zhangsheng377'],
+        body: decodeURI(location.href)
+      });
+      gitalk.render('gitalk-container');
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://github.com/gitalk/gitalk">comments powered by gitalk.</a></noscript>
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:435878393@qq.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://www.linkedin.com/in/zhangshengdong/" class="iconfont icon-linkedin" title="linkedin"></a>
+      <a href="https://github.com/zhangsheng377/" class="iconfont icon-github" title="github"></a>
+  <a href="https://www.zhangshengdong.com/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  <div class="busuanzi-footer">
+    <span id="busuanzi_container_site_pv"> 本站总访问量 <span id="busuanzi_value_site_pv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> 次 </span>
+      <span class="division">|</span>
+    <span id="busuanzi_container_site_uv"> 本站总访客数 <span id="busuanzi_value_site_uv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> 人 </span>
+  </div>
+
+  <span class="copyright-year">
+    &copy; 
+    2019 - 
+    2022<span class="heart"><i class="iconfont icon-heart"></i></span><span><a href="https://beian.miit.gov.cn/" target="_blank">苏ICP备15009593号-1</a></span>
+  </span>
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+
+
+
+<script type="text/javascript" src="/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js"></script>
+  <script type="text/javascript">
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        tags: 'ams',
+        }
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3.0.5/es5/tex-mml-chtml.js" integrity="sha256-HGLuEfFcsUJGhvB8cQ8nr0gai9EucOOaIxFw7qxmd+w=" crossorigin="anonymous"></script>
+
+<script id="baidu_analytics">
+  var _hmt = _hmt || [];
+  (function() {
+    if (window.location.hostname === 'localhost') return;
+    var hm = document.createElement("script"); hm.async = true;
+    hm.src = "https://hm.baidu.com/hm.js?c602db2501643f661d9789f9e9707386";
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(hm, s);
+  })();
+</script>
+
+
+
+
+
+
+</body>
+</html>

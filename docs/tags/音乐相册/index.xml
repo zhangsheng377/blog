@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>音乐相册 on 张胜东的博客</title>
+    <link>https://www.zhangshengdong.com/tags/%E9%9F%B3%E4%B9%90%E7%9B%B8%E5%86%8C/</link>
+    <description>Recent content in 音乐相册 on 张胜东的博客</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>&lt;a href=&#34;https://beian.miit.gov.cn/&#34; target=&#34;_blank&#34;&gt;苏ICP备15009593号-1&lt;/a&gt;</copyright>
+    <lastBuildDate>Mon, 22 Aug 2022 23:33:58 +0800</lastBuildDate>
+    
+	<atom:link href="https://www.zhangshengdong.com/tags/%E9%9F%B3%E4%B9%90%E7%9B%B8%E5%86%8C/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>电子墨水屏音乐相册</title>
+      <link>https://www.zhangshengdong.com/post/auto_music_photo_show_epaper/</link>
+      <pubDate>Mon, 22 Aug 2022 23:33:58 +0800</pubDate>
+      
+      <guid>https://www.zhangshengdong.com/post/auto_music_photo_show_epaper/</guid>
+      <description>背景 事情还要从一年前，我做的墨水屏早教机说起。https://www.zhangshengdong.com/post/baby_epaper</description>
+    </item>
+    
+  </channel>
+</rss>

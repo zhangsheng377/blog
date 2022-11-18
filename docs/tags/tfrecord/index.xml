@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>tfrecord on 张胜东的博客</title>
+    <link>https://www.zhangshengdong.com/tags/tfrecord/</link>
+    <description>Recent content in tfrecord on 张胜东的博客</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>&lt;a href=&#34;https://beian.miit.gov.cn/&#34; target=&#34;_blank&#34;&gt;苏ICP备15009593号-1&lt;/a&gt;</copyright>
+    <lastBuildDate>Wed, 05 May 2021 02:42:58 +0800</lastBuildDate>
+    
+	<atom:link href="https://www.zhangshengdong.com/tags/tfrecord/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>使用tfrecord构建数据集</title>
+      <link>https://www.zhangshengdong.com/post/tfrecord/</link>
+      <pubDate>Wed, 05 May 2021 02:42:58 +0800</pubDate>
+      
+      <guid>https://www.zhangshengdong.com/post/tfrecord/</guid>
+      <description>背景 最近在打比赛，听说tfrecord的格式可以以二进制的方式高效存储数据，并利用protobuf协议读取数据，所以就想着把训练代码改成tf</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>监控网页 on 张胜东的博客</title>
+    <link>https://www.zhangshengdong.com/tags/%E7%9B%91%E6%8E%A7%E7%BD%91%E9%A1%B5/</link>
+    <description>Recent content in 监控网页 on 张胜东的博客</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>&lt;a href=&#34;https://beian.miit.gov.cn/&#34; target=&#34;_blank&#34;&gt;苏ICP备15009593号-1&lt;/a&gt;</copyright>
+    <lastBuildDate>Tue, 09 Aug 2022 23:33:58 +0800</lastBuildDate>
+    
+	<atom:link href="https://www.zhangshengdong.com/tags/%E7%9B%91%E6%8E%A7%E7%BD%91%E9%A1%B5/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>利用check酱监控网页并生成rss</title>
+      <link>https://www.zhangshengdong.com/post/checkchan_rss/</link>
+      <pubDate>Tue, 09 Aug 2022 23:33:58 +0800</pubDate>
+      
+      <guid>https://www.zhangshengdong.com/post/checkchan_rss/</guid>
+      <description>背景 最近发现了一个很好玩的开源项目：Check酱。 https://github.com/easychen/checkchan-dist 它可以通过保存cookie的方式，监控任意网页上任意元素的变化。然后通过使用Server</description>
+    </item>
+    
+  </channel>
+</rss>

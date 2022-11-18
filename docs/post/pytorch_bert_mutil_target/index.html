@@ -1,0 +1,2273 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>pytorch版bert多目标多分类 - 张胜东的博客</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="张胜东" /><meta name="description" content="背景 基于上次把pytorch使用bert给调成功后，就想试试多目标，或者叫专家网络的结构。 题目是这样的，有10个正常分类和一个其他分类，但是" /><meta name="keywords" content="张胜东, 博客, 编程" />
+
+
+<meta name="baidu-site-verification" content="qWR9jJPJ9e" />
+<meta name="google-site-verification" content="s9FkJZw4X2alyC8-nsdZgiPHBwX6uqr1QVNxRaGfDKY" />
+
+
+<meta name="generator" content="Hugo 0.68.3 with theme even" />
+
+
+<link rel="canonical" href="https://www.zhangshengdong.com/post/pytorch_bert_mutil_target/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<link href="/sass/main.min.2e81bbed97b8b282c1aeb57488cc71c8d8c8ec559f3931531bd396bf31e0d4dd.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="pytorch版bert多目标多分类" />
+<meta property="og:description" content="背景 基于上次把pytorch使用bert给调成功后，就想试试多目标，或者叫专家网络的结构。 题目是这样的，有10个正常分类和一个其他分类，但是" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://www.zhangshengdong.com/post/pytorch_bert_mutil_target/" />
+<meta property="article:published_time" content="2021-09-04T23:22:58+08:00" />
+<meta property="article:modified_time" content="2021-09-09T04:13:14+08:00" />
+<meta itemprop="name" content="pytorch版bert多目标多分类">
+<meta itemprop="description" content="背景 基于上次把pytorch使用bert给调成功后，就想试试多目标，或者叫专家网络的结构。 题目是这样的，有10个正常分类和一个其他分类，但是">
+<meta itemprop="datePublished" content="2021-09-04T23:22:58&#43;08:00" />
+<meta itemprop="dateModified" content="2021-09-09T04:13:14&#43;08:00" />
+<meta itemprop="wordCount" content="4807">
+
+
+
+<meta itemprop="keywords" content="pytorch,bert,多分类,多目标," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="pytorch版bert多目标多分类"/>
+<meta name="twitter:description" content="背景 基于上次把pytorch使用bert给调成功后，就想试试多目标，或者叫专家网络的结构。 题目是这样的，有10个正常分类和一个其他分类，但是"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">张胜东的博客</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">About</li>
+      </a>
+  </ul>
+
+  
+
+
+</nav>
+
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">张胜东的博客</a>
+</div>
+
+
+
+
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about/">About</a>
+      </li>
+  </ul>
+</nav>
+
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">pytorch版bert多目标多分类</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2021-09-04 </span>
+        
+          <span class="more-meta"> 约 4807 字 </span>
+          <span class="more-meta"> 预计阅读 10 分钟 </span>
+        <span id="busuanzi_container_page_pv" class="more-meta"> <span id="busuanzi_value_page_pv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> 次阅读 </span>
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#背景">背景</a></li>
+        <li><a href="#关键点">关键点</a></li>
+        <li><a href="#附录">附录</a>
+          <ul>
+            <li><a href="#源代码">源代码</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <h2 id="背景">背景</h2>
+<p>基于上次把pytorch使用bert给调成功后，就想试试多目标，或者叫专家网络的结构。</p>
+<p>题目是这样的，有10个正常分类和一个其他分类，但是标注的数据集只有这10个正常分类的，还有剩下大批未标注的数据。</p>
+<p>所以就准备这样设计网络：先弄一个专家网络，专门使用有标注的数据训练那10个正常分类；然后，把专家网络的这10个输出，拼上之前的输入，再进一个正常的全部类别的分类网络，训练那带其他类别的11个分类。这样也就相当于是，最后的全类别网络可以参考之前的10类别专家的结论。</p>
+<p>当然，后来又想了一个结构，可以在前面再加一个训练是不是其他类别的专家网络，然后把它的2分类结果，和之后的10类别专家的结果，以及正常输入，一起拼起来进最终的分类网络。</p>
+<p>原本准备每个专家网络都用bert的，但发现6g显存的2060(在此感谢我的师弟)无法放下包含2个bert的模型，所以只好让这几个专家都使用同一个bert，这样就变成了多目标的那一套共享层了，也算是异曲同工。</p>
+<p>最后的loss还是按照每个专家网络，包括他们各自的输出层，独自更新设计的。并且针对非全部类别的专家网络，在计算他们的loss时，所使用的predict_label和label也都取了相应的子集。</p>
+<p>但这样其实共享层的bert就会更新多次了，这的确是当时没设计好的地方，应该把共享层的bert的参数更新单独取出，使用上层各网络loss的平均值才对。</p>
+<h2 id="关键点">关键点</h2>
+<p>模型定义：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">MutilTargetModel</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="s2">&#34;&#34;&#34;Bert分类器模型&#34;&#34;&#34;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hidden_size</span><span class="o">=</span><span class="mi">768</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">MutilTargetModel</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        
+<span class="c1">#         self.expert = AutoModel.from_pretrained(pretrained_bert_path)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">bert</span> <span class="o">=</span> <span class="n">AutoModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">pretrained_bert_path</span><span class="p">)</span>
+        
+        <span class="n">category_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">category_encoder</span><span class="o">.</span><span class="n">categories_</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">paragraphs_num_size</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">words_len_size</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">source_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">source_encoder</span><span class="o">.</span><span class="n">categories_</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">expert_size</span> <span class="o">=</span> <span class="mi">10</span>
+        <span class="n">linear_size</span> <span class="o">=</span> <span class="n">hidden_size</span> <span class="o">+</span> <span class="n">category_size</span> <span class="o">+</span> <span class="n">paragraphs_num_size</span> <span class="o">+</span> <span class="n">source_size</span> <span class="o">+</span> <span class="n">words_len_size</span> <span class="o">+</span> <span class="n">expert_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">all_net</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">linear_size</span><span class="p">,</span> <span class="mi">512</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="mf">0.5</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">64</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="mf">0.5</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">doctype_list</span><span class="p">)),</span>
+        <span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">expert_net</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">hidden_size</span><span class="p">,</span> <span class="mi">256</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="mf">0.5</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">256</span><span class="p">,</span> <span class="mi">64</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="mf">0.5</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="n">expert_size</span><span class="p">),</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_data</span><span class="p">):</span>
+        <span class="n">input_ids</span> <span class="o">=</span> <span class="n">batch_data</span><span class="p">[</span><span class="s1">&#39;input_ids&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
+        <span class="n">token_type_ids</span> <span class="o">=</span> <span class="n">batch_data</span><span class="p">[</span><span class="s1">&#39;token_type_ids&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
+        <span class="n">attention_mask</span> <span class="o">=</span> <span class="n">batch_data</span><span class="p">[</span><span class="s1">&#39;attention_mask&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
+        
+        <span class="n">bert_output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bert</span><span class="p">(</span><span class="n">input_ids</span><span class="o">=</span><span class="n">input_ids</span><span class="p">,</span> <span class="n">token_type_ids</span><span class="o">=</span><span class="n">token_type_ids</span><span class="p">,</span> <span class="n">attention_mask</span><span class="o">=</span><span class="n">attention_mask</span><span class="p">)</span>
+        <span class="n">bert_cls_hidden_state</span> <span class="o">=</span> <span class="n">bert_output</span><span class="p">[</span><span class="mi">0</span><span class="p">][:,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">:]</span>
+        
+<span class="c1">#         expert = self.expert(input_ids=input_ids, token_type_ids=token_type_ids, attention_mask=attention_mask)[0][:, 0, :]</span>
+        <span class="n">expert_output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expert_net</span><span class="p">(</span><span class="n">bert_cls_hidden_state</span><span class="p">)</span>
+        
+        <span class="n">cat_layer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">bert_cls_hidden_state</span><span class="p">,</span> 
+                               <span class="n">batch_data</span><span class="p">[</span><span class="s1">&#39;category&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">cuda</span><span class="p">(),</span> 
+                               <span class="n">batch_data</span><span class="p">[</span><span class="s1">&#39;paragraphs_num&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">cuda</span><span class="p">(),</span> 
+                               <span class="n">batch_data</span><span class="p">[</span><span class="s1">&#39;source&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">cuda</span><span class="p">(),</span> 
+                               <span class="n">batch_data</span><span class="p">[</span><span class="s1">&#39;words_len&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">cuda</span><span class="p">(),</span>
+                               <span class="n">expert_output</span><span class="p">),</span> 
+                              <span class="mi">1</span><span class="p">)</span>
+        <span class="n">all_output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_net</span><span class="p">(</span><span class="n">cat_layer</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">all_output</span><span class="p">,</span> <span class="n">expert_output</span>
+    
+    <span class="k">def</span> <span class="nf">freeze</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">layer</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">layer</span><span class="o">.</span><span class="n">children</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">child</span><span class="o">.</span><span class="n">parameters</span><span class="p">():</span>
+                <span class="n">param</span><span class="o">.</span><span class="n">requires_grad</span> <span class="o">=</span> <span class="bp">False</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>给不同的网络单独设置优化器：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="c1"># 不同子网络设定不同的学习率</span>
+<span class="n">Bert_model_param</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">Bert_downstream_param</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">items</span><span class="p">,</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">named_parameters</span><span class="p">():</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">param</span><span class="o">.</span><span class="n">requires_grad</span><span class="p">:</span>
+        <span class="k">continue</span>
+    <span class="k">if</span> <span class="n">items</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;expert.&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">items</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;expert_net.&#39;</span><span class="p">):</span>
+        <span class="k">continue</span>
+    <span class="k">if</span> <span class="n">items</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;bert.&#39;</span><span class="p">):</span>
+        <span class="n">Bert_model_param</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">Bert_downstream_param</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
+<span class="n">param_groups</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">&#34;params&#34;</span><span class="p">:</span> <span class="n">Bert_model_param</span><span class="p">,</span> <span class="s2">&#34;lr&#34;</span><span class="p">:</span> <span class="mf">1e-5</span><span class="p">},</span>
+                <span class="p">{</span><span class="s2">&#34;params&#34;</span><span class="p">:</span> <span class="n">Bert_downstream_param</span><span class="p">,</span> <span class="s2">&#34;lr&#34;</span><span class="p">:</span> <span class="mf">1e-4</span><span class="p">}]</span>
+<span class="n">all_optimizer</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">param_groups</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="mf">1e-7</span><span class="p">,</span> <span class="n">weight_decay</span><span class="o">=</span><span class="mf">0.001</span><span class="p">)</span>
+
+<span class="n">Bert_model_param</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">Bert_downstream_param</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">items</span><span class="p">,</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">named_parameters</span><span class="p">():</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">param</span><span class="o">.</span><span class="n">requires_grad</span><span class="p">:</span>
+        <span class="k">continue</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">items</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;expert.&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">items</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;expert_net.&#39;</span><span class="p">):</span>
+        <span class="k">continue</span>
+    <span class="k">if</span> <span class="n">items</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;bert.&#39;</span><span class="p">):</span>
+        <span class="n">Bert_model_param</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">Bert_downstream_param</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
+<span class="n">param_groups</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">&#34;params&#34;</span><span class="p">:</span> <span class="n">Bert_model_param</span><span class="p">,</span> <span class="s2">&#34;lr&#34;</span><span class="p">:</span> <span class="mf">1e-5</span><span class="p">},</span>
+                <span class="p">{</span><span class="s2">&#34;params&#34;</span><span class="p">:</span> <span class="n">Bert_downstream_param</span><span class="p">,</span> <span class="s2">&#34;lr&#34;</span><span class="p">:</span> <span class="mf">1e-4</span><span class="p">}]</span>
+<span class="n">expert_optimizer</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">param_groups</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="mf">1e-7</span><span class="p">,</span> <span class="n">weight_decay</span><span class="o">=</span><span class="mf">0.001</span><span class="p">)</span>
+
+<span class="c1"># 初始化 early_stopping 对象</span>
+<span class="n">patience</span> <span class="o">=</span> <span class="mi">2</span>	<span class="c1"># 当验证集损失在连续n次训练周期中都没有得到降低时，停止模型训练，以防止模型过拟合</span>
+<span class="n">early_stopping</span> <span class="o">=</span> <span class="n">EarlyStopping</span><span class="p">(</span><span class="n">patience</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">criterion</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">CrossEntropyLoss</span><span class="p">()</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>训练：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="n">epoch_num</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">batch_loss_num</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">epoch_num</span><span class="p">):</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>	<span class="c1"># 设置模型为训练模式</span>
+    <span class="n">train_dataset</span> <span class="o">=</span> <span class="n">MyDataset</span><span class="p">([</span><span class="n">processed_expose_train_train_path</span><span class="p">],</span> <span class="s1">&#39;train&#39;</span><span class="p">)</span>
+    <span class="n">train_loader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">dataset</span><span class="o">=</span><span class="n">train_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="n">num_workers</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">train_loader</span><span class="p">))</span> <span class="k">as</span> <span class="n">t</span><span class="p">:</span>
+        <span class="n">loss_sum</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">batch_loss</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="k">for</span> <span class="n">batch_idx</span><span class="p">,</span><span class="n">data_</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">train_loader</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="n">data</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="n">data_</span>
+            <span class="c1"># 清空梯度</span>
+            <span class="n">all_optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+            <span class="n">expert_optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+            
+            <span class="n">all_output</span><span class="p">,</span> <span class="n">expert_output</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            
+            <span class="n">all_loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">all_output</span><span class="p">,</span> <span class="n">label</span><span class="o">.</span><span class="n">cuda</span><span class="p">())</span>
+<span class="c1">#             all_loss = all_loss / 2</span>
+            
+<span class="c1">#             expert_predict = np.argmax(expert_output.cpu(), 1)</span>
+            <span class="n">other_index</span> <span class="o">=</span> <span class="n">doctype_list</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;其他&#39;</span><span class="p">)</span>
+            <span class="n">expert_predict</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">expert_output</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="mi">1</span><span class="p">))</span>
+            <span class="n">expert_index</span> <span class="o">=</span> <span class="n">label</span> <span class="o">!=</span> <span class="n">other_index</span>
+            <span class="n">expert_label</span> <span class="o">=</span> <span class="n">label</span><span class="p">[</span><span class="n">expert_index</span><span class="p">]</span>
+            <span class="n">expert_output</span> <span class="o">=</span> <span class="n">expert_output</span><span class="p">[</span><span class="n">expert_index</span><span class="p">]</span>
+            <span class="n">expert_loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">expert_output</span><span class="p">,</span> <span class="n">expert_label</span><span class="o">.</span><span class="n">cuda</span><span class="p">())</span>
+<span class="c1">#             expert_loss = expert_loss / 2</span>
+    
+            <span class="n">all_loss</span><span class="o">.</span><span class="n">backward</span><span class="p">(</span><span class="n">retain_graph</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="c1">#             all_loss.backward()</span>
+            <span class="n">expert_loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+            <span class="c1"># 更新模型参数</span>
+            <span class="n">all_optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+            <span class="n">expert_optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+            
+            <span class="n">loss_sum</span> <span class="o">+=</span> <span class="n">all_loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">batch_idx</span> <span class="o">%</span> <span class="n">batch_loss_num</span> <span class="o">==</span> <span class="n">batch_loss_num</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">batch_loss</span> <span class="o">=</span> <span class="n">loss_sum</span> <span class="o">/</span> <span class="n">batch_loss_num</span>
+                <span class="n">localtime</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">asctime</span><span class="p">(</span> <span class="n">time</span><span class="o">.</span><span class="n">localtime</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span> <span class="p">)</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&#34;early_stop.log&#34;</span><span class="p">,</span> <span class="s1">&#39;a+&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&#34;utf-8&#34;</span><span class="p">)</span> <span class="k">as</span> <span class="n">log_file</span><span class="p">:</span>
+                    <span class="n">log_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;{localtime} train_loss={all_loss.item():.6f} batch_loss={batch_loss:.6f}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">loss_sum</span> <span class="o">=</span> <span class="mf">0.0</span>
+          
+            <span class="n">t</span><span class="o">.</span><span class="n">set_postfix_str</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;train_loss={all_loss.item():.6f} batch_loss={batch_loss:.6f}&#39;</span><span class="p">)</span>
+            <span class="n">t</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+            
+            <span class="k">del</span> <span class="n">data</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">all_output</span><span class="p">,</span> <span class="n">expert_output</span><span class="p">,</span> <span class="n">other_index</span><span class="p">,</span> <span class="n">expert_predict</span><span class="p">,</span> <span class="n">expert_index</span><span class="p">,</span> <span class="n">expert_label</span>
+            <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">empty_cache</span><span class="p">()</span>
+            
+    <span class="c1">#----------------------------------------------------</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span> <span class="c1"># 设置模型为评估/测试模式</span>
+    <span class="n">valid_dataset</span> <span class="o">=</span> <span class="n">MyDataset</span><span class="p">([</span><span class="n">processed_expose_train_valid_path</span><span class="p">],</span> <span class="s1">&#39;valid&#39;</span><span class="p">)</span>
+    <span class="n">valid_loader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">dataset</span><span class="o">=</span><span class="n">valid_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="n">num_workers</span><span class="p">)</span>
+    <span class="n">valid_loss_sum</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="k">with</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">valid_loader</span><span class="p">))</span> <span class="k">as</span> <span class="n">t</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">data</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">valid_loader</span><span class="p">:</span>
+                <span class="c1"># 一般如果验证集不是很大的话，模型验证就不需要按批量进行了，但要注意输入参数的维度不能错</span>
+                <span class="n">all_output</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+                <span class="n">all_loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">all_output</span><span class="p">,</span> <span class="n">label</span><span class="o">.</span><span class="n">cuda</span><span class="p">())</span>
+                <span class="n">valid_loss_sum</span> <span class="o">+=</span> <span class="n">all_loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+                <span class="n">t</span><span class="o">.</span><span class="n">set_postfix_str</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;valid loss={all_loss.item()}&#39;</span><span class="p">)</span>
+                <span class="n">t</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+    <span class="n">early_stopping</span><span class="p">(</span><span class="n">valid_loss_sum</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span>
+    <span class="c1"># 若满足 early stopping 要求</span>
+    <span class="k">if</span> <span class="n">early_stopping</span><span class="o">.</span><span class="n">early_stop</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&#34;Early stopping&#34;</span><span class="p">)</span>
+        <span class="c1"># 结束模型训练</span>
+        <span class="k">break</span>
+</code></pre></td></tr></table>
+</div>
+</div><h2 id="附录">附录</h2>
+<h3 id="源代码">源代码</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">  1
+</span><span class="lnt">  2
+</span><span class="lnt">  3
+</span><span class="lnt">  4
+</span><span class="lnt">  5
+</span><span class="lnt">  6
+</span><span class="lnt">  7
+</span><span class="lnt">  8
+</span><span class="lnt">  9
+</span><span class="lnt"> 10
+</span><span class="lnt"> 11
+</span><span class="lnt"> 12
+</span><span class="lnt"> 13
+</span><span class="lnt"> 14
+</span><span class="lnt"> 15
+</span><span class="lnt"> 16
+</span><span class="lnt"> 17
+</span><span class="lnt"> 18
+</span><span class="lnt"> 19
+</span><span class="lnt"> 20
+</span><span class="lnt"> 21
+</span><span class="lnt"> 22
+</span><span class="lnt"> 23
+</span><span class="lnt"> 24
+</span><span class="lnt"> 25
+</span><span class="lnt"> 26
+</span><span class="lnt"> 27
+</span><span class="lnt"> 28
+</span><span class="lnt"> 29
+</span><span class="lnt"> 30
+</span><span class="lnt"> 31
+</span><span class="lnt"> 32
+</span><span class="lnt"> 33
+</span><span class="lnt"> 34
+</span><span class="lnt"> 35
+</span><span class="lnt"> 36
+</span><span class="lnt"> 37
+</span><span class="lnt"> 38
+</span><span class="lnt"> 39
+</span><span class="lnt"> 40
+</span><span class="lnt"> 41
+</span><span class="lnt"> 42
+</span><span class="lnt"> 43
+</span><span class="lnt"> 44
+</span><span class="lnt"> 45
+</span><span class="lnt"> 46
+</span><span class="lnt"> 47
+</span><span class="lnt"> 48
+</span><span class="lnt"> 49
+</span><span class="lnt"> 50
+</span><span class="lnt"> 51
+</span><span class="lnt"> 52
+</span><span class="lnt"> 53
+</span><span class="lnt"> 54
+</span><span class="lnt"> 55
+</span><span class="lnt"> 56
+</span><span class="lnt"> 57
+</span><span class="lnt"> 58
+</span><span class="lnt"> 59
+</span><span class="lnt"> 60
+</span><span class="lnt"> 61
+</span><span class="lnt"> 62
+</span><span class="lnt"> 63
+</span><span class="lnt"> 64
+</span><span class="lnt"> 65
+</span><span class="lnt"> 66
+</span><span class="lnt"> 67
+</span><span class="lnt"> 68
+</span><span class="lnt"> 69
+</span><span class="lnt"> 70
+</span><span class="lnt"> 71
+</span><span class="lnt"> 72
+</span><span class="lnt"> 73
+</span><span class="lnt"> 74
+</span><span class="lnt"> 75
+</span><span class="lnt"> 76
+</span><span class="lnt"> 77
+</span><span class="lnt"> 78
+</span><span class="lnt"> 79
+</span><span class="lnt"> 80
+</span><span class="lnt"> 81
+</span><span class="lnt"> 82
+</span><span class="lnt"> 83
+</span><span class="lnt"> 84
+</span><span class="lnt"> 85
+</span><span class="lnt"> 86
+</span><span class="lnt"> 87
+</span><span class="lnt"> 88
+</span><span class="lnt"> 89
+</span><span class="lnt"> 90
+</span><span class="lnt"> 91
+</span><span class="lnt"> 92
+</span><span class="lnt"> 93
+</span><span class="lnt"> 94
+</span><span class="lnt"> 95
+</span><span class="lnt"> 96
+</span><span class="lnt"> 97
+</span><span class="lnt"> 98
+</span><span class="lnt"> 99
+</span><span class="lnt">100
+</span><span class="lnt">101
+</span><span class="lnt">102
+</span><span class="lnt">103
+</span><span class="lnt">104
+</span><span class="lnt">105
+</span><span class="lnt">106
+</span><span class="lnt">107
+</span><span class="lnt">108
+</span><span class="lnt">109
+</span><span class="lnt">110
+</span><span class="lnt">111
+</span><span class="lnt">112
+</span><span class="lnt">113
+</span><span class="lnt">114
+</span><span class="lnt">115
+</span><span class="lnt">116
+</span><span class="lnt">117
+</span><span class="lnt">118
+</span><span class="lnt">119
+</span><span class="lnt">120
+</span><span class="lnt">121
+</span><span class="lnt">122
+</span><span class="lnt">123
+</span><span class="lnt">124
+</span><span class="lnt">125
+</span><span class="lnt">126
+</span><span class="lnt">127
+</span><span class="lnt">128
+</span><span class="lnt">129
+</span><span class="lnt">130
+</span><span class="lnt">131
+</span><span class="lnt">132
+</span><span class="lnt">133
+</span><span class="lnt">134
+</span><span class="lnt">135
+</span><span class="lnt">136
+</span><span class="lnt">137
+</span><span class="lnt">138
+</span><span class="lnt">139
+</span><span class="lnt">140
+</span><span class="lnt">141
+</span><span class="lnt">142
+</span><span class="lnt">143
+</span><span class="lnt">144
+</span><span class="lnt">145
+</span><span class="lnt">146
+</span><span class="lnt">147
+</span><span class="lnt">148
+</span><span class="lnt">149
+</span><span class="lnt">150
+</span><span class="lnt">151
+</span><span class="lnt">152
+</span><span class="lnt">153
+</span><span class="lnt">154
+</span><span class="lnt">155
+</span><span class="lnt">156
+</span><span class="lnt">157
+</span><span class="lnt">158
+</span><span class="lnt">159
+</span><span class="lnt">160
+</span><span class="lnt">161
+</span><span class="lnt">162
+</span><span class="lnt">163
+</span><span class="lnt">164
+</span><span class="lnt">165
+</span><span class="lnt">166
+</span><span class="lnt">167
+</span><span class="lnt">168
+</span><span class="lnt">169
+</span><span class="lnt">170
+</span><span class="lnt">171
+</span><span class="lnt">172
+</span><span class="lnt">173
+</span><span class="lnt">174
+</span><span class="lnt">175
+</span><span class="lnt">176
+</span><span class="lnt">177
+</span><span class="lnt">178
+</span><span class="lnt">179
+</span><span class="lnt">180
+</span><span class="lnt">181
+</span><span class="lnt">182
+</span><span class="lnt">183
+</span><span class="lnt">184
+</span><span class="lnt">185
+</span><span class="lnt">186
+</span><span class="lnt">187
+</span><span class="lnt">188
+</span><span class="lnt">189
+</span><span class="lnt">190
+</span><span class="lnt">191
+</span><span class="lnt">192
+</span><span class="lnt">193
+</span><span class="lnt">194
+</span><span class="lnt">195
+</span><span class="lnt">196
+</span><span class="lnt">197
+</span><span class="lnt">198
+</span><span class="lnt">199
+</span><span class="lnt">200
+</span><span class="lnt">201
+</span><span class="lnt">202
+</span><span class="lnt">203
+</span><span class="lnt">204
+</span><span class="lnt">205
+</span><span class="lnt">206
+</span><span class="lnt">207
+</span><span class="lnt">208
+</span><span class="lnt">209
+</span><span class="lnt">210
+</span><span class="lnt">211
+</span><span class="lnt">212
+</span><span class="lnt">213
+</span><span class="lnt">214
+</span><span class="lnt">215
+</span><span class="lnt">216
+</span><span class="lnt">217
+</span><span class="lnt">218
+</span><span class="lnt">219
+</span><span class="lnt">220
+</span><span class="lnt">221
+</span><span class="lnt">222
+</span><span class="lnt">223
+</span><span class="lnt">224
+</span><span class="lnt">225
+</span><span class="lnt">226
+</span><span class="lnt">227
+</span><span class="lnt">228
+</span><span class="lnt">229
+</span><span class="lnt">230
+</span><span class="lnt">231
+</span><span class="lnt">232
+</span><span class="lnt">233
+</span><span class="lnt">234
+</span><span class="lnt">235
+</span><span class="lnt">236
+</span><span class="lnt">237
+</span><span class="lnt">238
+</span><span class="lnt">239
+</span><span class="lnt">240
+</span><span class="lnt">241
+</span><span class="lnt">242
+</span><span class="lnt">243
+</span><span class="lnt">244
+</span><span class="lnt">245
+</span><span class="lnt">246
+</span><span class="lnt">247
+</span><span class="lnt">248
+</span><span class="lnt">249
+</span><span class="lnt">250
+</span><span class="lnt">251
+</span><span class="lnt">252
+</span><span class="lnt">253
+</span><span class="lnt">254
+</span><span class="lnt">255
+</span><span class="lnt">256
+</span><span class="lnt">257
+</span><span class="lnt">258
+</span><span class="lnt">259
+</span><span class="lnt">260
+</span><span class="lnt">261
+</span><span class="lnt">262
+</span><span class="lnt">263
+</span><span class="lnt">264
+</span><span class="lnt">265
+</span><span class="lnt">266
+</span><span class="lnt">267
+</span><span class="lnt">268
+</span><span class="lnt">269
+</span><span class="lnt">270
+</span><span class="lnt">271
+</span><span class="lnt">272
+</span><span class="lnt">273
+</span><span class="lnt">274
+</span><span class="lnt">275
+</span><span class="lnt">276
+</span><span class="lnt">277
+</span><span class="lnt">278
+</span><span class="lnt">279
+</span><span class="lnt">280
+</span><span class="lnt">281
+</span><span class="lnt">282
+</span><span class="lnt">283
+</span><span class="lnt">284
+</span><span class="lnt">285
+</span><span class="lnt">286
+</span><span class="lnt">287
+</span><span class="lnt">288
+</span><span class="lnt">289
+</span><span class="lnt">290
+</span><span class="lnt">291
+</span><span class="lnt">292
+</span><span class="lnt">293
+</span><span class="lnt">294
+</span><span class="lnt">295
+</span><span class="lnt">296
+</span><span class="lnt">297
+</span><span class="lnt">298
+</span><span class="lnt">299
+</span><span class="lnt">300
+</span><span class="lnt">301
+</span><span class="lnt">302
+</span><span class="lnt">303
+</span><span class="lnt">304
+</span><span class="lnt">305
+</span><span class="lnt">306
+</span><span class="lnt">307
+</span><span class="lnt">308
+</span><span class="lnt">309
+</span><span class="lnt">310
+</span><span class="lnt">311
+</span><span class="lnt">312
+</span><span class="lnt">313
+</span><span class="lnt">314
+</span><span class="lnt">315
+</span><span class="lnt">316
+</span><span class="lnt">317
+</span><span class="lnt">318
+</span><span class="lnt">319
+</span><span class="lnt">320
+</span><span class="lnt">321
+</span><span class="lnt">322
+</span><span class="lnt">323
+</span><span class="lnt">324
+</span><span class="lnt">325
+</span><span class="lnt">326
+</span><span class="lnt">327
+</span><span class="lnt">328
+</span><span class="lnt">329
+</span><span class="lnt">330
+</span><span class="lnt">331
+</span><span class="lnt">332
+</span><span class="lnt">333
+</span><span class="lnt">334
+</span><span class="lnt">335
+</span><span class="lnt">336
+</span><span class="lnt">337
+</span><span class="lnt">338
+</span><span class="lnt">339
+</span><span class="lnt">340
+</span><span class="lnt">341
+</span><span class="lnt">342
+</span><span class="lnt">343
+</span><span class="lnt">344
+</span><span class="lnt">345
+</span><span class="lnt">346
+</span><span class="lnt">347
+</span><span class="lnt">348
+</span><span class="lnt">349
+</span><span class="lnt">350
+</span><span class="lnt">351
+</span><span class="lnt">352
+</span><span class="lnt">353
+</span><span class="lnt">354
+</span><span class="lnt">355
+</span><span class="lnt">356
+</span><span class="lnt">357
+</span><span class="lnt">358
+</span><span class="lnt">359
+</span><span class="lnt">360
+</span><span class="lnt">361
+</span><span class="lnt">362
+</span><span class="lnt">363
+</span><span class="lnt">364
+</span><span class="lnt">365
+</span><span class="lnt">366
+</span><span class="lnt">367
+</span><span class="lnt">368
+</span><span class="lnt">369
+</span><span class="lnt">370
+</span><span class="lnt">371
+</span><span class="lnt">372
+</span><span class="lnt">373
+</span><span class="lnt">374
+</span><span class="lnt">375
+</span><span class="lnt">376
+</span><span class="lnt">377
+</span><span class="lnt">378
+</span><span class="lnt">379
+</span><span class="lnt">380
+</span><span class="lnt">381
+</span><span class="lnt">382
+</span><span class="lnt">383
+</span><span class="lnt">384
+</span><span class="lnt">385
+</span><span class="lnt">386
+</span><span class="lnt">387
+</span><span class="lnt">388
+</span><span class="lnt">389
+</span><span class="lnt">390
+</span><span class="lnt">391
+</span><span class="lnt">392
+</span><span class="lnt">393
+</span><span class="lnt">394
+</span><span class="lnt">395
+</span><span class="lnt">396
+</span><span class="lnt">397
+</span><span class="lnt">398
+</span><span class="lnt">399
+</span><span class="lnt">400
+</span><span class="lnt">401
+</span><span class="lnt">402
+</span><span class="lnt">403
+</span><span class="lnt">404
+</span><span class="lnt">405
+</span><span class="lnt">406
+</span><span class="lnt">407
+</span><span class="lnt">408
+</span><span class="lnt">409
+</span><span class="lnt">410
+</span><span class="lnt">411
+</span><span class="lnt">412
+</span><span class="lnt">413
+</span><span class="lnt">414
+</span><span class="lnt">415
+</span><span class="lnt">416
+</span><span class="lnt">417
+</span><span class="lnt">418
+</span><span class="lnt">419
+</span><span class="lnt">420
+</span><span class="lnt">421
+</span><span class="lnt">422
+</span><span class="lnt">423
+</span><span class="lnt">424
+</span><span class="lnt">425
+</span><span class="lnt">426
+</span><span class="lnt">427
+</span><span class="lnt">428
+</span><span class="lnt">429
+</span><span class="lnt">430
+</span><span class="lnt">431
+</span><span class="lnt">432
+</span><span class="lnt">433
+</span><span class="lnt">434
+</span><span class="lnt">435
+</span><span class="lnt">436
+</span><span class="lnt">437
+</span><span class="lnt">438
+</span><span class="lnt">439
+</span><span class="lnt">440
+</span><span class="lnt">441
+</span><span class="lnt">442
+</span><span class="lnt">443
+</span><span class="lnt">444
+</span><span class="lnt">445
+</span><span class="lnt">446
+</span><span class="lnt">447
+</span><span class="lnt">448
+</span><span class="lnt">449
+</span><span class="lnt">450
+</span><span class="lnt">451
+</span><span class="lnt">452
+</span><span class="lnt">453
+</span><span class="lnt">454
+</span><span class="lnt">455
+</span><span class="lnt">456
+</span><span class="lnt">457
+</span><span class="lnt">458
+</span><span class="lnt">459
+</span><span class="lnt">460
+</span><span class="lnt">461
+</span><span class="lnt">462
+</span><span class="lnt">463
+</span><span class="lnt">464
+</span><span class="lnt">465
+</span><span class="lnt">466
+</span><span class="lnt">467
+</span><span class="lnt">468
+</span><span class="lnt">469
+</span><span class="lnt">470
+</span><span class="lnt">471
+</span><span class="lnt">472
+</span><span class="lnt">473
+</span><span class="lnt">474
+</span><span class="lnt">475
+</span><span class="lnt">476
+</span><span class="lnt">477
+</span><span class="lnt">478
+</span><span class="lnt">479
+</span><span class="lnt">480
+</span><span class="lnt">481
+</span><span class="lnt">482
+</span><span class="lnt">483
+</span><span class="lnt">484
+</span><span class="lnt">485
+</span><span class="lnt">486
+</span><span class="lnt">487
+</span><span class="lnt">488
+</span><span class="lnt">489
+</span><span class="lnt">490
+</span><span class="lnt">491
+</span><span class="lnt">492
+</span><span class="lnt">493
+</span><span class="lnt">494
+</span><span class="lnt">495
+</span><span class="lnt">496
+</span><span class="lnt">497
+</span><span class="lnt">498
+</span><span class="lnt">499
+</span><span class="lnt">500
+</span><span class="lnt">501
+</span><span class="lnt">502
+</span><span class="lnt">503
+</span><span class="lnt">504
+</span><span class="lnt">505
+</span><span class="lnt">506
+</span><span class="lnt">507
+</span><span class="lnt">508
+</span><span class="lnt">509
+</span><span class="lnt">510
+</span><span class="lnt">511
+</span><span class="lnt">512
+</span><span class="lnt">513
+</span><span class="lnt">514
+</span><span class="lnt">515
+</span><span class="lnt">516
+</span><span class="lnt">517
+</span><span class="lnt">518
+</span><span class="lnt">519
+</span><span class="lnt">520
+</span><span class="lnt">521
+</span><span class="lnt">522
+</span><span class="lnt">523
+</span><span class="lnt">524
+</span><span class="lnt">525
+</span><span class="lnt">526
+</span><span class="lnt">527
+</span><span class="lnt">528
+</span><span class="lnt">529
+</span><span class="lnt">530
+</span><span class="lnt">531
+</span><span class="lnt">532
+</span><span class="lnt">533
+</span><span class="lnt">534
+</span><span class="lnt">535
+</span><span class="lnt">536
+</span><span class="lnt">537
+</span><span class="lnt">538
+</span><span class="lnt">539
+</span><span class="lnt">540
+</span><span class="lnt">541
+</span><span class="lnt">542
+</span><span class="lnt">543
+</span><span class="lnt">544
+</span><span class="lnt">545
+</span><span class="lnt">546
+</span><span class="lnt">547
+</span><span class="lnt">548
+</span><span class="lnt">549
+</span><span class="lnt">550
+</span><span class="lnt">551
+</span><span class="lnt">552
+</span><span class="lnt">553
+</span><span class="lnt">554
+</span><span class="lnt">555
+</span><span class="lnt">556
+</span><span class="lnt">557
+</span><span class="lnt">558
+</span><span class="lnt">559
+</span><span class="lnt">560
+</span><span class="lnt">561
+</span><span class="lnt">562
+</span><span class="lnt">563
+</span><span class="lnt">564
+</span><span class="lnt">565
+</span><span class="lnt">566
+</span><span class="lnt">567
+</span><span class="lnt">568
+</span><span class="lnt">569
+</span><span class="lnt">570
+</span><span class="lnt">571
+</span><span class="lnt">572
+</span><span class="lnt">573
+</span><span class="lnt">574
+</span><span class="lnt">575
+</span><span class="lnt">576
+</span><span class="lnt">577
+</span><span class="lnt">578
+</span><span class="lnt">579
+</span><span class="lnt">580
+</span><span class="lnt">581
+</span><span class="lnt">582
+</span><span class="lnt">583
+</span><span class="lnt">584
+</span><span class="lnt">585
+</span><span class="lnt">586
+</span><span class="lnt">587
+</span><span class="lnt">588
+</span><span class="lnt">589
+</span><span class="lnt">590
+</span><span class="lnt">591
+</span><span class="lnt">592
+</span><span class="lnt">593
+</span><span class="lnt">594
+</span><span class="lnt">595
+</span><span class="lnt">596
+</span><span class="lnt">597
+</span><span class="lnt">598
+</span><span class="lnt">599
+</span><span class="lnt">600
+</span><span class="lnt">601
+</span><span class="lnt">602
+</span><span class="lnt">603
+</span><span class="lnt">604
+</span><span class="lnt">605
+</span><span class="lnt">606
+</span><span class="lnt">607
+</span><span class="lnt">608
+</span><span class="lnt">609
+</span><span class="lnt">610
+</span><span class="lnt">611
+</span><span class="lnt">612
+</span><span class="lnt">613
+</span><span class="lnt">614
+</span><span class="lnt">615
+</span><span class="lnt">616
+</span><span class="lnt">617
+</span><span class="lnt">618
+</span><span class="lnt">619
+</span><span class="lnt">620
+</span><span class="lnt">621
+</span><span class="lnt">622
+</span><span class="lnt">623
+</span><span class="lnt">624
+</span><span class="lnt">625
+</span><span class="lnt">626
+</span><span class="lnt">627
+</span><span class="lnt">628
+</span><span class="lnt">629
+</span><span class="lnt">630
+</span><span class="lnt">631
+</span><span class="lnt">632
+</span><span class="lnt">633
+</span><span class="lnt">634
+</span><span class="lnt">635
+</span><span class="lnt">636
+</span><span class="lnt">637
+</span><span class="lnt">638
+</span><span class="lnt">639
+</span><span class="lnt">640
+</span><span class="lnt">641
+</span><span class="lnt">642
+</span><span class="lnt">643
+</span><span class="lnt">644
+</span><span class="lnt">645
+</span><span class="lnt">646
+</span><span class="lnt">647
+</span><span class="lnt">648
+</span><span class="lnt">649
+</span><span class="lnt">650
+</span><span class="lnt">651
+</span><span class="lnt">652
+</span><span class="lnt">653
+</span><span class="lnt">654
+</span><span class="lnt">655
+</span><span class="lnt">656
+</span><span class="lnt">657
+</span><span class="lnt">658
+</span><span class="lnt">659
+</span><span class="lnt">660
+</span><span class="lnt">661
+</span><span class="lnt">662
+</span><span class="lnt">663
+</span><span class="lnt">664
+</span><span class="lnt">665
+</span><span class="lnt">666
+</span><span class="lnt">667
+</span><span class="lnt">668
+</span><span class="lnt">669
+</span><span class="lnt">670
+</span><span class="lnt">671
+</span><span class="lnt">672
+</span><span class="lnt">673
+</span><span class="lnt">674
+</span><span class="lnt">675
+</span><span class="lnt">676
+</span><span class="lnt">677
+</span><span class="lnt">678
+</span><span class="lnt">679
+</span><span class="lnt">680
+</span><span class="lnt">681
+</span><span class="lnt">682
+</span><span class="lnt">683
+</span><span class="lnt">684
+</span><span class="lnt">685
+</span><span class="lnt">686
+</span><span class="lnt">687
+</span><span class="lnt">688
+</span><span class="lnt">689
+</span><span class="lnt">690
+</span><span class="lnt">691
+</span><span class="lnt">692
+</span><span class="lnt">693
+</span><span class="lnt">694
+</span><span class="lnt">695
+</span><span class="lnt">696
+</span><span class="lnt">697
+</span><span class="lnt">698
+</span><span class="lnt">699
+</span><span class="lnt">700
+</span><span class="lnt">701
+</span><span class="lnt">702
+</span><span class="lnt">703
+</span><span class="lnt">704
+</span><span class="lnt">705
+</span><span class="lnt">706
+</span><span class="lnt">707
+</span><span class="lnt">708
+</span><span class="lnt">709
+</span><span class="lnt">710
+</span><span class="lnt">711
+</span><span class="lnt">712
+</span><span class="lnt">713
+</span><span class="lnt">714
+</span><span class="lnt">715
+</span><span class="lnt">716
+</span><span class="lnt">717
+</span><span class="lnt">718
+</span><span class="lnt">719
+</span><span class="lnt">720
+</span><span class="lnt">721
+</span><span class="lnt">722
+</span><span class="lnt">723
+</span><span class="lnt">724
+</span><span class="lnt">725
+</span><span class="lnt">726
+</span><span class="lnt">727
+</span><span class="lnt">728
+</span><span class="lnt">729
+</span><span class="lnt">730
+</span><span class="lnt">731
+</span><span class="lnt">732
+</span><span class="lnt">733
+</span><span class="lnt">734
+</span><span class="lnt">735
+</span><span class="lnt">736
+</span><span class="lnt">737
+</span><span class="lnt">738
+</span><span class="lnt">739
+</span><span class="lnt">740
+</span><span class="lnt">741
+</span><span class="lnt">742
+</span><span class="lnt">743
+</span><span class="lnt">744
+</span><span class="lnt">745
+</span><span class="lnt">746
+</span><span class="lnt">747
+</span><span class="lnt">748
+</span><span class="lnt">749
+</span><span class="lnt">750
+</span><span class="lnt">751
+</span><span class="lnt">752
+</span><span class="lnt">753
+</span><span class="lnt">754
+</span><span class="lnt">755
+</span><span class="lnt">756
+</span><span class="lnt">757
+</span><span class="lnt">758
+</span><span class="lnt">759
+</span><span class="lnt">760
+</span><span class="lnt">761
+</span><span class="lnt">762
+</span><span class="lnt">763
+</span><span class="lnt">764
+</span><span class="lnt">765
+</span><span class="lnt">766
+</span><span class="lnt">767
+</span><span class="lnt">768
+</span><span class="lnt">769
+</span><span class="lnt">770
+</span><span class="lnt">771
+</span><span class="lnt">772
+</span><span class="lnt">773
+</span><span class="lnt">774
+</span><span class="lnt">775
+</span><span class="lnt">776
+</span><span class="lnt">777
+</span><span class="lnt">778
+</span><span class="lnt">779
+</span><span class="lnt">780
+</span><span class="lnt">781
+</span><span class="lnt">782
+</span><span class="lnt">783
+</span><span class="lnt">784
+</span><span class="lnt">785
+</span><span class="lnt">786
+</span><span class="lnt">787
+</span><span class="lnt">788
+</span><span class="lnt">789
+</span><span class="lnt">790
+</span><span class="lnt">791
+</span><span class="lnt">792
+</span><span class="lnt">793
+</span><span class="lnt">794
+</span><span class="lnt">795
+</span><span class="lnt">796
+</span><span class="lnt">797
+</span><span class="lnt">798
+</span><span class="lnt">799
+</span><span class="lnt">800
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="c1"># 要添加一个新单元，输入 &#39;# %%&#39;</span>
+<span class="c1"># 要添加一个新的标记单元，输入 &#39;# %% [markdown]&#39;</span>
+<span class="c1"># %%</span>
+<span class="kn">from</span> <span class="nn">IPython</span> <span class="kn">import</span> <span class="n">get_ipython</span>
+
+<span class="c1"># %%</span>
+<span class="n">get_ipython</span><span class="p">()</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s1">&#39;nvidia-smi&#39;</span><span class="p">)</span>
+
+
+<span class="c1"># %%</span>
+
+
+
+<span class="c1"># %%</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">gc</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">from</span> <span class="nn">sklearn.utils.class_weight</span> <span class="kn">import</span> <span class="n">compute_class_weight</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">DataLoader</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">optim</span>
+<span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="kn">as</span> <span class="nn">F</span>
+<span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">AutoTokenizer</span><span class="p">,</span> <span class="n">AutoModel</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">OneHotEncoder</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+
+
+<span class="c1"># %%</span>
+<span class="n">torch</span><span class="o">.</span><span class="n">__version__</span>
+
+
+<span class="c1"># %%</span>
+<span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span>
+
+
+<span class="c1"># %%</span>
+<span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">cudnn</span><span class="o">.</span><span class="n">enabled</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">cudnn</span><span class="o">.</span><span class="n">benchmark</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="c1"># torch.backends.cudnn.enabled = False</span>
+
+
+<span class="c1"># %%</span>
+<span class="n">processed_expose_test_path</span> <span class="o">=</span> <span class="s2">&#34;data/processed_test_expose.json&#34;</span>
+<span class="n">processed_expose_train_labeled_path</span> <span class="o">=</span> <span class="s2">&#34;data/processed_train_expose_labeled.json&#34;</span>
+<span class="n">processed_expose_train_unlabel_predict_other_path</span> <span class="o">=</span> <span class="s2">&#34;data/processed_train_expose_unlabel_predict_other_0.5.json&#34;</span>
+<span class="n">processed_expose_train_valid_path</span> <span class="o">=</span> <span class="s2">&#34;data/processed_train_valid.json&#34;</span>
+<span class="n">processed_expose_train_train_path</span> <span class="o">=</span> <span class="s2">&#34;data/processed_train_train.json&#34;</span>
+
+<span class="n">pretrained_bert_path</span> <span class="o">=</span> <span class="s2">&#34;bert-base-chinese/&#34;</span>
+
+<span class="n">category_encoder_path</span> <span class="o">=</span> <span class="s1">&#39;model/category_encoder_second.pickle&#39;</span>
+<span class="n">paragraphs_num_encoder_path</span> <span class="o">=</span> <span class="s1">&#39;model/paragraphs_num_encoder_second.pickle&#39;</span>
+<span class="n">source_encoder_path</span> <span class="o">=</span> <span class="s1">&#39;model/source_encoder_second.pickle&#39;</span>
+<span class="n">doctype_encoder_path</span> <span class="o">=</span> <span class="s1">&#39;model/doctype_encoder_second.pickle&#39;</span>
+<span class="n">words_len_encoder_path</span> <span class="o">=</span> <span class="s1">&#39;model/words_len_encoder_second.pickle&#39;</span>
+<span class="n">model_train_mutil_model_path</span> <span class="o">=</span> <span class="s1">&#39;model/model_train_mutil_target.pt&#39;</span>
+
+<span class="n">submission_path</span> <span class="o">=</span> <span class="s2">&#34;submission_train_mutil_target_predict.csv&#34;</span>
+
+<span class="n">num_workers</span> <span class="o">=</span> <span class="mi">0</span>
+
+
+<span class="c1"># %%</span>
+
+
+
+<span class="c1"># %%</span>
+<span class="k">def</span> <span class="nf">get_feature_list</span><span class="p">(</span><span class="n">input_path</span><span class="p">,</span> <span class="n">feature_name</span><span class="p">):</span>
+    <span class="n">feature_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">input_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&#34;utf-8&#34;</span><span class="p">)</span> <span class="k">as</span> <span class="n">input_file</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">input_file</span><span class="p">):</span>
+            <span class="n">json_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="n">feature_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">json_data</span><span class="p">[</span><span class="n">feature_name</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">feature_list</span>
+
+
+<span class="c1"># %%</span>
+<span class="k">def</span> <span class="nf">get_category_encoder</span><span class="p">():</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">category_encoder_path</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span> <span class="p">(</span><span class="n">category_encoder_path</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">category_encoder_file</span><span class="p">:</span> 
+            <span class="k">return</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">category_encoder_file</span><span class="p">)</span>
+    
+    <span class="n">category_list</span> <span class="o">=</span> <span class="n">get_feature_list</span><span class="p">(</span><span class="n">processed_expose_train_labeled_path</span><span class="p">,</span> <span class="s1">&#39;category&#39;</span><span class="p">)</span> <span class="o">+</span>                     <span class="n">get_feature_list</span><span class="p">(</span><span class="n">processed_expose_test_path</span><span class="p">,</span> <span class="s1">&#39;category&#39;</span><span class="p">)</span> <span class="o">+</span>                     <span class="n">get_feature_list</span><span class="p">(</span><span class="n">processed_expose_train_unlabel_predict_other_path</span><span class="p">,</span> <span class="s1">&#39;category&#39;</span><span class="p">)</span>
+    <span class="n">category_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">category_list</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">encoder</span> <span class="o">=</span> <span class="n">OneHotEncoder</span><span class="p">(</span><span class="n">categories</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">,</span> <span class="n">handle_unknown</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">category_list</span><span class="p">)</span>
+    
+    <span class="k">with</span> <span class="nb">open</span> <span class="p">(</span><span class="n">category_encoder_path</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">category_encoder_file</span><span class="p">:</span>
+        <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">encoder</span><span class="p">,</span> <span class="n">category_encoder_file</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">encoder</span>
+
+
+<span class="c1"># %%</span>
+<span class="n">category_encoder</span> <span class="o">=</span> <span class="n">get_category_encoder</span><span class="p">()</span>
+<span class="n">category_encoder</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">toarray</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+
+
+<span class="c1"># %%</span>
+<span class="nb">len</span><span class="p">(</span><span class="n">category_encoder</span><span class="o">.</span><span class="n">categories_</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+
+<span class="c1"># %%</span>
+<span class="k">def</span> <span class="nf">get_paragraphs_num_encoder</span><span class="p">():</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">paragraphs_num_encoder_path</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span> <span class="p">(</span><span class="n">paragraphs_num_encoder_path</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">paragraphs_num_encoder_file</span><span class="p">:</span> 
+            <span class="k">return</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">paragraphs_num_encoder_file</span><span class="p">)</span>
+    
+    <span class="n">paragraphs_num_list</span> <span class="o">=</span> <span class="n">get_feature_list</span><span class="p">(</span><span class="n">processed_expose_train_labeled_path</span><span class="p">,</span> <span class="s1">&#39;paragraphs_num&#39;</span><span class="p">)</span> <span class="o">+</span>                           <span class="n">get_feature_list</span><span class="p">(</span><span class="n">processed_expose_test_path</span><span class="p">,</span> <span class="s1">&#39;paragraphs_num&#39;</span><span class="p">)</span> <span class="o">+</span>                           <span class="n">get_feature_list</span><span class="p">(</span><span class="n">processed_expose_train_unlabel_predict_other_path</span><span class="p">,</span> <span class="s1">&#39;paragraphs_num&#39;</span><span class="p">)</span>
+    <span class="n">paragraphs_num_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">paragraphs_num_list</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">encoder</span> <span class="o">=</span> <span class="n">StandardScaler</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">paragraphs_num_list</span><span class="p">)</span>
+    
+    <span class="k">with</span> <span class="nb">open</span> <span class="p">(</span><span class="n">paragraphs_num_encoder_path</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">paragraphs_num_encoder_file</span><span class="p">:</span>
+        <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">encoder</span><span class="p">,</span> <span class="n">paragraphs_num_encoder_file</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">encoder</span>
+
+
+<span class="c1"># %%</span>
+<span class="n">paragraphs_num_encoder</span> <span class="o">=</span> <span class="n">get_paragraphs_num_encoder</span><span class="p">()</span>
+<span class="n">paragraphs_num_encoder</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">100</span><span class="p">])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
+
+<span class="c1"># %%</span>
+<span class="n">paragraphs_num_encoder</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">99999999999</span><span class="p">])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
+
+<span class="c1"># %%</span>
+<span class="k">def</span> <span class="nf">get_words_len_encoder</span><span class="p">():</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">words_len_encoder_path</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span> <span class="p">(</span><span class="n">words_len_encoder_path</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">words_len_encoder_file</span><span class="p">:</span> 
+            <span class="k">return</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">words_len_encoder_file</span><span class="p">)</span>
+    
+    <span class="n">words_len_list</span> <span class="o">=</span> <span class="n">get_feature_list</span><span class="p">(</span><span class="n">processed_expose_train_labeled_path</span><span class="p">,</span> <span class="s1">&#39;words_len&#39;</span><span class="p">)</span> <span class="o">+</span>                      <span class="n">get_feature_list</span><span class="p">(</span><span class="n">processed_expose_test_path</span><span class="p">,</span> <span class="s1">&#39;words_len&#39;</span><span class="p">)</span> <span class="o">+</span>                      <span class="n">get_feature_list</span><span class="p">(</span><span class="n">processed_expose_train_unlabel_predict_other_path</span><span class="p">,</span> <span class="s1">&#39;words_len&#39;</span><span class="p">)</span>
+    <span class="n">words_len_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">words_len_list</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">encoder</span> <span class="o">=</span> <span class="n">StandardScaler</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">words_len_list</span><span class="p">)</span>
+    
+    <span class="k">with</span> <span class="nb">open</span> <span class="p">(</span><span class="n">words_len_encoder_path</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">words_len_encoder_file</span><span class="p">:</span>
+        <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">encoder</span><span class="p">,</span> <span class="n">words_len_encoder_file</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">encoder</span>
+
+
+<span class="c1"># %%</span>
+<span class="n">words_len_encoder</span> <span class="o">=</span> <span class="n">get_words_len_encoder</span><span class="p">()</span>
+<span class="n">words_len_encoder</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1000</span><span class="p">])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
+
+<span class="c1"># %%</span>
+<span class="n">words_len_encoder</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">2000</span><span class="p">])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
+
+<span class="c1"># %%</span>
+<span class="k">def</span> <span class="nf">get_source_encoder</span><span class="p">():</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">source_encoder_path</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span> <span class="p">(</span><span class="n">source_encoder_path</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">source_encoder_file</span><span class="p">:</span> 
+            <span class="k">return</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">source_encoder_file</span><span class="p">)</span>
+    
+    <span class="n">source_list</span> <span class="o">=</span> <span class="n">get_feature_list</span><span class="p">(</span><span class="n">processed_expose_train_labeled_path</span><span class="p">,</span> <span class="s1">&#39;source&#39;</span><span class="p">)</span> <span class="o">+</span>                   <span class="n">get_feature_list</span><span class="p">(</span><span class="n">processed_expose_test_path</span><span class="p">,</span> <span class="s1">&#39;source&#39;</span><span class="p">)</span> <span class="o">+</span>                   <span class="n">get_feature_list</span><span class="p">(</span><span class="n">processed_expose_train_unlabel_predict_other_path</span><span class="p">,</span> <span class="s1">&#39;source&#39;</span><span class="p">)</span>
+    <span class="n">source_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">source_list</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">encoder</span> <span class="o">=</span> <span class="n">OneHotEncoder</span><span class="p">(</span><span class="n">categories</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">,</span> <span class="n">handle_unknown</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">source_list</span><span class="p">)</span>
+    
+    <span class="k">with</span> <span class="nb">open</span> <span class="p">(</span><span class="n">source_encoder_path</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">source_encoder_file</span><span class="p">:</span>
+        <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">encoder</span><span class="p">,</span> <span class="n">source_encoder_file</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">encoder</span>
+
+
+<span class="c1"># %%</span>
+<span class="n">source_encoder</span> <span class="o">=</span> <span class="n">get_source_encoder</span><span class="p">()</span>
+<span class="n">source_encoder</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="s1">&#39;中国经济周刊&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">toarray</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+
+
+<span class="c1"># %%</span>
+<span class="n">source_encoder</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="s1">&#39;hg&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">toarray</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+
+
+<span class="c1"># %%</span>
+<span class="nb">len</span><span class="p">(</span><span class="n">source_encoder</span><span class="o">.</span><span class="n">categories_</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+
+<span class="c1"># %%</span>
+<span class="k">def</span> <span class="nf">get_doctype_encoder</span><span class="p">():</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">doctype_encoder_path</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span> <span class="p">(</span><span class="n">doctype_encoder_path</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">doctype_encoder_file</span><span class="p">:</span> 
+            <span class="k">return</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">doctype_encoder_file</span><span class="p">)</span>
+    
+    <span class="n">doctype_list</span> <span class="o">=</span> <span class="n">get_feature_list</span><span class="p">(</span><span class="n">processed_expose_train_labeled_path</span><span class="p">,</span> <span class="s1">&#39;doctype&#39;</span><span class="p">)</span> <span class="o">+</span>                   <span class="n">get_feature_list</span><span class="p">(</span><span class="n">processed_expose_train_unlabel_predict_other_path</span><span class="p">,</span> <span class="s1">&#39;doctype&#39;</span><span class="p">)</span>
+    <span class="n">doctype_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">doctype_list</span><span class="p">)</span>
+    <span class="n">doctype_set</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s1">&#39;其他&#39;</span><span class="p">)</span>
+    <span class="n">doctype_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">doctype_set</span><span class="p">)</span>
+    <span class="n">doctype_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;其他&#39;</span><span class="p">)</span>
+    
+    <span class="k">with</span> <span class="nb">open</span> <span class="p">(</span><span class="n">doctype_encoder_path</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">doctype_encoder_file</span><span class="p">:</span>
+        <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">doctype_list</span><span class="p">,</span> <span class="n">doctype_encoder_file</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">doctype_list</span>
+
+
+<span class="c1"># %%</span>
+<span class="n">doctype_list</span> <span class="o">=</span> <span class="n">get_doctype_encoder</span><span class="p">()</span>
+<span class="n">doctype_list</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">doctype_list</span><span class="p">)</span>
+
+
+<span class="c1"># %%</span>
+
+
+
+<span class="c1"># %%</span>
+<span class="c1"># with open(processed_expose_train_labeled_path, &#39;r&#39;, encoding=&#34;utf-8&#34;) as input_file, \</span>
+<span class="c1">#      open(processed_expose_train_unlabel_predict_other_path, &#39;r&#39;, encoding=&#34;utf-8&#34;) as input1_file, \</span>
+<span class="c1">#      open(processed_expose_train_train_path, &#39;w&#39;, encoding=&#34;utf-8&#34;) as train_file, \</span>
+<span class="c1">#      open(processed_expose_train_valid_path, &#39;w&#39;, encoding=&#34;utf-8&#34;) as valid_file:</span>
+<span class="c1">#     for line in tqdm(input_file):</span>
+<span class="c1">#         json_data = json.loads(line)</span>
+<span class="c1">#         if random.random() &lt; 0.1:</span>
+<span class="c1">#             valid_file.write(f&#34;{json.dumps(json_data, ensure_ascii=False)}\n&#34;)</span>
+<span class="c1">#         else:</span>
+<span class="c1">#             train_file.write(f&#34;{json.dumps(json_data, ensure_ascii=False)}\n&#34;)</span>
+<span class="c1">#     for line in tqdm(input1_file):</span>
+<span class="c1">#         json_data = json.loads(line)</span>
+<span class="c1">#         if random.random() &lt; 0.1:</span>
+<span class="c1">#             valid_file.write(f&#34;{json.dumps(json_data, ensure_ascii=False)}\n&#34;)</span>
+<span class="c1">#         else:</span>
+<span class="c1">#             train_file.write(f&#34;{json.dumps(json_data, ensure_ascii=False)}\n&#34;)</span>
+
+
+<span class="c1"># %%</span>
+
+
+
+<span class="c1"># %%</span>
+<span class="k">class</span> <span class="nc">MyDataset</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_paths</span><span class="p">,</span> <span class="n">dataset_type</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset_type</span> <span class="o">=</span> <span class="n">dataset_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">pretrained_bert_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_data</span><span class="p">(</span><span class="n">input_paths</span><span class="p">)</span>
+        
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_data_label</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">,</span> <span class="n">item</span><span class="p">,</span> <span class="n">dataset_type</span><span class="p">):</span>
+        <span class="n">token</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s1">&#39;text&#39;</span><span class="p">],</span> <span class="n">add_special_tokens</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                                              <span class="n">max_length</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span>
+                                              <span class="n">truncation</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                                              <span class="n">padding</span><span class="o">=</span><span class="s1">&#39;max_length&#39;</span><span class="p">,</span>
+                                              <span class="n">return_tensors</span><span class="o">=</span><span class="s2">&#34;pt&#34;</span><span class="p">)</span>
+        <span class="k">del</span> <span class="n">item</span><span class="p">[</span><span class="s1">&#39;text&#39;</span><span class="p">]</span>
+<span class="c1">#         item = dict(item, **token)</span>
+        <span class="n">item</span><span class="p">[</span><span class="s1">&#39;input_ids&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">token</span><span class="p">[</span><span class="s1">&#39;input_ids&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">item</span><span class="p">[</span><span class="s1">&#39;token_type_ids&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">token</span><span class="p">[</span><span class="s1">&#39;token_type_ids&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">item</span><span class="p">[</span><span class="s1">&#39;attention_mask&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">token</span><span class="p">[</span><span class="s1">&#39;attention_mask&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        
+        <span class="n">item</span><span class="p">[</span><span class="s1">&#39;category&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">category_encoder</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">item</span><span class="p">[</span><span class="s1">&#39;category&#39;</span><span class="p">]])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">toarray</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">item</span><span class="p">[</span><span class="s1">&#39;paragraphs_num&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">paragraphs_num_encoder</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">item</span><span class="p">[</span><span class="s1">&#39;paragraphs_num&#39;</span><span class="p">]])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">item</span><span class="p">[</span><span class="s1">&#39;words_len&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">words_len_encoder</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">item</span><span class="p">[</span><span class="s1">&#39;words_len&#39;</span><span class="p">]])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">del</span> <span class="n">item</span><span class="p">[</span><span class="s1">&#39;pic_num&#39;</span><span class="p">]</span>
+        <span class="n">item</span><span class="p">[</span><span class="s1">&#39;source&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">source_encoder</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">item</span><span class="p">[</span><span class="s1">&#39;source&#39;</span><span class="p">]])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">toarray</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+        
+<span class="c1">#         del item[&#39;id&#39;]</span>
+
+        <span class="k">if</span> <span class="n">dataset_type</span> <span class="o">==</span> <span class="s1">&#39;test&#39;</span><span class="p">:</span>
+            <span class="n">item</span><span class="p">[</span><span class="s1">&#39;doctype&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">item</span><span class="p">[</span><span class="s1">&#39;doctype&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">doctype_list</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s1">&#39;doctype&#39;</span><span class="p">])</span>
+        <span class="n">label</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="s1">&#39;doctype&#39;</span><span class="p">]</span>
+        
+        <span class="k">del</span> <span class="n">item</span><span class="p">[</span><span class="s1">&#39;doctype&#39;</span><span class="p">]</span>
+        
+        <span class="c1">#         print(item)</span>
+        
+        <span class="k">return</span> <span class="n">item</span><span class="p">,</span> <span class="n">label</span>
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="n">item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_list</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+        <span class="n">item</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="n">MyDataset</span><span class="o">.</span><span class="n">get_data_label</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">,</span> <span class="n">item</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_type</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">item</span><span class="p">,</span> <span class="n">label</span>
+        
+
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_list</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">load_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_paths</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">input_paths</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">list</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&#34;input_paths is not list!&#34;</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="n">data_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">input_path</span> <span class="ow">in</span> <span class="n">input_paths</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">input_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">input_file</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">input_file</span><span class="p">):</span>
+                    <span class="n">json_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+                    <span class="n">data_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">json_data</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_type</span> <span class="o">!=</span> <span class="s1">&#39;test&#39;</span><span class="p">:</span>
+            <span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">data_list</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">data_list</span>
+
+
+<span class="c1"># %%</span>
+<span class="c1"># train_dataset = MyDataset([processed_expose_train_train_path], &#39;train&#39;)</span>
+<span class="c1"># train_loader = DataLoader(dataset=train_dataset, batch_size=2, shuffle=True, num_workers=num_workers)</span>
+<span class="c1"># for batch_idx,data_ in enumerate(train_loader, 0):</span>
+<span class="c1">#     print(data_)</span>
+<span class="c1">#     break</span>
+
+
+<span class="c1"># %%</span>
+<span class="c1"># torch.tensor([])</span>
+
+
+<span class="c1"># %%</span>
+<span class="n">train_dataset</span> <span class="o">=</span> <span class="n">MyDataset</span><span class="p">([</span><span class="n">processed_expose_train_train_path</span><span class="p">],</span> <span class="s1">&#39;train&#39;</span><span class="p">)</span>
+<span class="n">train_loader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">dataset</span><span class="o">=</span><span class="n">train_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="n">num_workers</span><span class="p">)</span>
+<span class="n">data_tmp</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;id&#39;</span><span class="p">:[],</span>
+       <span class="s1">&#39;category&#39;</span><span class="p">:</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([]),</span>
+       <span class="s1">&#39;paragraphs_num&#39;</span><span class="p">:</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([]),</span>
+       <span class="s1">&#39;source&#39;</span><span class="p">:</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([]),</span>
+       <span class="s1">&#39;words_len&#39;</span><span class="p">:</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([]),</span>
+       <span class="s1">&#39;input_ids&#39;</span><span class="p">:</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([]),</span>
+       <span class="s1">&#39;token_type_ids&#39;</span><span class="p">:</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([]),</span>
+       <span class="s1">&#39;attention_mask&#39;</span><span class="p">:</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([]),}</span>
+<span class="n">label_tmp</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
+<span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">for</span> <span class="n">data_</span> <span class="ow">in</span> <span class="n">train_loader</span><span class="p">:</span>
+<span class="c1">#     print(data_)</span>
+    <span class="n">data</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="n">data_</span>
+<span class="c1">#     print(label)</span>
+    <span class="n">data_tmp</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">])</span>
+    <span class="n">data_tmp</span><span class="p">[</span><span class="s1">&#39;category&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">data_tmp</span><span class="p">[</span><span class="s1">&#39;category&#39;</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;category&#39;</span><span class="p">]),</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">data_tmp</span><span class="p">[</span><span class="s1">&#39;paragraphs_num&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">data_tmp</span><span class="p">[</span><span class="s1">&#39;paragraphs_num&#39;</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;paragraphs_num&#39;</span><span class="p">]),</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">data_tmp</span><span class="p">[</span><span class="s1">&#39;source&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">data_tmp</span><span class="p">[</span><span class="s1">&#39;source&#39;</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;source&#39;</span><span class="p">]),</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">data_tmp</span><span class="p">[</span><span class="s1">&#39;words_len&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">data_tmp</span><span class="p">[</span><span class="s1">&#39;words_len&#39;</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;words_len&#39;</span><span class="p">]),</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">data_tmp</span><span class="p">[</span><span class="s1">&#39;input_ids&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">data_tmp</span><span class="p">[</span><span class="s1">&#39;input_ids&#39;</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;input_ids&#39;</span><span class="p">]),</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">data_tmp</span><span class="p">[</span><span class="s1">&#39;token_type_ids&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">data_tmp</span><span class="p">[</span><span class="s1">&#39;token_type_ids&#39;</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;token_type_ids&#39;</span><span class="p">]),</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">data_tmp</span><span class="p">[</span><span class="s1">&#39;attention_mask&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">data_tmp</span><span class="p">[</span><span class="s1">&#39;attention_mask&#39;</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;attention_mask&#39;</span><span class="p">]),</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">label_tmp</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">label_tmp</span><span class="p">,</span> <span class="n">label</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="n">count</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">data_tmp</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">label_tmp</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">label_tmp</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">label_tmp</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">label_tmp</span><span class="p">))</span>
+        <span class="n">data_tmp</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;id&#39;</span><span class="p">:[],</span>
+               <span class="s1">&#39;category&#39;</span><span class="p">:</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([]),</span>
+               <span class="s1">&#39;paragraphs_num&#39;</span><span class="p">:</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([]),</span>
+               <span class="s1">&#39;source&#39;</span><span class="p">:</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([]),</span>
+               <span class="s1">&#39;words_len&#39;</span><span class="p">:</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([]),</span>
+               <span class="s1">&#39;input_ids&#39;</span><span class="p">:</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([]),</span>
+               <span class="s1">&#39;token_type_ids&#39;</span><span class="p">:</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([]),</span>
+               <span class="s1">&#39;attention_mask&#39;</span><span class="p">:</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([]),}</span>
+        <span class="n">label_tmp</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+        <span class="k">break</span>
+
+
+<span class="c1"># %%</span>
+
+
+
+<span class="c1"># %%</span>
+<span class="k">class</span> <span class="nc">MutilTargetModel</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="s2">&#34;&#34;&#34;Bert分类器模型&#34;&#34;&#34;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hidden_size</span><span class="o">=</span><span class="mi">768</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">MutilTargetModel</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        
+<span class="c1">#         self.expert = AutoModel.from_pretrained(pretrained_bert_path)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">bert</span> <span class="o">=</span> <span class="n">AutoModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">pretrained_bert_path</span><span class="p">)</span>
+        
+        <span class="n">category_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">category_encoder</span><span class="o">.</span><span class="n">categories_</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">paragraphs_num_size</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">words_len_size</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">source_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">source_encoder</span><span class="o">.</span><span class="n">categories_</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">expert_size</span> <span class="o">=</span> <span class="mi">10</span>
+        <span class="n">linear_size</span> <span class="o">=</span> <span class="n">hidden_size</span> <span class="o">+</span> <span class="n">category_size</span> <span class="o">+</span> <span class="n">paragraphs_num_size</span> <span class="o">+</span> <span class="n">source_size</span> <span class="o">+</span> <span class="n">words_len_size</span> <span class="o">+</span> <span class="n">expert_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">all_net</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">linear_size</span><span class="p">,</span> <span class="mi">512</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="mf">0.5</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">64</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="mf">0.5</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">doctype_list</span><span class="p">)),</span>
+        <span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">expert_net</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">hidden_size</span><span class="p">,</span> <span class="mi">256</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="mf">0.5</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">256</span><span class="p">,</span> <span class="mi">64</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="mf">0.5</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="n">expert_size</span><span class="p">),</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_data</span><span class="p">):</span>
+        <span class="n">input_ids</span> <span class="o">=</span> <span class="n">batch_data</span><span class="p">[</span><span class="s1">&#39;input_ids&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
+        <span class="n">token_type_ids</span> <span class="o">=</span> <span class="n">batch_data</span><span class="p">[</span><span class="s1">&#39;token_type_ids&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
+        <span class="n">attention_mask</span> <span class="o">=</span> <span class="n">batch_data</span><span class="p">[</span><span class="s1">&#39;attention_mask&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
+        
+        <span class="n">bert_output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bert</span><span class="p">(</span><span class="n">input_ids</span><span class="o">=</span><span class="n">input_ids</span><span class="p">,</span> <span class="n">token_type_ids</span><span class="o">=</span><span class="n">token_type_ids</span><span class="p">,</span> <span class="n">attention_mask</span><span class="o">=</span><span class="n">attention_mask</span><span class="p">)</span>
+        <span class="n">bert_cls_hidden_state</span> <span class="o">=</span> <span class="n">bert_output</span><span class="p">[</span><span class="mi">0</span><span class="p">][:,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">:]</span>
+        
+<span class="c1">#         expert = self.expert(input_ids=input_ids, token_type_ids=token_type_ids, attention_mask=attention_mask)[0][:, 0, :]</span>
+        <span class="n">expert_output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expert_net</span><span class="p">(</span><span class="n">bert_cls_hidden_state</span><span class="p">)</span>
+        
+        <span class="n">cat_layer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">bert_cls_hidden_state</span><span class="p">,</span> 
+                               <span class="n">batch_data</span><span class="p">[</span><span class="s1">&#39;category&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">cuda</span><span class="p">(),</span> 
+                               <span class="n">batch_data</span><span class="p">[</span><span class="s1">&#39;paragraphs_num&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">cuda</span><span class="p">(),</span> 
+                               <span class="n">batch_data</span><span class="p">[</span><span class="s1">&#39;source&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">cuda</span><span class="p">(),</span> 
+                               <span class="n">batch_data</span><span class="p">[</span><span class="s1">&#39;words_len&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">cuda</span><span class="p">(),</span>
+                               <span class="n">expert_output</span><span class="p">),</span> 
+                              <span class="mi">1</span><span class="p">)</span>
+<span class="c1">#         print(cat_layer.shape)</span>
+        <span class="n">all_output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_net</span><span class="p">(</span><span class="n">cat_layer</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">all_output</span><span class="p">,</span> <span class="n">expert_output</span>
+    
+    <span class="k">def</span> <span class="nf">freeze</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">layer</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">layer</span><span class="o">.</span><span class="n">children</span><span class="p">():</span>
+<span class="c1">#             print(child)</span>
+            <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">child</span><span class="o">.</span><span class="n">parameters</span><span class="p">():</span>
+                <span class="n">param</span><span class="o">.</span><span class="n">requires_grad</span> <span class="o">=</span> <span class="bp">False</span>
+<span class="c1">#                 print(param)</span>
+
+
+<span class="c1"># %%</span>
+<span class="k">class</span> <span class="nc">EarlyStopping</span><span class="p">:</span>
+    <span class="s2">&#34;&#34;&#34;Early stops the training if validation loss doesn&#39;t improve after a given patience.&#34;&#34;&#34;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">patience</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">delta</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="s2">&#34;&#34;&#34;
+</span><span class="s2">        Args:
+</span><span class="s2">            patience (int): How long to wait after last time validation loss improved.
+</span><span class="s2">                            Default: 7
+</span><span class="s2">            verbose (bool): If True, prints a message for each validation loss improvement. 
+</span><span class="s2">                            Default: False
+</span><span class="s2">            delta (float): Minimum change in the monitored quantity to qualify as an improvement.
+</span><span class="s2">                            Default: 0
+</span><span class="s2">        &#34;&#34;&#34;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">patience</span> <span class="o">=</span> <span class="n">patience</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">counter</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">best_score</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">early_stop</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">val_loss_min</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">Inf</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">delta</span> <span class="o">=</span> <span class="n">delta</span>
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val_loss</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
+        <span class="n">score</span> <span class="o">=</span> <span class="o">-</span><span class="n">val_loss</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">best_score</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">best_score</span> <span class="o">=</span> <span class="n">score</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">save_checkpoint</span><span class="p">(</span><span class="n">val_loss</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">score</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">best_score</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">counter</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">print</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;EarlyStopping counter: {self.counter} out of {self.patience}. score:{-score}&#39;</span><span class="p">)</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&#34;early_stop.log&#34;</span><span class="p">,</span> <span class="s1">&#39;a+&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&#34;utf-8&#34;</span><span class="p">)</span> <span class="k">as</span> <span class="n">log_file</span><span class="p">:</span>
+                <span class="n">log_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;{localtime} EarlyStopping counter: {self.counter} out of {self.patience}. score:{-score}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">counter</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">patience</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">early_stop</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">best_score</span> <span class="o">=</span> <span class="n">score</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">save_checkpoint</span><span class="p">(</span><span class="n">val_loss</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">counter</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">def</span> <span class="nf">save_checkpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val_loss</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
+        <span class="s1">&#39;&#39;&#39;Saves model when validation loss decrease.&#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Validation loss decreased ({self.val_loss_min:.6f} --&gt; {val_loss:.6f}).  Saving model ...&#39;</span><span class="p">)</span>
+            <span class="n">localtime</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">asctime</span><span class="p">(</span> <span class="n">time</span><span class="o">.</span><span class="n">localtime</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span> <span class="p">)</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&#34;early_stop.log&#34;</span><span class="p">,</span> <span class="s1">&#39;a+&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&#34;utf-8&#34;</span><span class="p">)</span> <span class="k">as</span> <span class="n">log_file</span><span class="p">:</span>
+                <span class="n">log_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;{localtime} Validation loss decreased ({self.val_loss_min:.6f} --&gt; {val_loss:.6f}).  Saving model ...</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="c1">#         torch.save(model.state_dict(), model_train_mutil_model_path)	# 这里会存储迄今最优模型的参数</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">model_train_mutil_model_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">val_loss_min</span> <span class="o">=</span> <span class="n">val_loss</span>
+
+
+<span class="c1"># %%</span>
+<span class="n">batch_size</span> <span class="o">=</span> <span class="mi">3</span>
+
+<span class="c1"># torch.cuda.set_device(0)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">MutilTargetModel</span><span class="p">()</span>
+<span class="c1"># torch.set_default_tensor_type(torch.DoubleTensor)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
+<span class="c1"># print(model)</span>
+
+<span class="c1"># 不同子网络设定不同的学习率</span>
+<span class="n">Bert_model_param</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">Bert_downstream_param</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">items</span><span class="p">,</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">named_parameters</span><span class="p">():</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">param</span><span class="o">.</span><span class="n">requires_grad</span><span class="p">:</span>
+<span class="c1">#         print(items)</span>
+        <span class="k">continue</span>
+    <span class="k">if</span> <span class="n">items</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;expert.&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">items</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;expert_net.&#39;</span><span class="p">):</span>
+        <span class="k">continue</span>
+    <span class="k">if</span> <span class="n">items</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;bert.&#39;</span><span class="p">):</span>
+        <span class="n">Bert_model_param</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">Bert_downstream_param</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
+<span class="n">param_groups</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">&#34;params&#34;</span><span class="p">:</span> <span class="n">Bert_model_param</span><span class="p">,</span> <span class="s2">&#34;lr&#34;</span><span class="p">:</span> <span class="mf">1e-5</span><span class="p">},</span>
+                <span class="p">{</span><span class="s2">&#34;params&#34;</span><span class="p">:</span> <span class="n">Bert_downstream_param</span><span class="p">,</span> <span class="s2">&#34;lr&#34;</span><span class="p">:</span> <span class="mf">1e-4</span><span class="p">}]</span>
+<span class="n">all_optimizer</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">param_groups</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="mf">1e-7</span><span class="p">,</span> <span class="n">weight_decay</span><span class="o">=</span><span class="mf">0.001</span><span class="p">)</span>
+
+<span class="n">Bert_model_param</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">Bert_downstream_param</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">items</span><span class="p">,</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">named_parameters</span><span class="p">():</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">param</span><span class="o">.</span><span class="n">requires_grad</span><span class="p">:</span>
+        <span class="k">continue</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">items</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;expert.&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">items</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;expert_net.&#39;</span><span class="p">):</span>
+        <span class="k">continue</span>
+    <span class="k">if</span> <span class="n">items</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;bert.&#39;</span><span class="p">):</span>
+        <span class="n">Bert_model_param</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">Bert_downstream_param</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
+<span class="n">param_groups</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">&#34;params&#34;</span><span class="p">:</span> <span class="n">Bert_model_param</span><span class="p">,</span> <span class="s2">&#34;lr&#34;</span><span class="p">:</span> <span class="mf">1e-5</span><span class="p">},</span>
+                <span class="p">{</span><span class="s2">&#34;params&#34;</span><span class="p">:</span> <span class="n">Bert_downstream_param</span><span class="p">,</span> <span class="s2">&#34;lr&#34;</span><span class="p">:</span> <span class="mf">1e-4</span><span class="p">}]</span>
+<span class="n">expert_optimizer</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">param_groups</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="mf">1e-7</span><span class="p">,</span> <span class="n">weight_decay</span><span class="o">=</span><span class="mf">0.001</span><span class="p">)</span>
+
+<span class="c1"># 初始化 early_stopping 对象</span>
+<span class="n">patience</span> <span class="o">=</span> <span class="mi">2</span>	<span class="c1"># 当验证集损失在连续n次训练周期中都没有得到降低时，停止模型训练，以防止模型过拟合</span>
+<span class="n">early_stopping</span> <span class="o">=</span> <span class="n">EarlyStopping</span><span class="p">(</span><span class="n">patience</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">criterion</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">CrossEntropyLoss</span><span class="p">()</span>
+
+
+<span class="c1"># %%</span>
+<span class="n">epoch_num</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">batch_loss_num</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">epoch_num</span><span class="p">):</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>	<span class="c1"># 设置模型为训练模式</span>
+    <span class="n">train_dataset</span> <span class="o">=</span> <span class="n">MyDataset</span><span class="p">([</span><span class="n">processed_expose_train_train_path</span><span class="p">],</span> <span class="s1">&#39;train&#39;</span><span class="p">)</span>
+    <span class="n">train_loader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">dataset</span><span class="o">=</span><span class="n">train_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="n">num_workers</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">train_loader</span><span class="p">))</span> <span class="k">as</span> <span class="n">t</span><span class="p">:</span>
+        <span class="n">loss_sum</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">batch_loss</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="k">for</span> <span class="n">batch_idx</span><span class="p">,</span><span class="n">data_</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">train_loader</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="n">data</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="n">data_</span>
+            <span class="c1"># 清空梯度</span>
+            <span class="n">all_optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+            <span class="n">expert_optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+            
+            <span class="n">all_output</span><span class="p">,</span> <span class="n">expert_output</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            
+            <span class="n">all_loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">all_output</span><span class="p">,</span> <span class="n">label</span><span class="o">.</span><span class="n">cuda</span><span class="p">())</span>
+<span class="c1">#             all_loss = all_loss / 2</span>
+            
+<span class="c1">#             print(f&#34;label:{label}&#34;)</span>
+<span class="c1">#             print(f&#34;expert_output:{expert_output}&#34;)</span>
+<span class="c1">#             print(all_output)</span>
+<span class="c1">#             expert_predict = np.argmax(expert_output.cpu(), 1)</span>
+            <span class="n">other_index</span> <span class="o">=</span> <span class="n">doctype_list</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;其他&#39;</span><span class="p">)</span>
+            <span class="n">expert_predict</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">expert_output</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="mi">1</span><span class="p">))</span>
+<span class="c1">#             print(f&#34;expert_predict:{expert_predict}&#34;)</span>
+<span class="c1">#             expert_label = torch.where(label &gt; other_index, label - 1, label)</span>
+<span class="c1">#             print(expert_label)</span>
+<span class="c1">#             expert_label = torch.where(label == other_index, expert_predict, expert_label)</span>
+            <span class="n">expert_index</span> <span class="o">=</span> <span class="n">label</span> <span class="o">!=</span> <span class="n">other_index</span>
+<span class="c1">#             print(f&#34;expert_index:{expert_index}&#34;)</span>
+            <span class="n">expert_label</span> <span class="o">=</span> <span class="n">label</span><span class="p">[</span><span class="n">expert_index</span><span class="p">]</span>
+<span class="c1"># #             expert_label = label.clone().detach().float().requires_grad_()</span>
+<span class="c1"># #             for i in range(label.shape[0]):</span>
+<span class="c1"># #                 if label[i] == doctype_list.index(&#39;其他&#39;):</span>
+<span class="c1"># #                     expert_label[i] = torch.max(expert_output[i])</span>
+<span class="c1">#             print(f&#34;expert_label:{expert_label}&#34;)</span>
+            <span class="n">expert_output</span> <span class="o">=</span> <span class="n">expert_output</span><span class="p">[</span><span class="n">expert_index</span><span class="p">]</span>
+<span class="c1">#             print(f&#34;expert_output:{expert_output}&#34;)</span>
+            <span class="n">expert_loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">expert_output</span><span class="p">,</span> <span class="n">expert_label</span><span class="o">.</span><span class="n">cuda</span><span class="p">())</span>
+<span class="c1">#             expert_loss = expert_loss / 2</span>
+    
+            <span class="n">all_loss</span><span class="o">.</span><span class="n">backward</span><span class="p">(</span><span class="n">retain_graph</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="c1">#             all_loss.backward()</span>
+            <span class="n">expert_loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+            <span class="c1"># 更新模型参数</span>
+            <span class="n">all_optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+            <span class="n">expert_optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+            
+            <span class="n">loss_sum</span> <span class="o">+=</span> <span class="n">all_loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">batch_idx</span> <span class="o">%</span> <span class="n">batch_loss_num</span> <span class="o">==</span> <span class="n">batch_loss_num</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">batch_loss</span> <span class="o">=</span> <span class="n">loss_sum</span> <span class="o">/</span> <span class="n">batch_loss_num</span>
+                <span class="n">localtime</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">asctime</span><span class="p">(</span> <span class="n">time</span><span class="o">.</span><span class="n">localtime</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span> <span class="p">)</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&#34;early_stop.log&#34;</span><span class="p">,</span> <span class="s1">&#39;a+&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&#34;utf-8&#34;</span><span class="p">)</span> <span class="k">as</span> <span class="n">log_file</span><span class="p">:</span>
+                    <span class="n">log_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;{localtime} train_loss={all_loss.item():.6f} batch_loss={batch_loss:.6f}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">loss_sum</span> <span class="o">=</span> <span class="mf">0.0</span>
+          
+            <span class="n">t</span><span class="o">.</span><span class="n">set_postfix_str</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;train_loss={all_loss.item():.6f} batch_loss={batch_loss:.6f}&#39;</span><span class="p">)</span>
+            <span class="n">t</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+            
+            <span class="k">del</span> <span class="n">data</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">all_output</span><span class="p">,</span> <span class="n">expert_output</span><span class="p">,</span> <span class="n">other_index</span><span class="p">,</span> <span class="n">expert_predict</span><span class="p">,</span> <span class="n">expert_index</span><span class="p">,</span> <span class="n">expert_label</span>
+            <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">empty_cache</span><span class="p">()</span>
+            
+    <span class="c1">#----------------------------------------------------</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span> <span class="c1"># 设置模型为评估/测试模式</span>
+    <span class="n">valid_dataset</span> <span class="o">=</span> <span class="n">MyDataset</span><span class="p">([</span><span class="n">processed_expose_train_valid_path</span><span class="p">],</span> <span class="s1">&#39;valid&#39;</span><span class="p">)</span>
+    <span class="n">valid_loader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">dataset</span><span class="o">=</span><span class="n">valid_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="n">num_workers</span><span class="p">)</span>
+    <span class="n">valid_loss_sum</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="k">with</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">valid_loader</span><span class="p">))</span> <span class="k">as</span> <span class="n">t</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">data</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">valid_loader</span><span class="p">:</span>
+                <span class="c1"># 一般如果验证集不是很大的话，模型验证就不需要按批量进行了，但要注意输入参数的维度不能错</span>
+                <span class="n">all_output</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+                <span class="n">all_loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">all_output</span><span class="p">,</span> <span class="n">label</span><span class="o">.</span><span class="n">cuda</span><span class="p">())</span>
+                <span class="n">valid_loss_sum</span> <span class="o">+=</span> <span class="n">all_loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+                <span class="n">t</span><span class="o">.</span><span class="n">set_postfix_str</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;valid loss={all_loss.item()}&#39;</span><span class="p">)</span>
+                <span class="n">t</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+    <span class="n">early_stopping</span><span class="p">(</span><span class="n">valid_loss_sum</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span>
+    <span class="c1"># 若满足 early stopping 要求</span>
+    <span class="k">if</span> <span class="n">early_stopping</span><span class="o">.</span><span class="n">early_stop</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&#34;Early stopping&#34;</span><span class="p">)</span>
+        <span class="c1"># 结束模型训练</span>
+        <span class="k">break</span>
+
+
+<span class="c1"># %%</span>
+<span class="c1"># 保存完整的 BERT 分类器模型</span>
+<span class="c1"># torch.save(model, model_train_mutil_model_path)</span>
+
+
+<span class="c1"># %%</span>
+<span class="c1"># 获得 early stopping 时的模型参数</span>
+<span class="c1"># model.load_state_dict(torch.load(model_train_mutil_model_path))</span>
+
+
+<span class="c1"># %%</span>
+<span class="n">epoch_num</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">batch_loss_num</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">epoch_num</span><span class="p">):</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>	<span class="c1"># 设置模型为训练模式</span>
+    <span class="n">train_dataset</span> <span class="o">=</span> <span class="n">MyDataset</span><span class="p">([</span><span class="n">processed_expose_train_labeled_path</span><span class="p">,</span> <span class="n">processed_expose_train_unlabel_predict_other_path</span><span class="p">],</span> <span class="s1">&#39;train&#39;</span><span class="p">)</span>
+    <span class="n">train_loader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">dataset</span><span class="o">=</span><span class="n">train_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="n">num_workers</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">train_loader</span><span class="p">))</span> <span class="k">as</span> <span class="n">t</span><span class="p">:</span>
+        <span class="n">loss_sum</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">batch_loss</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="k">for</span> <span class="n">batch_idx</span><span class="p">,</span><span class="n">data_</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">train_loader</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="n">data</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="n">data_</span>
+             <span class="c1"># 清空梯度</span>
+            <span class="n">all_optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+            <span class="n">expert_optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+            
+            <span class="n">all_output</span><span class="p">,</span> <span class="n">expert_output</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            
+            <span class="n">all_loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">all_output</span><span class="p">,</span> <span class="n">label</span><span class="o">.</span><span class="n">cuda</span><span class="p">())</span>
+<span class="c1">#             all_loss = all_loss / 2</span>
+            
+            <span class="n">other_index</span> <span class="o">=</span> <span class="n">doctype_list</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;其他&#39;</span><span class="p">)</span>
+<span class="c1">#             print(expert_output)</span>
+            <span class="n">expert_predict</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">expert_output</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="mi">1</span><span class="p">))</span>
+<span class="c1">#             print(expert_predict)</span>
+<span class="c1">#             print(label)</span>
+<span class="c1">#             expert_label = torch.where(label &gt; other_index, label - 1, label)</span>
+<span class="c1">#             expert_label = torch.where(label == other_index, expert_predict, expert_label)</span>
+            <span class="n">expert_label</span> <span class="o">=</span> <span class="n">label</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">label</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+                <span class="k">if</span> <span class="n">label</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="n">other_index</span><span class="p">:</span>
+                    <span class="n">expert_label</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">expert_predict</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="k">elif</span> <span class="n">label</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">other_index</span><span class="p">:</span>
+                    <span class="n">expert_label</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-=</span> <span class="mi">1</span>
+<span class="c1">#             print(expert_label)</span>
+            <span class="n">expert_loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">expert_output</span><span class="p">,</span> <span class="n">expert_label</span><span class="o">.</span><span class="n">cuda</span><span class="p">())</span>
+<span class="c1">#             expert_loss = expert_loss / 2</span>
+    
+            <span class="n">all_loss</span><span class="o">.</span><span class="n">backward</span><span class="p">(</span><span class="n">retain_graph</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+            <span class="n">expert_loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+            <span class="c1"># 更新模型参数</span>
+            <span class="n">all_optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+            <span class="n">expert_optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+            
+            <span class="n">loss_sum</span> <span class="o">+=</span> <span class="n">all_loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">batch_idx</span> <span class="o">%</span> <span class="n">batch_loss_num</span> <span class="o">==</span> <span class="n">batch_loss_num</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">batch_loss</span> <span class="o">=</span> <span class="n">loss_sum</span> <span class="o">/</span> <span class="n">batch_loss_num</span>
+                <span class="n">localtime</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">asctime</span><span class="p">(</span> <span class="n">time</span><span class="o">.</span><span class="n">localtime</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span> <span class="p">)</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&#34;early_stop.log&#34;</span><span class="p">,</span> <span class="s1">&#39;a+&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&#34;utf-8&#34;</span><span class="p">)</span> <span class="k">as</span> <span class="n">log_file</span><span class="p">:</span>
+                    <span class="n">log_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;{localtime} train_loss={all_loss.item():.6f} batch_loss={batch_loss:.6f}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">loss_sum</span> <span class="o">=</span> <span class="mf">0.0</span>
+          
+            <span class="n">t</span><span class="o">.</span><span class="n">set_postfix_str</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;train_loss={all_loss.item():.6f} batch_loss={batch_loss:.6f}&#39;</span><span class="p">)</span>
+            <span class="n">t</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+            
+            <span class="k">del</span> <span class="n">data</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">all_output</span><span class="p">,</span> <span class="n">expert_output</span> 
+            <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">empty_cache</span><span class="p">()</span>
+
+    <span class="c1"># 保存完整的 BERT 分类器模型</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">model_train_mutil_model_path</span><span class="p">)</span>
+    <span class="n">localtime</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">asctime</span><span class="p">(</span> <span class="n">time</span><span class="o">.</span><span class="n">localtime</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span> <span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&#34;early_stop.log&#34;</span><span class="p">,</span> <span class="s1">&#39;a+&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&#34;utf-8&#34;</span><span class="p">)</span> <span class="k">as</span> <span class="n">log_file</span><span class="p">:</span>
+        <span class="n">log_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;{localtime} Saving model ...</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        
+    <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span> <span class="c1"># 设置模型为评估/测试模式</span>
+    <span class="n">test_dataset</span> <span class="o">=</span> <span class="n">MyDataset</span><span class="p">([</span><span class="n">processed_expose_test_path</span><span class="p">],</span> <span class="s1">&#39;test&#39;</span><span class="p">)</span>
+    <span class="n">test_loader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">dataset</span><span class="o">=</span><span class="n">test_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="n">num_workers</span><span class="p">)</span>
+    <span class="n">predict_doctype</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">data</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">test_loader</span><span class="p">):</span>
+            <span class="nb">id</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">output</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="n">predict_list</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">predict_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">predict_list</span><span class="p">)</span>
+            <span class="n">predict_label</span> <span class="o">=</span> <span class="n">doctype_list</span><span class="p">[</span><span class="n">predict_index</span><span class="p">]</span>
+            <span class="n">predict_doctype</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">predict_label</span>
+    <span class="n">predict_data</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;predict_doctype&#39;</span> <span class="p">:</span> <span class="n">predict_doctype</span><span class="p">}</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">predict_data</span><span class="p">)</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;id&#39;</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">f</span><span class="s2">&#34;submission_train_mutil_target_predict_{epoch}.csv&#34;</span><span class="p">)</span>
+
+
+<span class="c1"># %%</span>
+
+
+
+<span class="c1"># %%</span>
+<span class="c1"># model = torch.load(model_train_mutil_model_path)</span>
+<span class="c1"># model = model.cuda()</span>
+
+
+<span class="c1"># %%</span>
+
+
+
+<span class="c1"># %%</span>
+<span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span> <span class="c1"># 设置模型为评估/测试模式</span>
+<span class="n">valid_dataset</span> <span class="o">=</span> <span class="n">MyDataset</span><span class="p">([</span><span class="n">processed_expose_train_valid_path</span><span class="p">],</span> <span class="s1">&#39;valid&#39;</span><span class="p">)</span>
+<span class="n">valid_loader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">dataset</span><span class="o">=</span><span class="n">valid_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="n">num_workers</span><span class="p">)</span>
+<span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">data</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">valid_loader</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">output</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="c1">#         print(output)</span>
+<span class="c1">#         print(torch.sigmoid(output))</span>
+<span class="c1">#         sigmoid = nn.Sigmoid()</span>
+<span class="c1">#         print(sigmoid(output))</span>
+        <span class="n">predict_list</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">predict_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">predict_list</span><span class="p">)</span>
+        <span class="n">predict_label</span> <span class="o">=</span> <span class="n">doctype_list</span><span class="p">[</span><span class="n">predict_index</span><span class="p">]</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">predict_label</span><span class="p">)</span>
+        <span class="k">break</span>
+
+
+<span class="c1"># %%</span>
+<span class="c1"># with open(&#34;data/processed_train_expose_labeled.json&#34;, &#34;r&#34;, encoding=&#39;utf-8&#39;) as input_file:</span>
+<span class="c1">#     for line in tqdm(input_file):</span>
+<span class="c1">#         json_data = json.loads(line)</span>
+<span class="c1">#         if json_data[&#39;id&#39;] == &#39;ee137ac3-c2a2-4aba-a517-36840ffd2f1a&#39;:</span>
+<span class="c1">#             print(line)</span>
+<span class="c1">#             break</span>
+
+
+<span class="c1"># %%</span>
+<span class="c1"># model.eval() # 设置模型为评估/测试模式</span>
+<span class="c1"># valid_dataset = MyDataset(&#34;data/test.txt&#34;, &#39;test&#39;)</span>
+<span class="c1"># valid_loader = DataLoader(dataset=valid_dataset, batch_size=1, shuffle=True, num_workers=num_workers)</span>
+<span class="c1"># with torch.no_grad():</span>
+<span class="c1">#     for data, label in tqdm(valid_loader):</span>
+<span class="c1"># #         print(data, label)</span>
+<span class="c1">#         output = model(data)</span>
+<span class="c1"># #         print(output)</span>
+<span class="c1"># #         print(torch.sigmoid(output))</span>
+<span class="c1">#         print(F.softmax(output, dim=1).tolist()[0])</span>
+<span class="c1">#         break</span>
+
+
+<span class="c1"># %%</span>
+
+
+
+<span class="c1"># %%</span>
+<span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span> <span class="c1"># 设置模型为评估/测试模式</span>
+<span class="n">test_dataset</span> <span class="o">=</span> <span class="n">MyDataset</span><span class="p">([</span><span class="n">processed_expose_test_path</span><span class="p">],</span> <span class="s1">&#39;test&#39;</span><span class="p">)</span>
+<span class="n">test_loader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">dataset</span><span class="o">=</span><span class="n">test_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="n">num_workers</span><span class="p">)</span>
+<span class="n">predict_doctype</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">data</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">test_loader</span><span class="p">):</span>
+        <span class="nb">id</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">output</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">predict_list</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">predict_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">predict_list</span><span class="p">)</span>
+        <span class="n">predict_label</span> <span class="o">=</span> <span class="n">doctype_list</span><span class="p">[</span><span class="n">predict_index</span><span class="p">]</span>
+        <span class="n">predict_doctype</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">predict_label</span>
+<span class="n">predict_data</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;predict_doctype&#39;</span> <span class="p">:</span> <span class="n">predict_doctype</span><span class="p">}</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">predict_data</span><span class="p">)</span>
+<span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+
+
+<span class="c1"># %%</span>
+<span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;id&#39;</span>
+<span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+
+
+<span class="c1"># %%</span>
+<span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s2">&#34;submission_train_mutil_target_predict.csv&#34;</span><span class="p">)</span>
+
+
+<span class="c1"># %%</span>
+<span class="c1"># 看起来，复杂、大模型是有效的(在验证数据集上，第二个epoch的loss还在降低)，所以下一步准备试一下cnn和albert(或roberta)</span>
+
+
+<span class="c1"># %%</span>
+
+
+
+
+</code></pre></td></tr></table>
+</div>
+</div>
+    </div>
+
+    
+<div class="post-reward">
+  <input type="checkbox" name="reward" id="reward" hidden />
+  <label class="reward-button" for="reward">赞赏支持</label>
+  <div class="qr-code">
+    
+    <label class="qr-code-image" for="reward">
+        <img class="image" src="/images/money_weixin_20200719212002.png">
+        <span>微信打赏</span>
+      </label>
+    <label class="qr-code-image" for="reward">
+        <img class="image" src="/images/alipay_20200801211208.png">
+        <span>支付宝打赏</span>
+      </label>
+  </div>
+</div><footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/pytorch/">pytorch</a>
+          <a href="/tags/bert/">bert</a>
+          <a href="/tags/%E5%A4%9A%E5%88%86%E7%B1%BB/">多分类</a>
+          <a href="/tags/%E5%A4%9A%E7%9B%AE%E6%A0%87/">多目标</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/esxi_dms/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">esxi虚拟机安装黑群晖,nfs挂载</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
+        <a class="next" href="/post/baby_epaper/">
+            <span class="next-text nav-default">彩色墨水屏早教机</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        <div id="gitalk-container"></div>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js" crossorigin="anonymous"></script>
+    <script type="text/javascript">
+      var gitalk = new Gitalk({
+        id: '2021-09-04 23:22:58 \x2b0800 CST',
+        title: 'pytorch版bert多目标多分类',
+        clientID: '5ea75f603117948d8d37',
+        clientSecret: '26c617c6bce9a975c2a65a68f1ca2a2cc7dde587',
+        repo: 'blog',
+        owner: 'zhangsheng377',
+        admin: ['zhangsheng377'],
+        body: decodeURI(location.href)
+      });
+      gitalk.render('gitalk-container');
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://github.com/gitalk/gitalk">comments powered by gitalk.</a></noscript>
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:435878393@qq.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://www.linkedin.com/in/zhangshengdong/" class="iconfont icon-linkedin" title="linkedin"></a>
+      <a href="https://github.com/zhangsheng377/" class="iconfont icon-github" title="github"></a>
+  <a href="https://www.zhangshengdong.com/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  <div class="busuanzi-footer">
+    <span id="busuanzi_container_site_pv"> 本站总访问量 <span id="busuanzi_value_site_pv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> 次 </span>
+      <span class="division">|</span>
+    <span id="busuanzi_container_site_uv"> 本站总访客数 <span id="busuanzi_value_site_uv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> 人 </span>
+  </div>
+
+  <span class="copyright-year">
+    &copy; 
+    2019 - 
+    2022<span class="heart"><i class="iconfont icon-heart"></i></span><span><a href="https://beian.miit.gov.cn/" target="_blank">苏ICP备15009593号-1</a></span>
+  </span>
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script><script></script><script src="https://cdn.jsdelivr.net/npm/raphael@2.2.7/raphael.min.js" integrity="sha256-67By+NpOtm9ka1R6xpUefeGOY8kWWHHRAKlvaTJ7ONI=" crossorigin="anonymous"></script> <script src="https://cdn.jsdelivr.net/npm/flowchart.js@1.8.0/release/flowchart.min.js" integrity="sha256-zNGWjubXoY6rb5MnmpBNefO0RgoVYfle9p0tvOQM+6k=" crossorigin="anonymous"></script><script></script><script src="https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.js" integrity="sha256-4O4pS1SH31ZqrSO2A/2QJTVjTPqVe+jnYgOWUVr7EEc=" crossorigin="anonymous"></script> <script src="https://cdn.jsdelivr.net/npm/snapsvg@0.5.1/dist/snap.svg-min.js" integrity="sha256-oI+elz+sIm+jpn8F/qEspKoKveTc5uKeFHNNVexe6d8=" crossorigin="anonymous"></script> <script src="https://cdn.jsdelivr.net/npm/underscore@1.8.3/underscore-min.js" integrity="sha256-obZACiHd7gkOk9iIL/pimWMTJ4W/pBsKu+oZnSeBIek=" crossorigin="anonymous"></script> <script src="https://cdn.jsdelivr.net/gh/bramp/js-sequence-diagrams@2.0.1/dist/sequence-diagram-min.js" integrity="sha384-8748Vn52gHJYJI0XEuPB2QlPVNUkJlJn9tHqKec6J3q2r9l8fvRxrgn/E5ZHV0sP" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/bramp/js-sequence-diagrams@2.0.1/dist/sequence-diagram-min.css" integrity="sha384-6QbLKJMz5dS3adWSeINZe74uSydBGFbnzaAYmp+tKyq60S7H2p6V7g1TysM5lAaF" crossorigin="anonymous">
+
+
+
+<script type="text/javascript" src="/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js"></script>
+  <script type="text/javascript">
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        tags: 'ams',
+        }
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3.0.5/es5/tex-mml-chtml.js" integrity="sha256-HGLuEfFcsUJGhvB8cQ8nr0gai9EucOOaIxFw7qxmd+w=" crossorigin="anonymous"></script>
+
+<script id="baidu_analytics">
+  var _hmt = _hmt || [];
+  (function() {
+    if (window.location.hostname === 'localhost') return;
+    var hm = document.createElement("script"); hm.async = true;
+    hm.src = "https://hm.baidu.com/hm.js?c602db2501643f661d9789f9e9707386";
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(hm, s);
+  })();
+</script>
+
+
+
+
+
+
+</body>
+</html>

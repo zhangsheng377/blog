@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>利用check酱监控网页并生成rss - 张胜东的博客</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="张胜东" /><meta name="description" content="背景 最近发现了一个很好玩的开源项目：Check酱。 https://github.com/easychen/checkchan-dist 它可以通过保存cookie的方式，监控任意网页上任意元素的变化。然后通过使用Server" /><meta name="keywords" content="张胜东, 博客, 编程" />
+
+
+<meta name="baidu-site-verification" content="qWR9jJPJ9e" />
+<meta name="google-site-verification" content="s9FkJZw4X2alyC8-nsdZgiPHBwX6uqr1QVNxRaGfDKY" />
+
+
+<meta name="generator" content="Hugo 0.68.3 with theme even" />
+
+
+<link rel="canonical" href="https://www.zhangshengdong.com/post/checkchan_rss/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<link href="/sass/main.min.2e81bbed97b8b282c1aeb57488cc71c8d8c8ec559f3931531bd396bf31e0d4dd.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="利用check酱监控网页并生成rss" />
+<meta property="og:description" content="背景 最近发现了一个很好玩的开源项目：Check酱。 https://github.com/easychen/checkchan-dist 它可以通过保存cookie的方式，监控任意网页上任意元素的变化。然后通过使用Server" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://www.zhangshengdong.com/post/checkchan_rss/" />
+<meta property="article:published_time" content="2022-08-09T23:33:58+08:00" />
+<meta property="article:modified_time" content="2022-08-10T02:22:54+08:00" />
+<meta itemprop="name" content="利用check酱监控网页并生成rss">
+<meta itemprop="description" content="背景 最近发现了一个很好玩的开源项目：Check酱。 https://github.com/easychen/checkchan-dist 它可以通过保存cookie的方式，监控任意网页上任意元素的变化。然后通过使用Server">
+<meta itemprop="datePublished" content="2022-08-09T23:33:58&#43;08:00" />
+<meta itemprop="dateModified" content="2022-08-10T02:22:54&#43;08:00" />
+<meta itemprop="wordCount" content="1845">
+
+
+
+<meta itemprop="keywords" content="check酱,监控网页,rss," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="利用check酱监控网页并生成rss"/>
+<meta name="twitter:description" content="背景 最近发现了一个很好玩的开源项目：Check酱。 https://github.com/easychen/checkchan-dist 它可以通过保存cookie的方式，监控任意网页上任意元素的变化。然后通过使用Server"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">张胜东的博客</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">About</li>
+      </a>
+  </ul>
+
+  
+
+
+</nav>
+
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">张胜东的博客</a>
+</div>
+
+
+
+
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about/">About</a>
+      </li>
+  </ul>
+</nav>
+
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">利用check酱监控网页并生成rss</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2022-08-09 </span>
+        
+          <span class="more-meta"> 约 1845 字 </span>
+          <span class="more-meta"> 预计阅读 4 分钟 </span>
+        <span id="busuanzi_container_page_pv" class="more-meta"> <span id="busuanzi_value_page_pv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> 次阅读 </span>
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#背景">背景</a></li>
+        <li><a href="#部署check酱实时监控">部署Check酱实时监控</a></li>
+        <li><a href="#万物皆可rss">万物皆可Rss</a></li>
+        <li><a href="#将监控动态发布成rss">将监控动态发布成Rss</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <h2 id="背景">背景</h2>
+<p>最近发现了一个很好玩的开源项目：Check酱。</p>
+<p><a href="https://github.com/easychen/checkchan-dist">https://github.com/easychen/checkchan-dist</a></p>
+<p>它可以通过保存cookie的方式，监控任意网页上任意元素的变化。然后通过使用Server酱或webhook的方式，对这些元素的变化进行时时提醒。</p>
+<h2 id="部署check酱实时监控">部署Check酱实时监控</h2>
+<p>Check酱的本体是一个chrome插件，但如果只用插件的话，则只能在开机打开浏览器时进行监控。</p>
+<p>好在官方提供了docker镜像，于是我首先使用Docker-compose的方式将其部署在我的服务器上。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-docker" data-lang="docker">version: <span class="s1">&#39;3&#39;</span><span class="err">
+</span><span class="err"></span>services:<span class="err">
+</span><span class="err"></span>  chrome:<span class="err">
+</span><span class="err"></span>    image: easychen/checkchan:latest<span class="err">
+</span><span class="err"></span>    container_name: checkchan_checkchan<span class="err">
+</span><span class="err"></span>    restart: always<span class="err">
+</span><span class="err"></span>    logging:<span class="err">
+</span><span class="err"></span>      options:<span class="err">
+</span><span class="err"></span>        max-size: <span class="s2">&#34;10m&#34;</span><span class="err">
+</span><span class="err"></span>    volumes:<span class="err">
+</span><span class="err"></span>      - /etc/timezone:/etc/timezone:ro<span class="err">
+</span><span class="err"></span>      - /etc/localtime:/etc/localtime:ro<span class="err">
+</span><span class="err"></span>      - <span class="s2">&#34;/xxx/data/checkchan:/checkchan/data&#34;</span><span class="err">
+</span><span class="err"></span>    environment:<span class="err">
+</span><span class="err"></span>      - <span class="s2">&#34;CKC_PASSWD=xxx&#34;</span><span class="err">
+</span><span class="err"></span>      - <span class="s2">&#34;VDEBUG=OFF&#34;</span><span class="err">
+</span><span class="err"></span>      - <span class="s2">&#34;VNC=ON&#34;</span><span class="err">
+</span><span class="err"></span>      <span class="c1">#- &#34;WIN_WIDTH=414&#34;</span><span class="err">
+</span><span class="err"></span>      <span class="c1">#- &#34;WIN_HEIGHT=896&#34;</span><span class="err">
+</span><span class="err"></span>      <span class="c1">#- &#34;XVFB_WHD=500x896x16&#34;</span><span class="err">
+</span><span class="err"></span>      - <span class="s2">&#34;API_KEY=xxx&#34;</span><span class="err">
+</span><span class="err"></span>      - <span class="s2">&#34;ERROR_IMAGE=NORMAL&#34;</span> <span class="c1"># NONE,NORMAL,FULL</span><span class="err">
+</span><span class="err"></span>      <span class="c1">#- &#34;SNAP_URL_BASE=http://xxx:xx&#34;</span><span class="err">
+</span><span class="err"></span>      <span class="c1">#- &#34;SNAP_FULL=0&#34;</span><span class="err">
+</span><span class="err"></span>      - <span class="s2">&#34;TZ=Asia/Nanjing&#34;</span><span class="err">
+</span><span class="err"></span>      <span class="c1">#- &#34;WEBHOOK_URL=&#34; # 云端 Webhook地址，不需要则不用设置</span><span class="err">
+</span><span class="err"></span>    ports:<span class="err">
+</span><span class="err"></span>      - <span class="s2">&#34;x:x&#34;</span> <span class="c1"># 远程桌面(VNC)</span><span class="err">
+</span><span class="err"></span>      - <span class="s2">&#34;x:x&#34;</span> <span class="c1"># 远程桌面的Web界面(NoVNC)</span><span class="err">
+</span><span class="err"></span>      - <span class="s2">&#34;x:x&#34;</span> <span class="c1"># 云端</span><span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div><p>于是，我用Check酱监控了b站up主的更新(主要是虽然b站有动态-投稿，可以只看关注的up主更新的视频，但等我发现这个功能时，我已经把2000个关注都点满了。。。)，以及京东商品的价格，还有微信公众号的更新。</p>
+<p>这边借用官方的图：
+<img src="https://github.com/easychen/checkchan-dist/blob/master/image/20220526194209.png" alt="Check酱浏览器插件"></p>
+<p>然后配置Server酱，将监控信息发送到钉钉机器人通道：
+<img src="https://github.com/easychen/checkchan-dist/blob/master/image/20220521224002.png" alt="Check酱配置Server酱">
+<img src="https://github.com/easychen/checkchan-dist/blob/master/image/20220521224356.png" alt="钉钉机器人通道">
+<img src="/images/checkchan_dingding.jpg" alt="钉钉机器人"></p>
+<p>现在看起来一切都很完美，但很快我就发现cookie是有时效的，所以我隔几天就要去登录一下。这样显然就麻烦了。</p>
+<h2 id="万物皆可rss">万物皆可Rss</h2>
+<p>所以很快，我就发现了RssHub。</p>
+<p><a href="https://docs.rsshub.app/">https://docs.rsshub.app/</a></p>
+<p><a href="https://github.com/DIYgod/RSSHub">https://github.com/DIYgod/RSSHub</a></p>
+<p>它是一个由广大网友共同编写规则，从而可以将大多数你想要的东西（包括那些不支持rss的）都变成rss订阅源的工具。</p>
+<p>所以，现在的思路就从直接监控网页，变成了监控rss的变化。（因为一般的rss阅读器提醒不是那么及时，并且我又喜欢把app都冰冻锁起来，所以我需要一个可以在聊天软件里提醒我的功能）</p>
+<p>当然，由于一些不可说的原因，rsshub的官方站在大陆使用会有点不顺畅。不过好在这依然是个开源软件，所以我们继续用docker部署在服务器上：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-docker" data-lang="docker">version: <span class="s1">&#39;3&#39;</span><span class="err">
+</span><span class="err">
+</span><span class="err"></span>services:<span class="err">
+</span><span class="err"></span>    rsshub:<span class="err">
+</span><span class="err"></span>        <span class="c1"># two ways to enable puppeteer:</span><span class="err">
+</span><span class="err"></span>        <span class="c1"># * comment out marked lines, then use this image instead: diygod/rsshub:chromium-bundled</span><span class="err">
+</span><span class="err"></span>        <span class="c1"># * (consumes more disk space and memory) leave everything unchanged</span><span class="err">
+</span><span class="err"></span>        image: diygod/rsshub<span class="err">
+</span><span class="err"></span>        container_name: rsshub_rsshub<span class="err">
+</span><span class="err"></span>        restart: always<span class="err">
+</span><span class="err"></span>        logging:<span class="err">
+</span><span class="err"></span>          options:<span class="err">
+</span><span class="err"></span>            max-size: <span class="s2">&#34;10m&#34;</span><span class="err">
+</span><span class="err"></span>        volumes:<span class="err">
+</span><span class="err"></span>          - /etc/timezone:/etc/timezone:ro<span class="err">
+</span><span class="err"></span>          - /etc/localtime:/etc/localtime:ro<span class="err">
+</span><span class="err"></span>        ports:<span class="err">
+</span><span class="err"></span>            - <span class="s1">&#39;1200:1200&#39;</span><span class="err">
+</span><span class="err"></span>        environment:<span class="err">
+</span><span class="err"></span>            NODE_ENV: production<span class="err">
+</span><span class="err"></span>            CACHE_TYPE: redis<span class="err">
+</span><span class="err"></span>            REDIS_URL: <span class="s1">&#39;redis://redis:6379/&#39;</span><span class="err">
+</span><span class="err"></span>            PUPPETEER_WS_ENDPOINT: <span class="s1">&#39;ws://browserless:3000&#39;</span>  <span class="c1"># marked</span><span class="err">
+</span><span class="err"></span>        depends_on:<span class="err">
+</span><span class="err"></span>            - browserless  <span class="c1"># marked</span><span class="err">
+</span><span class="err">
+</span><span class="err"></span>    browserless:  <span class="c1"># marked</span><span class="err">
+</span><span class="err"></span>        image: browserless/chrome  <span class="c1"># marked</span><span class="err">
+</span><span class="err"></span>        container_name: rsshub_chrome<span class="err">
+</span><span class="err"></span>        restart: always<span class="err">
+</span><span class="err"></span>        logging:<span class="err">
+</span><span class="err"></span>          options:<span class="err">
+</span><span class="err"></span>            max-size: <span class="s2">&#34;10m&#34;</span><span class="err">
+</span><span class="err"></span>        volumes:<span class="err">
+</span><span class="err"></span>          - /etc/timezone:/etc/timezone:ro<span class="err">
+</span><span class="err"></span>          - /etc/localtime:/etc/localtime:ro<span class="err">
+</span><span class="err">
+</span><span class="err"></span>        ulimits:  <span class="c1"># marked</span><span class="err">
+</span><span class="err"></span>          core:  <span class="c1"># marked</span><span class="err">
+</span><span class="err"></span>            hard: <span class="m">0</span>  <span class="c1"># marked</span><span class="err">
+</span><span class="err"></span>            soft: <span class="m">0</span>  <span class="c1"># marked</span><span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div><p>所以当前的架构就是这样：</p>
+<p><img src="/images/checkchan_flowchart.png" alt="架构0"></p>
+<p>我把网页的变化点做成rss发布，然后使用Check酱去监控rss的变化，一旦有变化就会通过Server酱向我的钉钉推送提醒；同时，我使用The Old Reader去订阅并管理我感兴趣的Rss源，这样当我的钉钉接收到提醒时，我就可以用安卓的FeedMe或网页端去查看更新的内容了，并且已读的条目也会双向同步到The Old Reader。</p>
+<p>完美。</p>
+<p>但。。。我老婆又向我提出了一个新的需求：她也想要去查看更新。。。</p>
+<p>这个需求的麻烦点在于，我不想让她的已读动作影响到我。看似用两个The Old Reader账号就能解决，但这样我就需要每次修改订阅都要在两个账号同步修改，太麻烦了。。。</p>
+<h2 id="将监控动态发布成rss">将监控动态发布成Rss</h2>
+<p>各种搜索解决方案，发现新版Check酱刚增加了一项功能，可以将监控的动态上传、发布成Rss。</p>
+<p>简单说来就是：<a href="https://github.com/easychen/checkchan-dist/issues/39">https://github.com/easychen/checkchan-dist/issues/39</a></p>
+<p>当正常的php网站部署， 然后填上对应的rss_upload.php地址：</p>
+<p><img src="https://user-images.githubusercontent.com/27722028/183260354-623d6109-49c1-4551-836d-f20088b7fd63.png" alt="上行地址"></p>
+<p>然后-&gt;“动态”， 点击&quot;RSS“上传：</p>
+<p><img src="https://user-images.githubusercontent.com/27722028/183260386-71177de9-3cb8-4721-82c7-7ee4149a7307.png" alt="Rss上传"></p>
+<p>最后打开https://example.com/rss.php 即可：</p>
+<p><img src="https://user-images.githubusercontent.com/27722028/183260465-98fe0cbe-4ee3-4fa1-ba76-a6d0f2e627ac.png" alt="Rss"></p>
+<p>rss_upload.php:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-php" data-lang="php"><span class="cp">&lt;?php</span>
+
+<span class="nx">header</span><span class="p">(</span><span class="s1">&#39;Access-Control-Allow-Origin: *&#39;</span><span class="p">);</span>
+<span class="nx">header</span><span class="p">(</span><span class="s1">&#39;Access-Control-Allow-Methods: GET, POST&#39;</span><span class="p">);</span>
+<span class="nx">header</span><span class="p">(</span><span class="s2">&#34;Access-Control-Allow-Headers: X-Requested-With&#34;</span><span class="p">);</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="nx">isset</span><span class="p">(</span><span class="nv">$_POST</span><span class="p">[</span><span class="s1">&#39;rss&#39;</span><span class="p">])</span> <span class="o">&amp;&amp;</span> <span class="nx">strlen</span><span class="p">(</span><span class="nv">$_POST</span><span class="p">[</span><span class="s1">&#39;rss&#39;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// sae
+</span><span class="c1"></span>    <span class="c1">// $kv = new SaeKV();
+</span><span class="c1"></span>    <span class="c1">// $kv-&gt;set(&#39;rss&#39;, $_POST[&#39;rss&#39;]);
+</span><span class="c1"></span>
+    <span class="c1">// 保存到文件
+</span><span class="c1"></span>    <span class="nx">file_put_contents</span><span class="p">(</span><span class="s2">&#34;rss.xml&#34;</span><span class="p">,</span> <span class="nv">$_POST</span><span class="p">[</span><span class="s1">&#39;rss&#39;</span><span class="p">]);</span>
+    <span class="c1">//die(&#34;rss saved 202208072310&#34;);
+</span><span class="c1"></span>    <span class="k">die</span><span class="p">(</span><span class="nv">$_POST</span><span class="p">[</span><span class="s1">&#39;rss&#39;</span><span class="p">]);</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="k">die</span><span class="p">(</span><span class="s2">&#34;rss not found&#34;</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="nx">print_r</span><span class="p">(</span><span class="nv">$_POST</span><span class="p">);</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>rss.php:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-php" data-lang="php"><span class="cp">&lt;?php</span>
+
+<span class="c1">// $kv = new SaeKV();
+</span><span class="c1">// $rss = $kv-&gt;get( &#39;rss&#39; );
+</span><span class="c1"></span><span class="nv">$rss</span> <span class="o">=</span> <span class="nx">file_get_contents</span><span class="p">(</span><span class="s2">&#34;rss.xml&#34;</span><span class="p">);</span>
+
+<span class="nx">header</span><span class="p">(</span><span class="s1">&#39;Content-Type: application/rss+xml; charset=utf-8&#39;</span><span class="p">);</span>
+<span class="k">echo</span> <span class="nv">$rss</span><span class="p">;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>利用这个功能，我就可以把Check酱监控的动态发布成Rss源，这样不论给多少人订阅都不会相互干扰了，而且监控的条目也方便管理，不用多次反复添加修改了。</p>
+<p><img src="/images/checkchan_flowchart_1.png" alt="架构1"></p>
+<p>但是，大家肯定发现了一个问题，那就是Rss的上传是要手动触发的啊。那岂不是没有一点可用性？</p>
+<p>幸好Check酱镜像支持了NoVNC，所以我通过NoVNC连接到服务器上部署的Check酱里，打开正在被自动化程序操控的浏览器，按F12进入开发者模式，在命令行中输入：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-js" data-lang="js"><span class="nx">setInterval</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span><span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s2">&#34;#root &gt; div &gt; div.solo-center.body.wrapped &gt; div &gt; div.side.md\\:show.hiden &gt; div.mt-2 &gt; div &gt; button:nth-child(2)&#34;</span><span class="p">).</span><span class="nx">click</span><span class="p">();</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;rss upload clicked.&#39;</span><span class="p">)},</span><span class="mi">1000</span><span class="o">*</span><span class="mi">60</span><span class="o">*</span><span class="mi">10</span><span class="p">);</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>这段js代码，就可以让浏览器每隔10分钟，自动去点击一下上传按钮。关闭NoVNC也可以生效。</p>
+<p>这下就全流程自动化了。</p>
+<p>这是在iPhone的ReadOn软件上的效果：</p>
+<p><img src="/images/checkchan_ios.jpg" alt="苹果"></p>
+<p>这是在安卓的FeedMe软件上的效果：</p>
+<p><img src="/images/checkchan_android.jpg" alt="苹果"></p>
+
+    </div>
+
+    
+<div class="post-reward">
+  <input type="checkbox" name="reward" id="reward" hidden />
+  <label class="reward-button" for="reward">赞赏支持</label>
+  <div class="qr-code">
+    
+    <label class="qr-code-image" for="reward">
+        <img class="image" src="/images/money_weixin_20200719212002.png">
+        <span>微信打赏</span>
+      </label>
+    <label class="qr-code-image" for="reward">
+        <img class="image" src="/images/alipay_20200801211208.png">
+        <span>支付宝打赏</span>
+      </label>
+  </div>
+</div><footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/check%E9%85%B1/">check酱</a>
+          <a href="/tags/%E7%9B%91%E6%8E%A7%E7%BD%91%E9%A1%B5/">监控网页</a>
+          <a href="/tags/rss/">rss</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/auto_music_photo_show_epaper/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">电子墨水屏音乐相册</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
+        <a class="next" href="/post/esxi_dms/">
+            <span class="next-text nav-default">esxi虚拟机安装黑群晖,nfs挂载</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        <div id="gitalk-container"></div>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js" crossorigin="anonymous"></script>
+    <script type="text/javascript">
+      var gitalk = new Gitalk({
+        id: '2022-08-09 23:33:58 \x2b0800 CST',
+        title: '利用check酱监控网页并生成rss',
+        clientID: '5ea75f603117948d8d37',
+        clientSecret: '26c617c6bce9a975c2a65a68f1ca2a2cc7dde587',
+        repo: 'blog',
+        owner: 'zhangsheng377',
+        admin: ['zhangsheng377'],
+        body: decodeURI(location.href)
+      });
+      gitalk.render('gitalk-container');
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://github.com/gitalk/gitalk">comments powered by gitalk.</a></noscript>
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:435878393@qq.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://www.linkedin.com/in/zhangshengdong/" class="iconfont icon-linkedin" title="linkedin"></a>
+      <a href="https://github.com/zhangsheng377/" class="iconfont icon-github" title="github"></a>
+  <a href="https://www.zhangshengdong.com/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  <div class="busuanzi-footer">
+    <span id="busuanzi_container_site_pv"> 本站总访问量 <span id="busuanzi_value_site_pv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> 次 </span>
+      <span class="division">|</span>
+    <span id="busuanzi_container_site_uv"> 本站总访客数 <span id="busuanzi_value_site_uv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> 人 </span>
+  </div>
+
+  <span class="copyright-year">
+    &copy; 
+    2019 - 
+    2022<span class="heart"><i class="iconfont icon-heart"></i></span><span><a href="https://beian.miit.gov.cn/" target="_blank">苏ICP备15009593号-1</a></span>
+  </span>
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script><script></script><script src="https://cdn.jsdelivr.net/npm/raphael@2.2.7/raphael.min.js" integrity="sha256-67By+NpOtm9ka1R6xpUefeGOY8kWWHHRAKlvaTJ7ONI=" crossorigin="anonymous"></script> <script src="https://cdn.jsdelivr.net/npm/flowchart.js@1.8.0/release/flowchart.min.js" integrity="sha256-zNGWjubXoY6rb5MnmpBNefO0RgoVYfle9p0tvOQM+6k=" crossorigin="anonymous"></script><script></script><script src="https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.js" integrity="sha256-4O4pS1SH31ZqrSO2A/2QJTVjTPqVe+jnYgOWUVr7EEc=" crossorigin="anonymous"></script> <script src="https://cdn.jsdelivr.net/npm/snapsvg@0.5.1/dist/snap.svg-min.js" integrity="sha256-oI+elz+sIm+jpn8F/qEspKoKveTc5uKeFHNNVexe6d8=" crossorigin="anonymous"></script> <script src="https://cdn.jsdelivr.net/npm/underscore@1.8.3/underscore-min.js" integrity="sha256-obZACiHd7gkOk9iIL/pimWMTJ4W/pBsKu+oZnSeBIek=" crossorigin="anonymous"></script> <script src="https://cdn.jsdelivr.net/gh/bramp/js-sequence-diagrams@2.0.1/dist/sequence-diagram-min.js" integrity="sha384-8748Vn52gHJYJI0XEuPB2QlPVNUkJlJn9tHqKec6J3q2r9l8fvRxrgn/E5ZHV0sP" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/bramp/js-sequence-diagrams@2.0.1/dist/sequence-diagram-min.css" integrity="sha384-6QbLKJMz5dS3adWSeINZe74uSydBGFbnzaAYmp+tKyq60S7H2p6V7g1TysM5lAaF" crossorigin="anonymous">
+
+
+
+<script type="text/javascript" src="/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js"></script>
+  <script type="text/javascript">
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        tags: 'ams',
+        }
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3.0.5/es5/tex-mml-chtml.js" integrity="sha256-HGLuEfFcsUJGhvB8cQ8nr0gai9EucOOaIxFw7qxmd+w=" crossorigin="anonymous"></script>
+
+<script id="baidu_analytics">
+  var _hmt = _hmt || [];
+  (function() {
+    if (window.location.hostname === 'localhost') return;
+    var hm = document.createElement("script"); hm.async = true;
+    hm.src = "https://hm.baidu.com/hm.js?c602db2501643f661d9789f9e9707386";
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(hm, s);
+  })();
+</script>
+
+
+
+
+
+
+</body>
+</html>

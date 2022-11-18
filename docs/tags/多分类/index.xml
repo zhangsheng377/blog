@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>多分类 on 张胜东的博客</title>
+    <link>https://www.zhangshengdong.com/tags/%E5%A4%9A%E5%88%86%E7%B1%BB/</link>
+    <description>Recent content in 多分类 on 张胜东的博客</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>&lt;a href=&#34;https://beian.miit.gov.cn/&#34; target=&#34;_blank&#34;&gt;苏ICP备15009593号-1&lt;/a&gt;</copyright>
+    <lastBuildDate>Sat, 04 Sep 2021 23:22:58 +0800</lastBuildDate>
+    
+	<atom:link href="https://www.zhangshengdong.com/tags/%E5%A4%9A%E5%88%86%E7%B1%BB/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>pytorch版bert多目标多分类</title>
+      <link>https://www.zhangshengdong.com/post/pytorch_bert_mutil_target/</link>
+      <pubDate>Sat, 04 Sep 2021 23:22:58 +0800</pubDate>
+      
+      <guid>https://www.zhangshengdong.com/post/pytorch_bert_mutil_target/</guid>
+      <description>背景 基于上次把pytorch使用bert给调成功后，就想试试多目标，或者叫专家网络的结构。 题目是这样的，有10个正常分类和一个其他分类，但是</description>
+    </item>
+    
+    <item>
+      <title>pytorch使用bert进行多分类</title>
+      <link>https://www.zhangshengdong.com/post/pytorch_bert/</link>
+      <pubDate>Tue, 17 Aug 2021 23:04:58 +0800</pubDate>
+      
+      <guid>https://www.zhangshengdong.com/post/pytorch_bert/</guid>
+      <description>背景 之前虽然会用keras来搭建模型，但后来发现用keras修改具体的底层细节实现比较麻烦。又不想用tensorflow写那么多代码，所以近</description>
+    </item>
+    
+  </channel>
+</rss>

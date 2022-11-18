@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>损失函数 on 张胜东的博客</title>
+    <link>https://www.zhangshengdong.com/tags/%E6%8D%9F%E5%A4%B1%E5%87%BD%E6%95%B0/</link>
+    <description>Recent content in 损失函数 on 张胜东的博客</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>&lt;a href=&#34;https://beian.miit.gov.cn/&#34; target=&#34;_blank&#34;&gt;苏ICP备15009593号-1&lt;/a&gt;</copyright>
+    <lastBuildDate>Wed, 31 Mar 2021 01:14:58 +0800</lastBuildDate>
+    
+	<atom:link href="https://www.zhangshengdong.com/tags/%E6%8D%9F%E5%A4%B1%E5%87%BD%E6%95%B0/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>用自定义损失函数实现选择启用不同子网络</title>
+      <link>https://www.zhangshengdong.com/post/custom_loss_to_switch_network/</link>
+      <pubDate>Wed, 31 Mar 2021 01:14:58 +0800</pubDate>
+      
+      <guid>https://www.zhangshengdong.com/post/custom_loss_to_switch_network/</guid>
+      <description>背景 最近发现有一道题，还挺有意思的。题目大意是，每条训练样本是一个文章对，labelA标签标识这两篇文章相似，labelB标签标识这两篇文章</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>esp32蓝牙通信 - 张胜东的博客</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="张胜东" /><meta name="description" content="最近想做一个发热垫，可以用手机控制。 一开始思考过用wifi接入米家进行控制，这样还能使用语音助手。但后来仔细思索一番，发现使用场景不对。如果" /><meta name="keywords" content="张胜东, 博客, 编程" />
+
+
+<meta name="baidu-site-verification" content="qWR9jJPJ9e" />
+<meta name="google-site-verification" content="s9FkJZw4X2alyC8-nsdZgiPHBwX6uqr1QVNxRaGfDKY" />
+
+
+<meta name="generator" content="Hugo 0.68.3 with theme even" />
+
+
+<link rel="canonical" href="https://www.zhangshengdong.com/post/esp32_bluetooth/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<link href="/sass/main.min.2e81bbed97b8b282c1aeb57488cc71c8d8c8ec559f3931531bd396bf31e0d4dd.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="esp32蓝牙通信" />
+<meta property="og:description" content="最近想做一个发热垫，可以用手机控制。 一开始思考过用wifi接入米家进行控制，这样还能使用语音助手。但后来仔细思索一番，发现使用场景不对。如果" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://www.zhangshengdong.com/post/esp32_bluetooth/" />
+<meta property="article:published_time" content="2021-02-21T22:01:58+08:00" />
+<meta property="article:modified_time" content="2021-09-09T04:13:14+08:00" />
+<meta itemprop="name" content="esp32蓝牙通信">
+<meta itemprop="description" content="最近想做一个发热垫，可以用手机控制。 一开始思考过用wifi接入米家进行控制，这样还能使用语音助手。但后来仔细思索一番，发现使用场景不对。如果">
+<meta itemprop="datePublished" content="2021-02-21T22:01:58&#43;08:00" />
+<meta itemprop="dateModified" content="2021-09-09T04:13:14&#43;08:00" />
+<meta itemprop="wordCount" content="1200">
+
+
+
+<meta itemprop="keywords" content="esp32,arduino,蓝牙," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="esp32蓝牙通信"/>
+<meta name="twitter:description" content="最近想做一个发热垫，可以用手机控制。 一开始思考过用wifi接入米家进行控制，这样还能使用语音助手。但后来仔细思索一番，发现使用场景不对。如果"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">张胜东的博客</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">About</li>
+      </a>
+  </ul>
+
+  
+
+
+</nav>
+
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">张胜东的博客</a>
+</div>
+
+
+
+
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about/">About</a>
+      </li>
+  </ul>
+</nav>
+
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">esp32蓝牙通信</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2021-02-21 </span>
+        
+          <span class="more-meta"> 约 1200 字 </span>
+          <span class="more-meta"> 预计阅读 3 分钟 </span>
+        <span id="busuanzi_container_page_pv" class="more-meta"> <span id="busuanzi_value_page_pv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> 次阅读 </span>
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#硬件选型">硬件选型</a></li>
+        <li><a href="#蓝牙连接方式">蓝牙连接方式</a></li>
+        <li><a href="#温控方式">温控方式</a></li>
+        <li><a href="#手机软件">手机软件</a></li>
+        <li><a href="#esp32程序">esp32程序</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <p>最近想做一个发热垫，可以用手机控制。</p>
+<p>一开始思考过用wifi接入米家进行控制，这样还能使用语音助手。但后来仔细思索一番，发现使用场景不对。如果使用wifi连接，那意味着只能在室内使用了。</p>
+<p>所以，最后还是决定直接使用蓝牙连接。</p>
+<h2 id="硬件选型">硬件选型</h2>
+<p>虽然选择了蓝牙连接，但为了以后扩展wifi方便，所以硬件选用了esp32，同时有wifi和蓝牙连接的功能，代码又兼容arduino，使用非常方便。</p>
+<h2 id="蓝牙连接方式">蓝牙连接方式</h2>
+<ol>
+<li>初步设想是把硬件的mac地址生成二维码，手机软件扫描二维码获取mac地址，进行连接及发送温度设置等指令。</li>
+<li>后来发现，貌似可以直接用设备名进行蓝牙连接，如此一来便可以把所有的硬件设备都设置为相同的设备名，又可以省去二维码，着实不错。</li>
+<li>最后是在查资料时看到一种蓝牙广播的方式，不过尚未来及做实验，日后有机会倒可以试试。</li>
+</ol>
+<h2 id="温控方式">温控方式</h2>
+<p>使用温敏电阻即可读取温度。</p>
+<ol>
+<li>最简单的温控可以是直接用继电器开关进行控制。设置温度的上下区间，加热到上区间停止，低于下区间则重启加热。</li>
+<li>高阶一点的是用pwm的方式调整发热电阻的功率，离目标温度越接近则功率越小，如此即可实现平滑温度曲线。甚至于再不行，还可上pid闭环控制算法，叠加上之前的误差，实时调整。</li>
+</ol>
+<p><img src="/images/O1CN01HzVKzp1rWFeAMwCeL_!!2207488875638.jpg" alt="esp32"></p>
+<p><img src="/images/ds18b20_esp32_single_normal.png" alt="ds18b20"></p>
+<p><img src="/images/ds18b20_esp32_multiple.png" alt="muitl_ds18b20"></p>
+<h2 id="手机软件">手机软件</h2>
+<p>由于我不会做安卓软件，现在只是使用一款“蓝牙串口”的app直接发送指令，控制硬件。</p>
+<p>以后还是要学一下安卓，做一套架子出来。</p>
+<h2 id="esp32程序">esp32程序</h2>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">  1
+</span><span class="lnt">  2
+</span><span class="lnt">  3
+</span><span class="lnt">  4
+</span><span class="lnt">  5
+</span><span class="lnt">  6
+</span><span class="lnt">  7
+</span><span class="lnt">  8
+</span><span class="lnt">  9
+</span><span class="lnt"> 10
+</span><span class="lnt"> 11
+</span><span class="lnt"> 12
+</span><span class="lnt"> 13
+</span><span class="lnt"> 14
+</span><span class="lnt"> 15
+</span><span class="lnt"> 16
+</span><span class="lnt"> 17
+</span><span class="lnt"> 18
+</span><span class="lnt"> 19
+</span><span class="lnt"> 20
+</span><span class="lnt"> 21
+</span><span class="lnt"> 22
+</span><span class="lnt"> 23
+</span><span class="lnt"> 24
+</span><span class="lnt"> 25
+</span><span class="lnt"> 26
+</span><span class="lnt"> 27
+</span><span class="lnt"> 28
+</span><span class="lnt"> 29
+</span><span class="lnt"> 30
+</span><span class="lnt"> 31
+</span><span class="lnt"> 32
+</span><span class="lnt"> 33
+</span><span class="lnt"> 34
+</span><span class="lnt"> 35
+</span><span class="lnt"> 36
+</span><span class="lnt"> 37
+</span><span class="lnt"> 38
+</span><span class="lnt"> 39
+</span><span class="lnt"> 40
+</span><span class="lnt"> 41
+</span><span class="lnt"> 42
+</span><span class="lnt"> 43
+</span><span class="lnt"> 44
+</span><span class="lnt"> 45
+</span><span class="lnt"> 46
+</span><span class="lnt"> 47
+</span><span class="lnt"> 48
+</span><span class="lnt"> 49
+</span><span class="lnt"> 50
+</span><span class="lnt"> 51
+</span><span class="lnt"> 52
+</span><span class="lnt"> 53
+</span><span class="lnt"> 54
+</span><span class="lnt"> 55
+</span><span class="lnt"> 56
+</span><span class="lnt"> 57
+</span><span class="lnt"> 58
+</span><span class="lnt"> 59
+</span><span class="lnt"> 60
+</span><span class="lnt"> 61
+</span><span class="lnt"> 62
+</span><span class="lnt"> 63
+</span><span class="lnt"> 64
+</span><span class="lnt"> 65
+</span><span class="lnt"> 66
+</span><span class="lnt"> 67
+</span><span class="lnt"> 68
+</span><span class="lnt"> 69
+</span><span class="lnt"> 70
+</span><span class="lnt"> 71
+</span><span class="lnt"> 72
+</span><span class="lnt"> 73
+</span><span class="lnt"> 74
+</span><span class="lnt"> 75
+</span><span class="lnt"> 76
+</span><span class="lnt"> 77
+</span><span class="lnt"> 78
+</span><span class="lnt"> 79
+</span><span class="lnt"> 80
+</span><span class="lnt"> 81
+</span><span class="lnt"> 82
+</span><span class="lnt"> 83
+</span><span class="lnt"> 84
+</span><span class="lnt"> 85
+</span><span class="lnt"> 86
+</span><span class="lnt"> 87
+</span><span class="lnt"> 88
+</span><span class="lnt"> 89
+</span><span class="lnt"> 90
+</span><span class="lnt"> 91
+</span><span class="lnt"> 92
+</span><span class="lnt"> 93
+</span><span class="lnt"> 94
+</span><span class="lnt"> 95
+</span><span class="lnt"> 96
+</span><span class="lnt"> 97
+</span><span class="lnt"> 98
+</span><span class="lnt"> 99
+</span><span class="lnt">100
+</span><span class="lnt">101
+</span><span class="lnt">102
+</span><span class="lnt">103
+</span><span class="lnt">104
+</span><span class="lnt">105
+</span><span class="lnt">106
+</span><span class="lnt">107
+</span><span class="lnt">108
+</span><span class="lnt">109
+</span><span class="lnt">110
+</span><span class="lnt">111
+</span><span class="lnt">112
+</span><span class="lnt">113
+</span><span class="lnt">114
+</span><span class="lnt">115
+</span><span class="lnt">116
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="c1">//This example code is in the Public Domain (or CC0 licensed, at your option.)
+</span><span class="c1">//By Evandro Copercini - 2018
+</span><span class="c1">//
+</span><span class="c1">//This example creates a bridge between Serial and Classical Bluetooth (SPP)
+</span><span class="c1">//and also demonstrate that SerialBT have the same functionalities of a normal Serial
+</span><span class="c1"></span>
+<span class="cp">#include</span> <span class="cpf">&#34;BluetoothSerial.h&#34;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;OneWire.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;DallasTemperature.h&gt;</span><span class="cp">
+</span><span class="cp"></span>
+<span class="cp">#if !defined(CONFIG_BT_ENABLED) || !defined(CONFIG_BLUEDROID_ENABLED)
+</span><span class="cp">#error Bluetooth is not enabled! Please run `make menuconfig` to and enable it
+</span><span class="cp">#endif
+</span><span class="cp"></span>
+<span class="c1">// 数据输出脚接开发板数字引脚
+</span><span class="c1"></span><span class="cp">#define ONE_WIRE_BUS 17
+</span><span class="cp">#define PWM_PIN 16
+</span><span class="cp"></span>
+<span class="n">BluetoothSerial</span> <span class="n">SerialBT</span><span class="p">;</span>
+<span class="n">OneWire</span> <span class="nf">oneWire</span><span class="p">(</span><span class="n">ONE_WIRE_BUS</span><span class="p">);</span>
+<span class="n">DallasTemperature</span> <span class="nf">sensors</span><span class="p">(</span><span class="o">&amp;</span><span class="n">oneWire</span><span class="p">);</span>
+
+<span class="kt">char</span> <span class="n">START_FLAG</span> <span class="o">=</span> <span class="sc">&#39;$&#39;</span><span class="p">;</span>
+<span class="kt">char</span> <span class="n">END_FLAG</span> <span class="o">=</span> <span class="sc">&#39;#&#39;</span><span class="p">;</span>
+<span class="kt">int</span> <span class="n">TEMPERATURE_MIN</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="kt">int</span> <span class="n">TEMPERATURE_MAX</span> <span class="o">=</span> <span class="mi">50</span><span class="p">;</span>
+
+<span class="kt">int</span> <span class="n">target_temperature</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="c1">// 1精度，*10存储
+</span><span class="c1"></span><span class="kt">int</span> <span class="n">current_temperature</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="c1">// 0.1精度，*10存储
+</span><span class="c1"></span>
+<span class="c1">// use first channel of 16 channels (started from zero)
+</span><span class="c1"></span><span class="cp">#define LEDC_CHANNEL 0
+</span><span class="cp"></span><span class="c1">// use 8 bit precission for LEDC timer
+</span><span class="c1">// 分辨率，即最大可写值为2^k-1，当为8时就是255
+</span><span class="c1"></span><span class="cp">#define LEDC_TIMER_BIT 8
+</span><span class="cp"></span><span class="c1">// use 5000 Hz as a LEDC base frequency
+</span><span class="c1"></span><span class="cp">#define LEDC_BASE_FREQ 5000
+</span><span class="cp"></span>
+<span class="kt">void</span> <span class="nf">setup</span><span class="p">()</span> <span class="p">{</span>
+  <span class="n">Serial</span><span class="p">.</span><span class="n">begin</span><span class="p">(</span><span class="mi">115200</span><span class="p">);</span>
+  <span class="n">SerialBT</span><span class="p">.</span><span class="n">begin</span><span class="p">(</span><span class="s">&#34;ESP32test&#34;</span><span class="p">);</span> <span class="c1">//Bluetooth device name
+</span><span class="c1"></span>  <span class="n">sensors</span><span class="p">.</span><span class="n">begin</span><span class="p">();</span>
+  <span class="c1">// Setup timer and attach timer to a pin
+</span><span class="c1"></span>  <span class="n">ledcSetup</span><span class="p">(</span><span class="n">LEDC_CHANNEL</span><span class="p">,</span> <span class="n">LEDC_BASE_FREQ</span><span class="p">,</span> <span class="n">LEDC_TIMER_BIT</span><span class="p">);</span>
+  <span class="n">ledcAttachPin</span><span class="p">(</span><span class="n">PWM_PIN</span><span class="p">,</span> <span class="n">LEDC_CHANNEL</span><span class="p">);</span>
+  <span class="n">Serial</span><span class="p">.</span><span class="n">println</span><span class="p">(</span><span class="s">&#34;The device started, now you can pair it with bluetooth!&#34;</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">SerialBT_sendMsg</span><span class="p">(</span><span class="n">String</span> <span class="n">msg</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">msg</span><span class="p">.</span><span class="n">length</span><span class="p">();</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">SerialBT</span><span class="p">.</span><span class="n">write</span><span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kt">int</span> <span class="n">NONE</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="kt">int</span> <span class="n">START</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="kt">int</span> <span class="n">pre_status</span> <span class="o">=</span> <span class="n">NONE</span><span class="p">;</span>
+<span class="kt">int</span> <span class="n">num</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="kt">void</span> <span class="nf">update_target_temperature</span><span class="p">()</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">SerialBT</span><span class="p">.</span><span class="n">available</span><span class="p">())</span> <span class="p">{</span>
+    <span class="kt">char</span> <span class="n">msg_char</span> <span class="o">=</span> <span class="n">SerialBT</span><span class="p">.</span><span class="n">read</span><span class="p">();</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">msg_char</span> <span class="o">==</span> <span class="n">START_FLAG</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">num</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+      <span class="n">pre_status</span> <span class="o">=</span> <span class="n">START</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">msg_char</span> <span class="o">==</span> <span class="n">END_FLAG</span> <span class="o">&amp;&amp;</span> <span class="n">pre_status</span> <span class="o">==</span> <span class="n">START</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="n">num</span> <span class="o">&gt;=</span> <span class="n">TEMPERATURE_MIN</span> <span class="o">&amp;&amp;</span> <span class="n">num</span> <span class="o">&lt;=</span> <span class="n">TEMPERATURE_MAX</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">target_temperature</span> <span class="o">=</span> <span class="n">num</span> <span class="o">*</span> <span class="mi">10</span><span class="p">;</span>
+        <span class="n">String</span> <span class="n">msg</span> <span class="o">=</span> <span class="n">String</span><span class="p">(</span><span class="s">&#34;set temperature to &#34;</span> <span class="o">+</span> <span class="n">String</span><span class="p">(</span><span class="n">target_temperature</span> <span class="o">/</span> <span class="mf">10.0</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#34;</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+        <span class="n">SerialBT_sendMsg</span><span class="p">(</span><span class="n">msg</span><span class="p">);</span>
+      <span class="p">}</span>
+      <span class="n">num</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+      <span class="n">pre_status</span> <span class="o">=</span> <span class="n">NONE</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">isDigit</span><span class="p">(</span><span class="n">msg_char</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="n">pre_status</span> <span class="o">==</span> <span class="n">START</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">num</span> <span class="o">=</span> <span class="n">num</span> <span class="o">*</span> <span class="mi">10</span> <span class="o">+</span> <span class="p">(</span><span class="n">msg_char</span> <span class="o">-</span> <span class="sc">&#39;0&#39;</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+      <span class="n">num</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+      <span class="n">pre_status</span> <span class="o">=</span> <span class="n">NONE</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">update_current_temperature</span><span class="p">()</span> <span class="p">{</span>
+  <span class="n">sensors</span><span class="p">.</span><span class="n">requestTemperatures</span><span class="p">();</span> <span class="c1">// 发送命令获取温度
+</span><span class="c1"></span>  <span class="kt">int</span> <span class="n">tmp_temperature</span> <span class="o">=</span> <span class="kt">int</span><span class="p">(</span><span class="n">sensors</span><span class="p">.</span><span class="n">getTempCByIndex</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="mi">10</span><span class="p">);</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">tmp_temperature</span> <span class="o">!=</span> <span class="n">current_temperature</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">current_temperature</span> <span class="o">=</span> <span class="n">tmp_temperature</span><span class="p">;</span>
+    <span class="n">Serial</span><span class="p">.</span><span class="n">print</span><span class="p">(</span><span class="s">&#34;Temperature for the device 1 (index 0) is: &#34;</span><span class="p">);</span>
+    <span class="n">Serial</span><span class="p">.</span><span class="n">println</span><span class="p">(</span><span class="n">current_temperature</span> <span class="o">/</span> <span class="mf">10.0</span><span class="p">);</span>
+    <span class="n">SerialBT_sendMsg</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="s">&#34;temperature is &#34;</span> <span class="o">+</span> <span class="n">String</span><span class="p">(</span><span class="n">current_temperature</span> <span class="o">/</span> <span class="mf">10.0</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#34;</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">));</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">set_heater_pwm</span><span class="p">()</span> <span class="p">{</span>
+  <span class="kt">int</span> <span class="n">tmp_current_temperature</span> <span class="o">=</span> <span class="n">min</span><span class="p">(</span><span class="n">current_temperature</span><span class="p">,</span> <span class="n">target_temperature</span><span class="p">);</span>
+  <span class="n">tmp_current_temperature</span> <span class="o">=</span> <span class="n">max</span><span class="p">(</span><span class="n">tmp_current_temperature</span><span class="p">,</span> <span class="n">TEMPERATURE_MIN</span><span class="p">);</span>
+  <span class="kt">int</span> <span class="n">pwm</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+  <span class="k">if</span> <span class="p">(</span><span class="n">target_temperature</span> <span class="o">&gt;</span> <span class="n">tmp_current_temperature</span> <span class="o">&amp;&amp;</span> <span class="n">target_temperature</span> <span class="o">&gt;</span> <span class="n">TEMPERATURE_MIN</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">pwm</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">*</span> <span class="p">(</span><span class="n">target_temperature</span> <span class="o">-</span> <span class="n">tmp_current_temperature</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">target_temperature</span> <span class="o">-</span> <span class="n">TEMPERATURE_MIN</span><span class="p">)</span> <span class="o">*</span> <span class="mi">255</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="n">ledcWrite</span><span class="p">(</span><span class="n">LEDC_CHANNEL</span><span class="p">,</span> <span class="n">pwm</span><span class="p">);</span> <span class="c1">// LEDC_TIMER_BIT分辨率设置为8时，最大duty为2^8-1=255
+</span><span class="c1"></span>  <span class="n">Serial</span><span class="p">.</span><span class="n">print</span><span class="p">(</span><span class="s">&#34;pwm is: &#34;</span><span class="p">);</span>
+  <span class="n">Serial</span><span class="p">.</span><span class="n">println</span><span class="p">(</span><span class="n">pwm</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">loop</span><span class="p">()</span> <span class="p">{</span>
+  <span class="n">update_target_temperature</span><span class="p">();</span>
+
+  <span class="n">update_current_temperature</span><span class="p">();</span>
+
+  <span class="n">set_heater_pwm</span><span class="p">();</span>
+
+  <span class="n">delay</span><span class="p">(</span><span class="mi">20</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div>
+    </div>
+
+    
+<div class="post-reward">
+  <input type="checkbox" name="reward" id="reward" hidden />
+  <label class="reward-button" for="reward">赞赏支持</label>
+  <div class="qr-code">
+    
+    <label class="qr-code-image" for="reward">
+        <img class="image" src="/images/money_weixin_20200719212002.png">
+        <span>微信打赏</span>
+      </label>
+    <label class="qr-code-image" for="reward">
+        <img class="image" src="/images/alipay_20200801211208.png">
+        <span>支付宝打赏</span>
+      </label>
+  </div>
+</div><footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/esp32/">esp32</a>
+          <a href="/tags/arduino/">arduino</a>
+          <a href="/tags/%E8%93%9D%E7%89%99/">蓝牙</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/data_iterator/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">给深度学习模型构建数据迭代器</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
+        <a class="next" href="/post/docker_log/">
+            <span class="next-text nav-default">docker log太占空间</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        <div id="gitalk-container"></div>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js" crossorigin="anonymous"></script>
+    <script type="text/javascript">
+      var gitalk = new Gitalk({
+        id: '2021-02-21 22:01:58 \x2b0800 CST',
+        title: 'esp32蓝牙通信',
+        clientID: '5ea75f603117948d8d37',
+        clientSecret: '26c617c6bce9a975c2a65a68f1ca2a2cc7dde587',
+        repo: 'blog',
+        owner: 'zhangsheng377',
+        admin: ['zhangsheng377'],
+        body: decodeURI(location.href)
+      });
+      gitalk.render('gitalk-container');
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://github.com/gitalk/gitalk">comments powered by gitalk.</a></noscript>
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:435878393@qq.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://www.linkedin.com/in/zhangshengdong/" class="iconfont icon-linkedin" title="linkedin"></a>
+      <a href="https://github.com/zhangsheng377/" class="iconfont icon-github" title="github"></a>
+  <a href="https://www.zhangshengdong.com/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  <div class="busuanzi-footer">
+    <span id="busuanzi_container_site_pv"> 本站总访问量 <span id="busuanzi_value_site_pv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> 次 </span>
+      <span class="division">|</span>
+    <span id="busuanzi_container_site_uv"> 本站总访客数 <span id="busuanzi_value_site_uv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> 人 </span>
+  </div>
+
+  <span class="copyright-year">
+    &copy; 
+    2019 - 
+    2022<span class="heart"><i class="iconfont icon-heart"></i></span><span><a href="https://beian.miit.gov.cn/" target="_blank">苏ICP备15009593号-1</a></span>
+  </span>
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+
+
+
+<script type="text/javascript" src="/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js"></script>
+  <script type="text/javascript">
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        tags: 'ams',
+        }
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3.0.5/es5/tex-mml-chtml.js" integrity="sha256-HGLuEfFcsUJGhvB8cQ8nr0gai9EucOOaIxFw7qxmd+w=" crossorigin="anonymous"></script>
+
+<script id="baidu_analytics">
+  var _hmt = _hmt || [];
+  (function() {
+    if (window.location.hostname === 'localhost') return;
+    var hm = document.createElement("script"); hm.async = true;
+    hm.src = "https://hm.baidu.com/hm.js?c602db2501643f661d9789f9e9707386";
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(hm, s);
+  })();
+</script>
+
+
+
+
+
+
+</body>
+</html>

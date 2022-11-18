@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>电子墨水屏音乐相册 - 张胜东的博客</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="张胜东" /><meta name="description" content="背景 事情还要从一年前，我做的墨水屏早教机说起。https://www.zhangshengdong.com/post/baby_epaper" /><meta name="keywords" content="张胜东, 博客, 编程" />
+
+
+<meta name="baidu-site-verification" content="qWR9jJPJ9e" />
+<meta name="google-site-verification" content="s9FkJZw4X2alyC8-nsdZgiPHBwX6uqr1QVNxRaGfDKY" />
+
+
+<meta name="generator" content="Hugo 0.68.3 with theme even" />
+
+
+<link rel="canonical" href="https://www.zhangshengdong.com/post/auto_music_photo_show_epaper/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<link href="/sass/main.min.2e81bbed97b8b282c1aeb57488cc71c8d8c8ec559f3931531bd396bf31e0d4dd.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="电子墨水屏音乐相册" />
+<meta property="og:description" content="背景 事情还要从一年前，我做的墨水屏早教机说起。https://www.zhangshengdong.com/post/baby_epaper" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://www.zhangshengdong.com/post/auto_music_photo_show_epaper/" />
+<meta property="article:published_time" content="2022-08-22T23:33:58+08:00" />
+<meta property="article:modified_time" content="2022-08-23T01:01:59+08:00" />
+<meta itemprop="name" content="电子墨水屏音乐相册">
+<meta itemprop="description" content="背景 事情还要从一年前，我做的墨水屏早教机说起。https://www.zhangshengdong.com/post/baby_epaper">
+<meta itemprop="datePublished" content="2022-08-22T23:33:58&#43;08:00" />
+<meta itemprop="dateModified" content="2022-08-23T01:01:59&#43;08:00" />
+<meta itemprop="wordCount" content="1785">
+
+
+
+<meta itemprop="keywords" content="电子墨水屏,音乐相册,Floyd-Steinberg,树莓派," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="电子墨水屏音乐相册"/>
+<meta name="twitter:description" content="背景 事情还要从一年前，我做的墨水屏早教机说起。https://www.zhangshengdong.com/post/baby_epaper"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">张胜东的博客</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">About</li>
+      </a>
+  </ul>
+
+  
+
+
+</nav>
+
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">张胜东的博客</a>
+</div>
+
+
+
+
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about/">About</a>
+      </li>
+  </ul>
+</nav>
+
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">电子墨水屏音乐相册</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2022-08-22 </span>
+        
+          <span class="more-meta"> 约 1785 字 </span>
+          <span class="more-meta"> 预计阅读 4 分钟 </span>
+        <span id="busuanzi_container_page_pv" class="more-meta"> <span id="busuanzi_value_page_pv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> 次阅读 </span>
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#背景">背景</a></li>
+        <li><a href="#音乐相册">音乐相册</a></li>
+        <li><a href="#自动转换照片">自动转换照片</a>
+          <ul>
+            <li><a href="#最简单的思路最近距离法">最简单的思路：最近距离法</a></li>
+            <li><a href="#色彩均衡">色彩均衡</a></li>
+            <li><a href="#floyd-steinberg扩散抖动算法">Floyd-Steinberg扩散抖动算法</a></li>
+          </ul>
+        </li>
+        <li><a href="#缓存">缓存</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <h2 id="背景">背景</h2>
+<p>事情还要从一年前，我做的墨水屏早教机说起。<a href="https://www.zhangshengdong.com/post/baby_epaper/">https://www.zhangshengdong.com/post/baby_epaper/</a></p>
+<p>虽然这个早教机宝宝的确很喜欢玩，是吸引注意力的一大利器。但架不住这个墨水屏刷新实在太慢，几乎要20秒，所以导致宝宝只有在图片刷出来时，才会看它一眼，这样就显得鸡肋了。</p>
+<p>所以，最近我就在想，有什么是不关注刷新时间的呢？</p>
+<p>嗯，就是早年间流行过的 音乐相册。</p>
+<h2 id="音乐相册">音乐相册</h2>
+<p>其实从早教机改成音乐相册并不复杂。</p>
+<p>早教机讲究的是对应的图片和讲解音频同时出现、同时切换，而音乐相册则是照片的展示和音乐无关。</p>
+<p>所以我直接开两个进程，让它们一个播放音乐，一个展示照片，各玩各的就行啦。但由于机身上只有一对按键，所以最后权衡再三，决定用这一对按钮来控制音乐的上下切换。</p>
+<p>大体程序如下:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">Mixer_thread</span><span class="p">(</span><span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">):</span>  <span class="c1"># 继承父类threading.Thread</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mp3_dir</span><span class="p">):</span>
+        <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mp3_paths</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">mp3_dir</span><span class="p">,</span> <span class="s1">&#39;*.mp3&#39;</span><span class="p">))</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s2">&#34;len(self.mp3_paths):{len(self.mp3_paths)}&#34;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span>
+
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># 把要执行的代码写到run函数里面 线程在创建后会直接运行run函数</span>
+        <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mp3_paths</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_index</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>  <span class="c1"># 相等说明没有外界修改</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">target_index</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mp3_paths</span><span class="p">)))</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s2">&#34;Mixer_thread run self.target_index:{self.target_index}&#34;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_index</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mp3_paths</span><span class="p">):</span>  <span class="c1"># target_index有效</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_index</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s2">&#34;Mixer_thread run mp3_path:{self.mp3_paths[self.index]}&#34;</span><span class="p">)</span>
+                <span class="n">mixer</span><span class="o">.</span><span class="n">music</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mp3_paths</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">])</span>
+                <span class="n">mixer</span><span class="o">.</span><span class="n">music</span><span class="o">.</span><span class="n">play</span><span class="p">()</span>
+                <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_index</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="ow">and</span> <span class="n">mixer</span><span class="o">.</span><span class="n">music</span><span class="o">.</span><span class="n">get_busy</span><span class="p">():</span>
+                    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_index</span>
+
+    <span class="k">def</span> <span class="nf">pre_music</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target_index</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mp3_paths</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mp3_paths</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s2">&#34;pre_music self.target_index:{self.target_index}&#34;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">next_music</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target_index</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mp3_paths</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s2">&#34;next_music self.target_index:{self.target_index}&#34;</span><span class="p">)</span>
+</code></pre></td></tr></table>
+</div>
+</div><h2 id="自动转换照片">自动转换照片</h2>
+<p>但只到这一步是不够的，因为由于我的墨水屏只有7色，所以这时候每张照片都得要我亲自打开photoshop，载入颜色表，把照片转换成7元色表示才能用。这样一来，照片多了工作量就大大不可接受了。</p>
+<p>所以我需要在树莓派上能够自动完成任意照片的转换。</p>
+<h3 id="最简单的思路最近距离法">最简单的思路：最近距离法</h3>
+<p>第一个想到的方案自然就是最近距离法了，即判断每个像素点距离色表中每个颜色的远近，从而把该像素设置为离它原有颜色最近的那个元色。</p>
+<p>代码：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">def</span> <span class="nf">_get_color_distance</span><span class="p">(</span><span class="n">color_a</span><span class="p">,</span> <span class="n">color_b</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">color_a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">color_b</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">color_a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">color_b</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">color_a</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">color_b</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span>
+
+
+<span class="k">def</span> <span class="nf">_get_closest_color</span><span class="p">(</span><span class="n">color</span><span class="p">):</span>
+    <span class="n">min_distance</span> <span class="o">=</span> <span class="mi">255</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">255</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">255</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">closest_color</span> <span class="o">=</span> <span class="n">color_act</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">color_act_</span> <span class="ow">in</span> <span class="n">color_act</span><span class="p">:</span>
+            <span class="n">distance</span> <span class="o">=</span> <span class="n">_get_color_distance</span><span class="p">(</span><span class="n">color_act_</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">distance</span> <span class="o">&lt;</span> <span class="n">min_distance</span><span class="p">:</span>
+                <span class="n">min_distance</span> <span class="o">=</span> <span class="n">distance</span>
+                <span class="n">closest_color</span> <span class="o">=</span> <span class="n">color_act_</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="n">traceback</span><span class="o">.</span><span class="n">print_exc</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">closest_color</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>但这个初始方案很快就被现实给打脸了。</p>
+<p>原图：</p>
+<p><img src="/images/IMG_20220618_174418_1661184931.jpg" alt="原图"></p>
+<p>最近距离法：</p>
+<p><img src="/images/cache_pic_0_1661185139.jpg" alt="最近距离法"></p>
+<p>可以发现，最近距离法转换出的就是色块，变成了剪影的效果，可以说毫无观感可言，几乎不能用了。</p>
+<h3 id="色彩均衡">色彩均衡</h3>
+<p>粗略的分析了一下，感觉可能是因为这张照片的颜色大体偏黑，所以最近距离转换出来就变成以黑白橙为主了。</p>
+<p>那如果原因是这样的话，我是不是可以对它做一下类似白平衡的色彩均衡操作，就可以把7元色都显示出来了呢？</p>
+<p>代码：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="n">image</span> <span class="o">=</span> <span class="n">ImageEnhance</span><span class="o">.</span><span class="n">Color</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+<span class="n">image</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">enhance</span><span class="p">(</span><span class="n">factor</span><span class="o">=</span><span class="mf">1.5</span><span class="p">)</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>色彩均衡：</p>
+<p><img src="/images/cache_pic_1_1661185585.jpg" alt="色彩均衡"></p>
+<p>可以发现，红色、蓝色、黄色的区域都变大了，还增加了一点点绿色，可以说的确是实现了刚才的目的：把7元色都显示出来。但这依旧没用啊，这个效果是绝对不能够使用的。</p>
+<h3 id="floyd-steinberg扩散抖动算法">Floyd-Steinberg扩散抖动算法</h3>
+<p>所以我就在想，那原先手动用photoshop处理时，它是用的什么算法呢？</p>
+<p>一通搜索，就发现了Floyd-Steinberg扩散抖动算法。</p>
+<p>这个算法相当于是，将像素使用我们的方法一最近距离法进行标准化后，所产生的误差叠加到相邻像素上，从而利用误差扩散实现抖动，最终使得平均量化误差最小。</p>
+<p>通俗一点说就是，它把误差分担到周边的像素上去，用周边这一团像素来模拟原图中的这一团区域。</p>
+<p>代码：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">def</span> <span class="nf">floyd_steinberg_dither</span><span class="p">(</span><span class="n">img</span><span class="p">):</span>
+    <span class="n">pixel</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+
+    <span class="n">x_lim</span><span class="p">,</span> <span class="n">y_lim</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">size</span>
+
+    <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">y_lim</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">x_lim</span><span class="p">):</span>
+            <span class="n">red_oldpixel</span><span class="p">,</span> <span class="n">green_oldpixel</span><span class="p">,</span> <span class="n">blue_oldpixel</span> <span class="o">=</span> <span class="n">pixel</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">]</span>
+            <span class="k">print</span><span class="p">(</span><span class="n">f</span><span class="s2">&#34;floyd_steinberg_dither : old pixel[x, y]: {pixel[x, y]}&#34;</span><span class="p">)</span>
+
+            <span class="k">print</span><span class="p">(</span><span class="n">f</span><span class="s2">&#34;floyd_steinberg_dither : _get_closest_color(pixel[x, y]): {_get_closest_color(pixel[x, y])}&#34;</span><span class="p">)</span>
+            <span class="n">pixel</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">]</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">_get_closest_color</span><span class="p">(</span><span class="n">pixel</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">]))</span>
+            <span class="n">red_newpixel</span><span class="p">,</span> <span class="n">green_newpixel</span><span class="p">,</span> <span class="n">blue_newpixel</span> <span class="o">=</span> <span class="n">pixel</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">]</span>
+
+            <span class="n">red_error</span> <span class="o">=</span> <span class="n">red_oldpixel</span> <span class="o">-</span> <span class="n">red_newpixel</span>
+            <span class="n">green_error</span> <span class="o">=</span> <span class="n">green_oldpixel</span> <span class="o">-</span> <span class="n">green_newpixel</span>
+            <span class="n">blue_error</span> <span class="o">=</span> <span class="n">blue_oldpixel</span> <span class="o">-</span> <span class="n">blue_newpixel</span>
+
+            <span class="k">if</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="n">x_lim</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">red</span> <span class="o">=</span> <span class="n">pixel</span><span class="p">[</span><span class="n">x</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">y</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="nb">round</span><span class="p">(</span><span class="n">red_error</span> <span class="o">*</span> <span class="mi">7</span> <span class="o">/</span> <span class="mi">16</span><span class="p">)</span>
+                <span class="n">green</span> <span class="o">=</span> <span class="n">pixel</span><span class="p">[</span><span class="n">x</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">y</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="nb">round</span><span class="p">(</span><span class="n">green_error</span> <span class="o">*</span> <span class="mi">7</span> <span class="o">/</span> <span class="mi">16</span><span class="p">)</span>
+                <span class="n">blue</span> <span class="o">=</span> <span class="n">pixel</span><span class="p">[</span><span class="n">x</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">y</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="nb">round</span><span class="p">(</span><span class="n">blue_error</span> <span class="o">*</span> <span class="mi">7</span> <span class="o">/</span> <span class="mi">16</span><span class="p">)</span>
+
+                <span class="n">pixel</span><span class="p">[</span><span class="n">x</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">y</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">red</span><span class="p">,</span> <span class="n">green</span><span class="p">,</span> <span class="n">blue</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">y</span> <span class="o">&lt;</span> <span class="n">y_lim</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">red</span> <span class="o">=</span> <span class="n">pixel</span><span class="p">[</span><span class="n">x</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">y</span> <span class="o">+</span> <span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="nb">round</span><span class="p">(</span><span class="n">red_error</span> <span class="o">*</span> <span class="mi">3</span> <span class="o">/</span> <span class="mi">16</span><span class="p">)</span>
+                <span class="n">green</span> <span class="o">=</span> <span class="n">pixel</span><span class="p">[</span><span class="n">x</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">y</span> <span class="o">+</span> <span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="nb">round</span><span class="p">(</span><span class="n">green_error</span> <span class="o">*</span> <span class="mi">3</span> <span class="o">/</span> <span class="mi">16</span><span class="p">)</span>
+                <span class="n">blue</span> <span class="o">=</span> <span class="n">pixel</span><span class="p">[</span><span class="n">x</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">y</span> <span class="o">+</span> <span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="nb">round</span><span class="p">(</span><span class="n">blue_error</span> <span class="o">*</span> <span class="mi">3</span> <span class="o">/</span> <span class="mi">16</span><span class="p">)</span>
+
+                <span class="n">pixel</span><span class="p">[</span><span class="n">x</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">y</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">red</span><span class="p">,</span> <span class="n">green</span><span class="p">,</span> <span class="n">blue</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">y</span> <span class="o">&lt;</span> <span class="n">y_lim</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">red</span> <span class="o">=</span> <span class="n">pixel</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">+</span> <span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="nb">round</span><span class="p">(</span><span class="n">red_error</span> <span class="o">*</span> <span class="mi">5</span> <span class="o">/</span> <span class="mi">16</span><span class="p">)</span>
+                <span class="n">green</span> <span class="o">=</span> <span class="n">pixel</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">+</span> <span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="nb">round</span><span class="p">(</span><span class="n">green_error</span> <span class="o">*</span> <span class="mi">5</span> <span class="o">/</span> <span class="mi">16</span><span class="p">)</span>
+                <span class="n">blue</span> <span class="o">=</span> <span class="n">pixel</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">+</span> <span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="nb">round</span><span class="p">(</span><span class="n">blue_error</span> <span class="o">*</span> <span class="mi">5</span> <span class="o">/</span> <span class="mi">16</span><span class="p">)</span>
+
+                <span class="n">pixel</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">red</span><span class="p">,</span> <span class="n">green</span><span class="p">,</span> <span class="n">blue</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="n">x_lim</span> <span class="o">-</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">y</span> <span class="o">&lt;</span> <span class="n">y_lim</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">red</span> <span class="o">=</span> <span class="n">pixel</span><span class="p">[</span><span class="n">x</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">y</span> <span class="o">+</span> <span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="nb">round</span><span class="p">(</span><span class="n">red_error</span> <span class="o">*</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">16</span><span class="p">)</span>
+                <span class="n">green</span> <span class="o">=</span> <span class="n">pixel</span><span class="p">[</span><span class="n">x</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">y</span> <span class="o">+</span> <span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="nb">round</span><span class="p">(</span><span class="n">green_error</span> <span class="o">*</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">16</span><span class="p">)</span>
+                <span class="n">blue</span> <span class="o">=</span> <span class="n">pixel</span><span class="p">[</span><span class="n">x</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">y</span> <span class="o">+</span> <span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="nb">round</span><span class="p">(</span><span class="n">blue_error</span> <span class="o">*</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">16</span><span class="p">)</span>
+
+                <span class="n">pixel</span><span class="p">[</span><span class="n">x</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">y</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">red</span><span class="p">,</span> <span class="n">green</span><span class="p">,</span> <span class="n">blue</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">img</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>Floyd-Steinberg扩散抖动算法：</p>
+<p><img src="/images/IMG_20220618_174418_1661186611.jpg" alt="Floyd-Steinberg扩散抖动算法"></p>
+<p>哇，效果上完胜啊！惊艳！</p>
+<h2 id="缓存">缓存</h2>
+<p>那么最后，由于不管是哪种算法，都需要逐一像素点的处理，哪怕是在树莓派上使用了多线程、进程，也还要近7分钟之久。</p>
+<p>所以就加入了缓存机制，在读取图片时，会先去查找有没有已经处理好的缓存文件，若没有才会真的进行转换处理。</p>
+<p>最终实现照：</p>
+<p><img src="/images/1661186762748_1661187074.jpg" alt="最终实现照"></p>
+
+    </div>
+
+    
+<div class="post-reward">
+  <input type="checkbox" name="reward" id="reward" hidden />
+  <label class="reward-button" for="reward">赞赏支持</label>
+  <div class="qr-code">
+    
+    <label class="qr-code-image" for="reward">
+        <img class="image" src="/images/money_weixin_20200719212002.png">
+        <span>微信打赏</span>
+      </label>
+    <label class="qr-code-image" for="reward">
+        <img class="image" src="/images/alipay_20200801211208.png">
+        <span>支付宝打赏</span>
+      </label>
+  </div>
+</div><footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/%E7%94%B5%E5%AD%90%E5%A2%A8%E6%B0%B4%E5%B1%8F/">电子墨水屏</a>
+          <a href="/tags/%E9%9F%B3%E4%B9%90%E7%9B%B8%E5%86%8C/">音乐相册</a>
+          <a href="/tags/floyd-steinberg/">Floyd-Steinberg</a>
+          <a href="/tags/%E6%A0%91%E8%8E%93%E6%B4%BE/">树莓派</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/hp1020plus/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">hp1020plus网络打印机服务器</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
+        <a class="next" href="/post/checkchan_rss/">
+            <span class="next-text nav-default">利用check酱监控网页并生成rss</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        <div id="gitalk-container"></div>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js" crossorigin="anonymous"></script>
+    <script type="text/javascript">
+      var gitalk = new Gitalk({
+        id: '2022-08-22 23:33:58 \x2b0800 CST',
+        title: '电子墨水屏音乐相册',
+        clientID: '5ea75f603117948d8d37',
+        clientSecret: '26c617c6bce9a975c2a65a68f1ca2a2cc7dde587',
+        repo: 'blog',
+        owner: 'zhangsheng377',
+        admin: ['zhangsheng377'],
+        body: decodeURI(location.href)
+      });
+      gitalk.render('gitalk-container');
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://github.com/gitalk/gitalk">comments powered by gitalk.</a></noscript>
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:435878393@qq.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://www.linkedin.com/in/zhangshengdong/" class="iconfont icon-linkedin" title="linkedin"></a>
+      <a href="https://github.com/zhangsheng377/" class="iconfont icon-github" title="github"></a>
+  <a href="https://www.zhangshengdong.com/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  <div class="busuanzi-footer">
+    <span id="busuanzi_container_site_pv"> 本站总访问量 <span id="busuanzi_value_site_pv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> 次 </span>
+      <span class="division">|</span>
+    <span id="busuanzi_container_site_uv"> 本站总访客数 <span id="busuanzi_value_site_uv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> 人 </span>
+  </div>
+
+  <span class="copyright-year">
+    &copy; 
+    2019 - 
+    2022<span class="heart"><i class="iconfont icon-heart"></i></span><span><a href="https://beian.miit.gov.cn/" target="_blank">苏ICP备15009593号-1</a></span>
+  </span>
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script><script></script><script src="https://cdn.jsdelivr.net/npm/raphael@2.2.7/raphael.min.js" integrity="sha256-67By+NpOtm9ka1R6xpUefeGOY8kWWHHRAKlvaTJ7ONI=" crossorigin="anonymous"></script> <script src="https://cdn.jsdelivr.net/npm/flowchart.js@1.8.0/release/flowchart.min.js" integrity="sha256-zNGWjubXoY6rb5MnmpBNefO0RgoVYfle9p0tvOQM+6k=" crossorigin="anonymous"></script><script></script><script src="https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.js" integrity="sha256-4O4pS1SH31ZqrSO2A/2QJTVjTPqVe+jnYgOWUVr7EEc=" crossorigin="anonymous"></script> <script src="https://cdn.jsdelivr.net/npm/snapsvg@0.5.1/dist/snap.svg-min.js" integrity="sha256-oI+elz+sIm+jpn8F/qEspKoKveTc5uKeFHNNVexe6d8=" crossorigin="anonymous"></script> <script src="https://cdn.jsdelivr.net/npm/underscore@1.8.3/underscore-min.js" integrity="sha256-obZACiHd7gkOk9iIL/pimWMTJ4W/pBsKu+oZnSeBIek=" crossorigin="anonymous"></script> <script src="https://cdn.jsdelivr.net/gh/bramp/js-sequence-diagrams@2.0.1/dist/sequence-diagram-min.js" integrity="sha384-8748Vn52gHJYJI0XEuPB2QlPVNUkJlJn9tHqKec6J3q2r9l8fvRxrgn/E5ZHV0sP" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/bramp/js-sequence-diagrams@2.0.1/dist/sequence-diagram-min.css" integrity="sha384-6QbLKJMz5dS3adWSeINZe74uSydBGFbnzaAYmp+tKyq60S7H2p6V7g1TysM5lAaF" crossorigin="anonymous">
+
+
+
+<script type="text/javascript" src="/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js"></script>
+  <script type="text/javascript">
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        tags: 'ams',
+        }
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3.0.5/es5/tex-mml-chtml.js" integrity="sha256-HGLuEfFcsUJGhvB8cQ8nr0gai9EucOOaIxFw7qxmd+w=" crossorigin="anonymous"></script>
+
+<script id="baidu_analytics">
+  var _hmt = _hmt || [];
+  (function() {
+    if (window.location.hostname === 'localhost') return;
+    var hm = document.createElement("script"); hm.async = true;
+    hm.src = "https://hm.baidu.com/hm.js?c602db2501643f661d9789f9e9707386";
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(hm, s);
+  })();
+</script>
+
+
+
+
+
+
+</body>
+</html>

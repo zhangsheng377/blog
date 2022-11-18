@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>迭代器 on 张胜东的博客</title>
+    <link>https://www.zhangshengdong.com/tags/%E8%BF%AD%E4%BB%A3%E5%99%A8/</link>
+    <description>Recent content in 迭代器 on 张胜东的博客</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>&lt;a href=&#34;https://beian.miit.gov.cn/&#34; target=&#34;_blank&#34;&gt;苏ICP备15009593号-1&lt;/a&gt;</copyright>
+    <lastBuildDate>Thu, 04 Mar 2021 23:44:58 +0800</lastBuildDate>
+    
+	<atom:link href="https://www.zhangshengdong.com/tags/%E8%BF%AD%E4%BB%A3%E5%99%A8/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>给深度学习模型构建数据迭代器</title>
+      <link>https://www.zhangshengdong.com/post/data_iterator/</link>
+      <pubDate>Thu, 04 Mar 2021 23:44:58 +0800</pubDate>
+      
+      <guid>https://www.zhangshengdong.com/post/data_iterator/</guid>
+      <description>最近在学习keras框架，不得不感叹keras的确比pytorch好用。 那么，现在就来整理一下深度学习里最常用的数据迭代器的写法吧。 1 2 3 4</description>
+    </item>
+    
+  </channel>
+</rss>

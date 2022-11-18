@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>打印机 on 张胜东的博客</title>
+    <link>https://www.zhangshengdong.com/tags/%E6%89%93%E5%8D%B0%E6%9C%BA/</link>
+    <description>Recent content in 打印机 on 张胜东的博客</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>&lt;a href=&#34;https://beian.miit.gov.cn/&#34; target=&#34;_blank&#34;&gt;苏ICP备15009593号-1&lt;/a&gt;</copyright>
+    <lastBuildDate>Fri, 18 Nov 2022 22:49:58 +0800</lastBuildDate>
+    
+	<atom:link href="https://www.zhangshengdong.com/tags/%E6%89%93%E5%8D%B0%E6%9C%BA/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>远程打印文件</title>
+      <link>https://www.zhangshengdong.com/post/lpr_remote/</link>
+      <pubDate>Fri, 18 Nov 2022 22:49:58 +0800</pubDate>
+      
+      <guid>https://www.zhangshengdong.com/post/lpr_remote/</guid>
+      <description>背景 之前弄了个网络打印机服务器cups，是可以添加打印机然后发起打印的，而手机、电脑却又只支持在局域网内添加打印机，所以一旦我在外面的话，就</description>
+    </item>
+    
+    <item>
+      <title>hp1020plus网络打印机服务器</title>
+      <link>https://www.zhangshengdong.com/post/hp1020plus/</link>
+      <pubDate>Sun, 06 Nov 2022 22:49:58 +0800</pubDate>
+      
+      <guid>https://www.zhangshengdong.com/post/hp1020plus/</guid>
+      <description>背景 之前就想着，弄个打印机，一方面，我们自己平常可以打印些文件；另一方面，等宝宝长大了，给他打印试卷、错题啥的，也是极好的。 原本趁着双11，</description>
+    </item>
+    
+  </channel>
+</rss>

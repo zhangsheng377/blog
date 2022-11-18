@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>tf on 张胜东的博客</title>
+    <link>https://www.zhangshengdong.com/tags/tf/</link>
+    <description>Recent content in tf on 张胜东的博客</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>&lt;a href=&#34;https://beian.miit.gov.cn/&#34; target=&#34;_blank&#34;&gt;苏ICP备15009593号-1&lt;/a&gt;</copyright>
+    <lastBuildDate>Fri, 07 May 2021 20:19:58 +0800</lastBuildDate>
+    
+	<atom:link href="https://www.zhangshengdong.com/tags/tf/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>keras_tf2数据并行</title>
+      <link>https://www.zhangshengdong.com/post/keras_tf2_data_parallel/</link>
+      <pubDate>Fri, 07 May 2021 20:19:58 +0800</pubDate>
+      
+      <guid>https://www.zhangshengdong.com/post/keras_tf2_data_parallel/</guid>
+      <description>背景 一直都想去搭一个并行模型，即使用多gpu共同计算的模型。今天终于把keras+tf2下的数据并行模式调通啦~~ 关键点 1 2 3 4 5 6 import os os.environ[&amp;#34;CUDA_VISIBLE_DEVICES&amp;#34;] =</description>
+    </item>
+    
+  </channel>
+</rss>

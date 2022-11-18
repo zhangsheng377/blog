@@ -1,0 +1,1931 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>使用tfrecord构建数据集 - 张胜东的博客</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="张胜东" /><meta name="description" content="背景 最近在打比赛，听说tfrecord的格式可以以二进制的方式高效存储数据，并利用protobuf协议读取数据，所以就想着把训练代码改成tf" /><meta name="keywords" content="张胜东, 博客, 编程" />
+
+
+<meta name="baidu-site-verification" content="qWR9jJPJ9e" />
+<meta name="google-site-verification" content="s9FkJZw4X2alyC8-nsdZgiPHBwX6uqr1QVNxRaGfDKY" />
+
+
+<meta name="generator" content="Hugo 0.68.3 with theme even" />
+
+
+<link rel="canonical" href="https://www.zhangshengdong.com/post/tfrecord/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<link href="/sass/main.min.2e81bbed97b8b282c1aeb57488cc71c8d8c8ec559f3931531bd396bf31e0d4dd.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="使用tfrecord构建数据集" />
+<meta property="og:description" content="背景 最近在打比赛，听说tfrecord的格式可以以二进制的方式高效存储数据，并利用protobuf协议读取数据，所以就想着把训练代码改成tf" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://www.zhangshengdong.com/post/tfrecord/" />
+<meta property="article:published_time" content="2021-05-05T02:42:58+08:00" />
+<meta property="article:modified_time" content="2021-09-09T04:13:14+08:00" />
+<meta itemprop="name" content="使用tfrecord构建数据集">
+<meta itemprop="description" content="背景 最近在打比赛，听说tfrecord的格式可以以二进制的方式高效存储数据，并利用protobuf协议读取数据，所以就想着把训练代码改成tf">
+<meta itemprop="datePublished" content="2021-05-05T02:42:58&#43;08:00" />
+<meta itemprop="dateModified" content="2021-09-09T04:13:14&#43;08:00" />
+<meta itemprop="wordCount" content="6380">
+
+
+
+<meta itemprop="keywords" content="深度学习,tfrecord,数据集,keras," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="使用tfrecord构建数据集"/>
+<meta name="twitter:description" content="背景 最近在打比赛，听说tfrecord的格式可以以二进制的方式高效存储数据，并利用protobuf协议读取数据，所以就想着把训练代码改成tf"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">张胜东的博客</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">About</li>
+      </a>
+  </ul>
+
+  
+
+
+</nav>
+
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">张胜东的博客</a>
+</div>
+
+
+
+
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about/">About</a>
+      </li>
+  </ul>
+</nav>
+
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">使用tfrecord构建数据集</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2021-05-05 </span>
+        
+          <span class="more-meta"> 约 6380 字 </span>
+          <span class="more-meta"> 预计阅读 13 分钟 </span>
+        <span id="busuanzi_container_page_pv" class="more-meta"> <span id="busuanzi_value_page_pv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> 次阅读 </span>
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#背景">背景</a></li>
+        <li><a href="#生成tfrecord数据集">生成tfrecord数据集</a></li>
+        <li><a href="#读取tfrecord数据集">读取tfrecord数据集</a></li>
+        <li><a href="#model的改造">model的改造</a></li>
+        <li><a href="#附录">附录</a>
+          <ul>
+            <li><a href="#全部代码">全部代码</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <h2 id="背景">背景</h2>
+<p>最近在打比赛，听说tfrecord的格式可以以二进制的方式高效存储数据，并利用protobuf协议读取数据，所以就想着把训练代码改成tfrecord试试。</p>
+<h2 id="生成tfrecord数据集">生成tfrecord数据集</h2>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="c1"># 正常数据预处理</span>
+</code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">def</span> <span class="nf">to_tfrecord</span><span class="p">(</span><span class="n">it</span><span class="p">,</span> <span class="n">output_path</span><span class="p">):</span>
+<span class="c1">#     it = get_keras_bert_iterator_notwhile(data_path, train_file_name, tokenizer)</span>
+    <span class="s2">&#34;&#34;&#34; 1. 定义TFRecordWriter, tf2使用tf.io, tf1使用tf.python_io &#34;&#34;&#34;</span>
+    <span class="k">with</span> <span class="n">tf</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">TFRecordWriter</span><span class="p">(</span><span class="n">output_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">tfrecord_writer</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">ids_texta</span><span class="p">,</span> <span class="n">token_type_ids_texta</span><span class="p">,</span> <span class="n">attention_mask_texta</span><span class="p">,</span> \
+            <span class="n">ids_textb</span><span class="p">,</span> <span class="n">token_type_ids_textb</span><span class="p">,</span> <span class="n">attention_mask_textb</span><span class="p">,</span> \
+            <span class="n">bm25</span><span class="p">,</span> <span class="n">tf_cosine</span><span class="p">,</span> <span class="n">tfidf_cosine</span><span class="p">,</span> \
+            <span class="n">cat_texta</span><span class="p">,</span> <span class="n">cat_textb</span><span class="p">,</span> \
+            <span class="n">labelA</span><span class="p">,</span> <span class="n">labelB</span><span class="p">,</span> <span class="nb">id</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">it</span><span class="p">):</span>
+
+            <span class="s2">&#34;&#34;&#34; 2. 定义features &#34;&#34;&#34;</span>
+            <span class="n">example</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">Example</span><span class="p">(</span>
+                <span class="n">features</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">Features</span><span class="p">(</span>
+                    <span class="n">feature</span> <span class="o">=</span> <span class="p">{</span>
+                        <span class="s1">&#39;ids_texta&#39;</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">Feature</span><span class="p">(</span>
+                            <span class="n">int64_list</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">Int64List</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">ids_texta</span><span class="p">)),</span>
+                        <span class="s1">&#39;token_type_ids_texta&#39;</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">Feature</span><span class="p">(</span>
+                            <span class="n">int64_list</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">Int64List</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">token_type_ids_texta</span><span class="p">)),</span>
+                        <span class="s1">&#39;attention_mask_texta&#39;</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">Feature</span><span class="p">(</span>
+                            <span class="n">int64_list</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">Int64List</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">attention_mask_texta</span><span class="p">)),</span>
+                        <span class="s1">&#39;ids_textb&#39;</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">Feature</span><span class="p">(</span>
+                            <span class="n">int64_list</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">Int64List</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">ids_textb</span><span class="p">)),</span>
+                        <span class="s1">&#39;token_type_ids_textb&#39;</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">Feature</span><span class="p">(</span>
+                            <span class="n">int64_list</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">Int64List</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">token_type_ids_textb</span><span class="p">)),</span>
+                        <span class="s1">&#39;attention_mask_textb&#39;</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">Feature</span><span class="p">(</span>
+                            <span class="n">int64_list</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">Int64List</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">attention_mask_textb</span><span class="p">)),</span>
+                        <span class="s1">&#39;bm25&#39;</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">Feature</span><span class="p">(</span>
+                            <span class="n">float_list</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">FloatList</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="p">[</span><span class="n">bm25</span><span class="p">])),</span>
+                        <span class="s1">&#39;tf_cosine&#39;</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">Feature</span><span class="p">(</span>
+                            <span class="n">float_list</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">FloatList</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="p">[</span><span class="n">tf_cosine</span><span class="p">])),</span>
+                        <span class="s1">&#39;tfidf_cosine&#39;</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">Feature</span><span class="p">(</span>
+                            <span class="n">float_list</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">FloatList</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="p">[</span><span class="n">tfidf_cosine</span><span class="p">])),</span>
+                        <span class="s1">&#39;cat_texta&#39;</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">Feature</span><span class="p">(</span>
+                            <span class="n">int64_list</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">Int64List</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="p">[</span><span class="n">cat_texta</span><span class="p">])),</span>
+                        <span class="s1">&#39;cat_textb&#39;</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">Feature</span><span class="p">(</span>
+                            <span class="n">int64_list</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">Int64List</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="p">[</span><span class="n">cat_textb</span><span class="p">])),</span>
+                        <span class="s1">&#39;labelA&#39;</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">Feature</span><span class="p">(</span>
+                            <span class="n">int64_list</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">Int64List</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="p">[</span><span class="n">labelA</span><span class="p">])),</span>
+                        <span class="s1">&#39;labelB&#39;</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">Feature</span><span class="p">(</span>
+                            <span class="n">int64_list</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">Int64List</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="p">[</span><span class="n">labelB</span><span class="p">])),</span>
+                        <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">Feature</span><span class="p">(</span>
+                            <span class="n">bytes_list</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">BytesList</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="p">[</span><span class="nb">id</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)])),</span>
+                    <span class="p">}))</span>
+
+            <span class="s2">&#34;&#34;&#34; 3. 序列化,写入&#34;&#34;&#34;</span>
+            <span class="n">serialized</span> <span class="o">=</span> <span class="n">example</span><span class="o">.</span><span class="n">SerializeToString</span><span class="p">()</span>
+            <span class="n">tfrecord_writer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">serialized</span><span class="p">)</span>
+</code></pre></td></tr></table>
+</div>
+</div><h2 id="读取tfrecord数据集">读取tfrecord数据集</h2>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">def</span> <span class="nf">parse_from_single_example</span><span class="p">(</span><span class="n">example_proto</span><span class="p">,</span> <span class="n">need_id</span><span class="p">):</span>
+    <span class="s2">&#34;&#34;&#34; 从example message反序列化得到当初写入的内容 &#34;&#34;&#34;</span>
+    <span class="c1"># 描述features</span>
+    <span class="s2">&#34;&#34;&#34; 不写shape的话，会报错 &#34;&#34;&#34;</span>
+    <span class="n">desc</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;ids_texta&#39;</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">FixedLenFeature</span><span class="p">([</span><span class="mi">512</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int64</span><span class="p">),</span>
+        <span class="s1">&#39;token_type_ids_texta&#39;</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">FixedLenFeature</span><span class="p">([</span><span class="mi">512</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int64</span><span class="p">),</span>
+        <span class="s1">&#39;attention_mask_texta&#39;</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">FixedLenFeature</span><span class="p">([</span><span class="mi">512</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int64</span><span class="p">),</span>
+        <span class="s1">&#39;ids_textb&#39;</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">FixedLenFeature</span><span class="p">([</span><span class="mi">512</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int64</span><span class="p">),</span>
+        <span class="s1">&#39;token_type_ids_textb&#39;</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">FixedLenFeature</span><span class="p">([</span><span class="mi">512</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int64</span><span class="p">),</span>
+        <span class="s1">&#39;attention_mask_textb&#39;</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">FixedLenFeature</span><span class="p">([</span><span class="mi">512</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int64</span><span class="p">),</span>
+        <span class="s1">&#39;bm25&#39;</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">FixedLenFeature</span><span class="p">([</span><span class="mi">1</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span>
+        <span class="s1">&#39;tf_cosine&#39;</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">FixedLenFeature</span><span class="p">([</span><span class="mi">1</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span>
+        <span class="s1">&#39;tfidf_cosine&#39;</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">FixedLenFeature</span><span class="p">([</span><span class="mi">1</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span>
+        <span class="s1">&#39;cat_texta&#39;</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">FixedLenFeature</span><span class="p">([</span><span class="mi">1</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int64</span><span class="p">),</span>
+        <span class="s1">&#39;cat_textb&#39;</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">FixedLenFeature</span><span class="p">([</span><span class="mi">1</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int64</span><span class="p">),</span>
+        <span class="s1">&#39;labelA&#39;</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">FixedLenFeature</span><span class="p">([</span><span class="mi">1</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int64</span><span class="p">),</span>
+        <span class="s1">&#39;labelB&#39;</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">FixedLenFeature</span><span class="p">([</span><span class="mi">1</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int64</span><span class="p">),</span>
+        <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">FixedLenFeature</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">string</span><span class="p">),</span>
+    <span class="p">}</span>
+    <span class="c1"># 使用tf.io.parse_single_example反序列化</span>
+    <span class="n">example</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">parse_single_example</span><span class="p">(</span><span class="n">example_proto</span><span class="p">,</span> <span class="n">desc</span><span class="p">)</span>
+    
+    <span class="s2">&#34;&#34;&#34; 需要单独返回data, label，如果放在同一个dict里会报找不到输出层,没有梯度的错误。 &#34;&#34;&#34;</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;ids_texta&#39;</span><span class="p">:</span> <span class="n">example</span><span class="p">[</span><span class="s1">&#39;ids_texta&#39;</span><span class="p">],</span>
+        <span class="s1">&#39;token_type_ids_texta&#39;</span><span class="p">:</span> <span class="n">example</span><span class="p">[</span><span class="s1">&#39;token_type_ids_texta&#39;</span><span class="p">],</span>
+        <span class="s1">&#39;attention_mask_texta&#39;</span><span class="p">:</span> <span class="n">example</span><span class="p">[</span><span class="s1">&#39;attention_mask_texta&#39;</span><span class="p">],</span>
+        <span class="s1">&#39;ids_textb&#39;</span><span class="p">:</span> <span class="n">example</span><span class="p">[</span><span class="s1">&#39;ids_textb&#39;</span><span class="p">],</span>
+        <span class="s1">&#39;token_type_ids_textb&#39;</span><span class="p">:</span> <span class="n">example</span><span class="p">[</span><span class="s1">&#39;token_type_ids_textb&#39;</span><span class="p">],</span>
+        <span class="s1">&#39;attention_mask_textb&#39;</span><span class="p">:</span> <span class="n">example</span><span class="p">[</span><span class="s1">&#39;attention_mask_textb&#39;</span><span class="p">],</span>
+        <span class="s1">&#39;bm25&#39;</span><span class="p">:</span> <span class="n">example</span><span class="p">[</span><span class="s1">&#39;bm25&#39;</span><span class="p">],</span>
+        <span class="s1">&#39;tf_cosine&#39;</span><span class="p">:</span> <span class="n">example</span><span class="p">[</span><span class="s1">&#39;tf_cosine&#39;</span><span class="p">],</span>
+        <span class="s1">&#39;tfidf_cosine&#39;</span><span class="p">:</span> <span class="n">example</span><span class="p">[</span><span class="s1">&#39;tfidf_cosine&#39;</span><span class="p">],</span>
+        <span class="s1">&#39;cat_texta&#39;</span><span class="p">:</span> <span class="n">example</span><span class="p">[</span><span class="s1">&#39;cat_texta&#39;</span><span class="p">],</span>
+        <span class="s1">&#39;cat_textb&#39;</span><span class="p">:</span> <span class="n">example</span><span class="p">[</span><span class="s1">&#39;cat_textb&#39;</span><span class="p">],</span>
+    <span class="p">}</span>
+    <span class="n">label</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;labelA&#39;</span><span class="p">:</span> <span class="n">example</span><span class="p">[</span><span class="s1">&#39;labelA&#39;</span><span class="p">],</span>
+        <span class="s1">&#39;labelB&#39;</span><span class="p">:</span> <span class="n">example</span><span class="p">[</span><span class="s1">&#39;labelB&#39;</span><span class="p">],</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">need_id</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">data</span><span class="p">,</span> <span class="n">label</span>
+    <span class="k">return</span> <span class="n">data</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">example</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">get_dataset</span><span class="p">(</span><span class="n">file_list</span><span class="p">,</span> <span class="n">epochs</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">need_id</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="c1"># from functools import partial</span>
+    <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">TFRecordDataset</span><span class="p">(</span><span class="n">file_list</span><span class="p">)</span> \
+        <span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="n">parse_from_single_example</span><span class="p">,</span> <span class="n">need_id</span><span class="o">=</span><span class="n">need_id</span><span class="p">),</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">()</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span> \
+        <span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">epochs</span><span class="p">)</span> \
+        <span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">buffer_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">reshuffle_each_iteration</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span> \
+        <span class="o">.</span><span class="n">batch</span><span class="p">(</span><span class="n">batch_size</span><span class="p">)</span> \
+        <span class="o">.</span><span class="n">prefetch</span><span class="p">(</span><span class="n">buffer_size</span><span class="o">=</span><span class="n">batch_size</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">save_test_result</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">result_file</span><span class="p">):</span>
+    <span class="n">it</span> <span class="o">=</span> <span class="n">get_dataset</span><span class="p">(</span><span class="s2">&#34;data/test_file.tfrecord&#34;</span><span class="p">,</span> <span class="n">epochs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">need_id</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">result_file</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">f</span><span class="s2">&#34;id,label</span><span class="se">\n</span><span class="s2">&#34;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">data</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="nb">id</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">it</span><span class="p">):</span>
+          <span class="n">predict</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+          <span class="k">if</span> <span class="nb">id</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">numpy</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;a&#39;</span><span class="p">:</span>
+            <span class="n">predict_cls</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">predict</span><span class="p">[</span><span class="s1">&#39;labelA&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">0.5</span> <span class="k">else</span> <span class="mi">0</span>
+          <span class="k">elif</span> <span class="nb">id</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">numpy</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;b&#39;</span><span class="p">:</span>
+            <span class="n">predict_cls</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">predict</span><span class="p">[</span><span class="s1">&#39;labelB&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">0.5</span> <span class="k">else</span> <span class="mi">0</span>
+          <span class="k">else</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+            <span class="k">continue</span>
+          <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">f</span><span class="s2">&#34;{id},{predict_cls}</span><span class="se">\n</span><span class="s2">&#34;</span><span class="p">)</span>
+</code></pre></td></tr></table>
+</div>
+</div><h2 id="model的改造">model的改造</h2>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span><span class="lnt">73
+</span><span class="lnt">74
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">def</span> <span class="nf">get_model</span><span class="p">():</span>
+    <span class="n">K</span><span class="o">.</span><span class="n">clear_session</span><span class="p">()</span>
+    
+    <span class="n">bert_model</span> <span class="o">=</span> <span class="n">TFBertModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">bert_path</span><span class="p">,</span> <span class="n">from_pt</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">trainable</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">bert_model</span><span class="o">.</span><span class="n">layers</span><span class="p">:</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">trainable</span> <span class="o">=</span> <span class="bp">True</span>
+ 
+    <span class="n">input_ids_texta</span> <span class="o">=</span> <span class="n">Input</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="bp">None</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;int32&#39;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;input_ids_texta&#39;</span><span class="p">)</span>
+    <span class="n">input_token_type_ids_texta</span> <span class="o">=</span> <span class="n">Input</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="bp">None</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;int32&#39;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;input_token_type_ids_texta&#39;</span><span class="p">)</span>
+    <span class="n">input_attention_mask_texta</span> <span class="o">=</span> <span class="n">Input</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="bp">None</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;int32&#39;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;input_attention_mask_texta&#39;</span><span class="p">)</span>
+    <span class="n">input_ids_textb</span> <span class="o">=</span> <span class="n">Input</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="bp">None</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;int32&#39;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;input_ids_textb&#39;</span><span class="p">)</span>
+    <span class="n">input_token_type_ids_textb</span> <span class="o">=</span> <span class="n">Input</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="bp">None</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;int32&#39;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;input_token_type_ids_textb&#39;</span><span class="p">)</span>
+    <span class="n">input_attention_mask_textb</span> <span class="o">=</span> <span class="n">Input</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="bp">None</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;int32&#39;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;input_attention_mask_textb&#39;</span><span class="p">)</span>
+    <span class="n">input_token_type_ids_textb</span> <span class="o">=</span> <span class="n">Input</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="bp">None</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;int32&#39;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;input_token_type_ids_textb&#39;</span><span class="p">)</span>
+    <span class="n">input_bm25</span> <span class="o">=</span> <span class="n">Input</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float32&#39;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;input_bm25&#39;</span><span class="p">)</span>
+    <span class="n">input_tf_cosine</span> <span class="o">=</span> <span class="n">Input</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float32&#39;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;input_tf_cosine&#39;</span><span class="p">)</span>
+    <span class="n">input_tfidf_cosine</span> <span class="o">=</span> <span class="n">Input</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float32&#39;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;input_tfidf_cosine&#39;</span><span class="p">)</span>
+    <span class="n">input_cat_texta</span> <span class="o">=</span> <span class="n">Input</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float32&#39;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;input_cat_texta&#39;</span><span class="p">)</span>
+    <span class="n">input_cat_textb</span> <span class="o">=</span> <span class="n">Input</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float32&#39;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;input_cat_textb&#39;</span><span class="p">)</span>
+ 
+    <span class="n">bert_output_texta</span> <span class="o">=</span> <span class="n">bert_model</span><span class="p">({</span><span class="s1">&#39;input_ids&#39;</span><span class="p">:</span><span class="n">input_ids_texta</span><span class="p">,</span> <span class="s1">&#39;token_type_ids&#39;</span><span class="p">:</span><span class="n">input_token_type_ids_texta</span><span class="p">,</span> <span class="s1">&#39;attention_mask&#39;</span><span class="p">:</span><span class="n">input_attention_mask_texta</span><span class="p">},</span> <span class="n">return_dict</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">training</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">projection_logits_texta</span> <span class="o">=</span> <span class="n">bert_output_texta</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">bert_cls_texta</span> <span class="o">=</span> <span class="n">Lambda</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])(</span><span class="n">projection_logits_texta</span><span class="p">)</span> <span class="c1"># 取出[CLS]对应的向量用来做分类</span>
+
+    <span class="n">bert_output_textb</span> <span class="o">=</span> <span class="n">bert_model</span><span class="p">({</span><span class="s1">&#39;input_ids&#39;</span><span class="p">:</span><span class="n">input_ids_textb</span><span class="p">,</span> <span class="s1">&#39;token_type_ids&#39;</span><span class="p">:</span><span class="n">input_token_type_ids_textb</span><span class="p">,</span> <span class="s1">&#39;attention_mask&#39;</span><span class="p">:</span><span class="n">input_attention_mask_textb</span><span class="p">},</span> <span class="n">return_dict</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">training</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">projection_logits_textb</span> <span class="o">=</span> <span class="n">bert_output_textb</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">bert_cls_textb</span> <span class="o">=</span> <span class="n">Lambda</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])(</span><span class="n">projection_logits_textb</span><span class="p">)</span> <span class="c1"># 取出[CLS]对应的向量用来做分类</span>
+    
+    <span class="n">subtracted</span> <span class="o">=</span> <span class="n">Subtract</span><span class="p">()([</span><span class="n">bert_cls_texta</span><span class="p">,</span> <span class="n">bert_cls_textb</span><span class="p">])</span>
+    <span class="n">cos</span> <span class="o">=</span> <span class="n">Dot</span><span class="p">(</span><span class="n">axes</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="bp">True</span><span class="p">)([</span><span class="n">bert_cls_texta</span><span class="p">,</span> <span class="n">bert_cls_textb</span><span class="p">])</span> <span class="c1"># dot=1按行点积，normalize=True输出余弦相似度</span>
+
+    <span class="n">bert_cls</span> <span class="o">=</span> <span class="n">concatenate</span><span class="p">([</span><span class="n">bert_cls_texta</span><span class="p">,</span> <span class="n">bert_cls_textb</span><span class="p">,</span> <span class="n">subtracted</span><span class="p">,</span> <span class="n">cos</span><span class="p">,</span> <span class="n">input_bm25</span><span class="p">,</span> <span class="n">input_tf_cosine</span><span class="p">,</span> <span class="n">input_tfidf_cosine</span><span class="p">,</span> <span class="n">input_cat_texta</span><span class="p">,</span> <span class="n">input_cat_textb</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+    
+    <span class="n">dense_A_0</span> <span class="o">=</span> <span class="n">Dense</span><span class="p">(</span><span class="mi">256</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s1">&#39;relu&#39;</span><span class="p">)(</span><span class="n">bert_cls</span><span class="p">)</span>
+    <span class="n">dropout_A_0</span> <span class="o">=</span> <span class="n">Dropout</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)(</span><span class="n">dense_A_0</span><span class="p">)</span>
+    <span class="n">dense_A_1</span> <span class="o">=</span> <span class="n">Dense</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s1">&#39;relu&#39;</span><span class="p">)(</span><span class="n">dropout_A_0</span><span class="p">)</span>
+    <span class="n">dropout_A_1</span> <span class="o">=</span> <span class="n">Dropout</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)(</span><span class="n">dense_A_1</span><span class="p">)</span>
+    <span class="n">output_A</span> <span class="o">=</span> <span class="n">Dense</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s1">&#39;sigmoid&#39;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;output_A&#39;</span><span class="p">)(</span><span class="n">dropout_A_1</span><span class="p">)</span>
+    
+    <span class="n">dense_B_0</span> <span class="o">=</span> <span class="n">Dense</span><span class="p">(</span><span class="mi">256</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s1">&#39;relu&#39;</span><span class="p">)(</span><span class="n">bert_cls</span><span class="p">)</span>
+    <span class="n">dropout_B_0</span> <span class="o">=</span> <span class="n">Dropout</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)(</span><span class="n">dense_B_0</span><span class="p">)</span>
+    <span class="n">dense_B_1</span> <span class="o">=</span> <span class="n">Dense</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s1">&#39;relu&#39;</span><span class="p">)(</span><span class="n">dropout_B_0</span><span class="p">)</span>
+    <span class="n">dropout_B_1</span> <span class="o">=</span> <span class="n">Dropout</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)(</span><span class="n">dense_B_1</span><span class="p">)</span>
+    <span class="n">output_B</span> <span class="o">=</span> <span class="n">Dense</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s1">&#39;sigmoid&#39;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;output_B&#39;</span><span class="p">)(</span><span class="n">dropout_B_1</span><span class="p">)</span>
+ 
+    <span class="c1"># 由于传入的dict的data和label，所以模型定义时也可直接采用dict的形式指定名字</span>
+    <span class="n">input_data</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;ids_texta&#39;</span><span class="p">:</span><span class="n">input_ids_texta</span><span class="p">,</span>
+        <span class="s1">&#39;token_type_ids_texta&#39;</span><span class="p">:</span><span class="n">input_token_type_ids_texta</span><span class="p">,</span>
+        <span class="s1">&#39;attention_mask_texta&#39;</span><span class="p">:</span><span class="n">input_attention_mask_texta</span><span class="p">,</span>
+        <span class="s1">&#39;ids_textb&#39;</span><span class="p">:</span><span class="n">input_ids_textb</span><span class="p">,</span>
+        <span class="s1">&#39;token_type_ids_textb&#39;</span><span class="p">:</span><span class="n">input_token_type_ids_textb</span><span class="p">,</span>
+        <span class="s1">&#39;attention_mask_textb&#39;</span><span class="p">:</span><span class="n">input_attention_mask_textb</span><span class="p">,</span>
+        <span class="s1">&#39;bm25&#39;</span><span class="p">:</span><span class="n">input_bm25</span><span class="p">,</span>
+        <span class="s1">&#39;tf_cosine&#39;</span><span class="p">:</span><span class="n">input_tf_cosine</span><span class="p">,</span>
+        <span class="s1">&#39;tfidf_cosine&#39;</span><span class="p">:</span><span class="n">input_tfidf_cosine</span><span class="p">,</span>
+        <span class="s1">&#39;cat_texta&#39;</span><span class="p">:</span><span class="n">input_cat_texta</span><span class="p">,</span>
+        <span class="s1">&#39;cat_textb&#39;</span><span class="p">:</span><span class="n">input_cat_textb</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="n">output_data</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;labelA&#39;</span><span class="p">:</span><span class="n">output_A</span><span class="p">,</span>
+        <span class="s1">&#39;labelB&#39;</span><span class="p">:</span><span class="n">output_B</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">Model</span><span class="p">(</span><span class="n">input_data</span><span class="p">,</span> <span class="n">output_data</span><span class="p">)</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+                  <span class="n">loss</span><span class="o">=</span><span class="p">{</span>
+                      <span class="s1">&#39;labelA&#39;</span><span class="p">:</span><span class="n">my_binary_crossentropy_A</span><span class="p">,</span>
+                      <span class="s1">&#39;labelB&#39;</span><span class="p">:</span><span class="n">my_binary_crossentropy_B</span><span class="p">,</span>
+                  <span class="p">},</span>
+                  <span class="n">optimizer</span><span class="o">=</span><span class="n">Adam</span><span class="p">(</span><span class="mf">1e-5</span><span class="p">),</span>    <span class="c1">#用足够小的学习率</span>
+                  <span class="n">metrics</span><span class="o">=</span><span class="p">[</span><span class="n">my_binary_accuracy</span><span class="p">,</span> <span class="n">my_f1_score</span><span class="p">]</span>
+                 <span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">summary</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">model</span>
+</code></pre></td></tr></table>
+</div>
+</div><hr>
+<h2 id="附录">附录</h2>
+<h3 id="全部代码">全部代码</h3>
+<pre><code># 导包
+
+
+```python
+import sys 
+sys.version
+```
+
+
+
+
+    '3.7.10 | packaged by conda-forge | (default, Feb 19 2021, 16:07:37) \n[GCC 9.3.0]'
+
+
+
+
+```python
+# from google.colab import drive
+# drive.mount('/content/drive')
+```
+
+
+```python
+# !unzip sohu2021_open_data_clean.zip
+# !unzip chinese_L-12_H-768_A-12.zip
+```
+
+
+```python
+# !pip install transformers
+```
+
+
+```python
+import os
+# os.environ[&quot;TF_CPP_MIN_LOG_LEVEL&quot;] = &quot;3&quot;
+os.environ[&quot;CUDA_VISIBLE_DEVICES&quot;] = &quot;0&quot;
+import sys
+import re
+from collections import Counter
+import random
+import json
+from joblib import dump, load
+from functools import partial
+from datetime import datetime
+import multiprocessing
+
+from tqdm import tqdm
+import numpy as np
+# import tensorflow.keras as keras
+import tensorflow as tf
+tf.config.run_functions_eagerly(True)
+tf.get_logger().setLevel(tf.compat.v1.logging.ERROR)
+from keras.metrics import top_k_categorical_accuracy, binary_accuracy
+from keras.layers import *
+from keras.callbacks import *
+from keras.models import Model, load_model, model_from_json
+import keras.backend as K
+from keras.optimizers import Adam
+from keras.utils import to_categorical, plot_model
+from keras.losses import SparseCategoricalCrossentropy, binary_crossentropy
+from transformers import (
+    BertTokenizer,
+    TFBertForPreTraining,
+    TFBertModel,
+)
+from sklearn.metrics import confusion_matrix, f1_score, precision_score, recall_score
+from sklearn.utils import class_weight
+import torch
+from pyhanlp import *
+import jieba
+
+from my_utils import calculate_bm25_similarity, calculate_tf_cosine_similarity, calculate_tfidf_cosine_similarity
+```
+
+
+```python
+tf.__version__
+```
+
+
+
+
+    '2.4.1'
+
+
+
+
+```python
+from tensorflow.python.client import device_lib
+device_lib.list_local_devices()
+```
+
+
+
+
+    [name: &quot;/device:CPU:0&quot;
+    device_type: &quot;CPU&quot;
+    memory_limit: 268435456
+    locality {
+    }
+    incarnation: 10997024018198363946,
+    name: &quot;/device:GPU:0&quot;
+    device_type: &quot;GPU&quot;
+    memory_limit: 10770692224
+    locality {
+    bus_id: 1
+    links {
+    }
+    }
+    incarnation: 12796525867518438692
+    physical_device_desc: &quot;device: 0, name: GeForce GTX 1080 Ti, pci bus id: 0000:04:00.0, compute capability: 6.1&quot;]
+
+
+
+
+```python
+
+```
+
+
+```python
+data_path = &quot;sohu2021_open_data_clean/&quot;
+# train_file_names = [&quot;train.txt&quot;, &quot;valid.txt&quot;, &quot;round2.txt&quot;, &quot;round3.txt&quot;]
+train_file_name = &quot;data/shuffle_total_file.json&quot;
+text_max_length = 512
+bert_path = r&quot;chinese_L-12_H-768_A-12&quot;
+
+check_point_path = 'trained_model_substract_1/multi_keras_bert_sohu.weights'
+weights_path = &quot;trained_model_substract_1/multi_keras_bert_sohu_final.weights&quot;
+config_path = &quot;trained_model_substract_1/multi_keras_bert_sohu_final.model_config.json&quot;
+result_path = &quot;trained_model_substract_1/multi_keras_bert_sohu_test_result_final.csv&quot;
+```
+
+
+```python
+# bm25Model = load(&quot;bm25.bin&quot;)
+# bm25Model
+```
+
+
+```python
+
+```
+
+
+```python
+
+```
+
+
+```python
+
+```
+
+
+```python
+
+```
+
+
+```python
+# 转换bert模型，到pytorch的pd格式
+```
+
+
+```python
+# !transformers-cli convert --model_type bert \
+#   --tf_checkpoint chinese_L-12_H-768_A-12/bert_model.ckpt \
+#   --config chinese_L-12_H-768_A-12/bert_config.json \
+#   --pytorch_dump_output chinese_L-12_H-768_A-12/pytorch_model.bin
+```
+
+
+```python
+
+```
+
+
+```python
+
+```
+
+
+```python
+
+```
+
+
+```python
+
+```
+
+# 多任务分支模型
+
+## 构建数据迭代器
+
+
+```python
+label_type_to_id = {'labelA':0, 'labelB':1}
+label_to_id = {'0':0, '1':1}
+```
+
+
+```python
+# def get_text_iterator(file_path):
+#     with open(file_path, 'r', encoding='utf-8') as f:
+#         for line in f:
+#             yield line
+```
+
+
+```python
+def _transform_text(text):
+text = text.strip().replace('\n', '。').replace('\t', '').replace('\u3000', '')
+return re.sub(r'。+', '。', text)
+```
+
+
+```python
+# def get_summary(text, senc_num=20):
+#     a = HanLP.extractSummary(text, 20)
+#     a_ = str(a)
+#     return a_[1:-1]
+```
+
+
+```python
+# def get_data_iterator(data_path, file_names):
+#     # TODO: 随机取
+#     file_iters = []
+#     for file_name in file_names:
+#       for category in os.listdir(data_path):
+#           category_path = os.path.join(data_path, category)
+#           if not os.path.isdir(category_path):
+#               continue
+            
+#           file_path = os.path.join(category_path, file_name)
+#           if not os.path.isfile(file_path):
+#               continue
+            
+        
+#           file_iter = get_text_iterator(file_path)
+#           cat_source = 0
+#           if category[0] == '长':
+#             cat_source = 1
+#           cat_target = 0
+#           if category[1] == '长':
+#             cat_target = 1
+#           file_iters.append((file_iter, cat_source, cat_target))
+        
+#     while len(file_iters) &gt; 0:
+#         i = random.randrange(len(file_iters))
+#         line = next(file_iters[i][0], None)
+#         cat_source = file_iters[i][1]
+#         cat_target = file_iters[i][2]
+#         if line is None:
+#             del file_iters[i]
+#             continue
+            
+#         data = json.loads(line)
+
+#         data['source'] = _transform_text(data['source'])
+#         if len(data['source']) == 0:
+#             print('source:', line, data)
+#             break
+# #                     continue
+
+#         data['target'] = _transform_text(data['target'])
+#         if len(data['target']) == 0:
+#             print('target:', line, data)
+#             break
+# #                     continue
+
+#         label_name_list = list(key for key in data.keys() if key[:5]=='label')
+#         if len(label_name_list) != 1:
+#             print('label_name_list:', line, data)
+#             break
+# #                     continue
+#         label_name = label_name_list[0]
+#         if data[label_name] not in label_to_id.keys():
+#             print('label_name:', line, data, label_name)
+#             break
+# #                     continue
+        
+#         label_dict = {key: -1 for key in label_type_to_id.keys()}
+#         label_dict[label_name] = label_to_id[data[label_name]]
+#         if label_dict['labelA'] == 0:
+#             label_dict['labelB'] = 0
+#         if label_dict['labelB'] == 1:
+#             label_dict['labelA'] = 1
+
+#         yield data['source'], data['target'], cat_source, cat_target, label_dict['labelA'], label_dict['labelB']
+```
+
+
+```python
+# it = get_data_iterator(data_path, train_file_names)
+```
+
+
+```python
+# next(it)
+```
+
+
+```python
+def get_sample_num(data_path, file_names):
+    count = 0
+    it = get_data_iterator(data_path, file_names)
+    for data in tqdm(it):
+        count += 1
+    return count
+```
+
+
+```python
+# sample_count = get_sample_num(data_path, train_file_names)
+# sample_count
+```
+
+
+```python
+# def get_shuffle_total_file(data_path, file_names, output_file_path):
+#     data_list = []
+#     it = get_data_iterator(data_path, file_names)
+#     for source, target, cat_source, cat_target, labelA, labelB in tqdm(it):
+#         json_data = {
+#             'source':source,
+#             'target':target,
+#             'cat_source':cat_source,
+#             'cat_target':cat_target,
+#             'labelA':labelA,
+#             'labelB':labelB
+#         }
+#         data_list.append(json_data)
+#     random.shuffle(data_list)
+    
+#     with open(output_file_path, 'w', encoding='utf-8') as output_file:
+#         for json_data in data_list:
+#             output_file.write(f&quot;{json.dumps(json_data)}\n&quot;)
+```
+
+
+```python
+# get_shuffle_total_file(data_path, train_file_names, train_file_name)
+```
+
+
+```python
+def get_data_iterator(data_path, file_name):
+    with open(file_name, 'r', encoding='utf-8') as f:
+        for line in f:
+            json_data = json.loads(line)
+            yield json_data['source'], json_data['target'], json_data['cat_source'], json_data['cat_target'], json_data['labelA'], json_data['labelB']
+```
+
+
+```python
+it = get_data_iterator(data_path, train_file_name)
+```
+
+
+```python
+next(it)
+```
+
+
+
+
+    ('湖人120-102火箭 一觉醒来，湖人队又是一场大胜。  毫不夸张的说，这两支球队可能都是全NBA球迷最多队伍之一，两队一交手，其收视率，堪比篮圈春晚。 既然是春晚，那就不能少了节目，今儿个双方为大家伙儿准备了以下几个节目： 其一，洛杉矶小伍德，对阵休斯顿真伍德， 其二，洛杉矶詹姆斯，对阵休斯顿詹姆斯， 前三，洛杉矶塔克，对阵休斯顿塔克， 其四，理智考辛斯，对阵暴走莫里斯。  第一节末端，考神与莫里斯率先整活儿，引爆全场气氛。 话说当时詹老汉正持球背打，莫里斯使出一套坦克突进，直接将火箭球员杰肖恩-泰特老哥撵出球场。 考辛斯一看泰特倒地，大喝一声：你敢欺负我队友，这还得了？ 上前一套马保国式接化发，将莫里斯推出二米开外，并回头打算拉起倒地的泰特。 事实证明，人在生气的时候最会被激发出无限的潜能，莫里斯从被推倒地上到站起来推开考辛斯，仅仅用时不到两秒， 这么冷静就走开了！？ 这还是我们认识的考辛斯吗？？ 那速度，简直比韦德、艾弗森、TJ-福特上篮速度更快，詹老汉可能也没想到莫里斯还有这爆发力，本想拉一把，却愣是没追上。 恕技巧君直言，要是莫里斯老哥打球也能有这速度，那么顶掉小黑，出任湖人队首发控卫简直绰绰有余。  判罚结果是，双方各吃一T，大莫被驱逐。 当然，考神在场上也没待多久。 第二节刚开打，老詹突破内线，考神下手切球，一巴掌不小心切到老詹头上。 从老詹的表情大家伙儿可以看到这记如来神掌是有多痛。 尽管考神及时弥补，上前试图拉起老詹，并努力告诉裁判：“那可是我詹大爷，我怎么可能恶犯他？”，依然没逃出被驱逐的命运。  好在浓眉的发挥，又把大家伙儿的目光吸引了回来。 平日里浓眉划划水，一旦遇到自己的模板，那叫一个放开抡绝不含糊，光凭一个上半场，小伍德已经8投8中，入账21分3盖帽。 戴维斯：听说你是我的模板？来个8中8致敬一下。 另一边真伍德整个人都是崩溃的：谁特么说他是小伍德？这不是给我找麻烦么！碰别人就划水碰我就认真，这以后可咋整啊？！ 毫不夸张的说，今儿这场大胜，洛杉矶小伍德得占首功，一人直接打崩火箭队内线。  至于两个詹姆斯，反倒是手牵手好朋友，你划一桨我划一桨，洛杉矶gigi怪入账18+7+7，休斯顿大胡子拿到20+6+9，顺便带走7个失误。 泰特梦幻脚步戏耍老詹 区别在于，湖人赢球了，詹姆斯数据怎样都无所谓，火箭队输球，场边观众直呼：“哈登！醒醒！”  最后一组对位，塔克之间的对决。 火箭老塔克本以为欺负小年轻，不过是手到擒来洒洒水，谁料还是大意了。这家伙居然上场就暴走，出战短短20分钟，便8投7中有17分5篮板3助攻4抢断入账。 反观老塔克，上场30分钟，4投1中4分入账。在老塔克的衬托之下，小塔克的形象显的无比高大。  湖人队在丰田中心，带走第一场比赛的胜利，重新登顶西部第一。',
+    '湖人作为上赛季的卫冕冠军以及本赛季最有希望夺冠的球队，他们的每场比赛都会被球迷关注，联盟也对湖人的比赛格外重视。可能是为了让湖人的比赛变得更加公正，执法湖人比赛的裁判也格外严厉。之前在湖人和火箭的比赛中，半场比赛没结束双方就被吹罚了五次技术犯规，本以为这已经算是告一段落了，没想到联盟还进一步发布了有关考辛斯和大莫里斯的追加处罚。  平时有关注NBA的朋友应该都清楚NBA现在的规则，一般情况下只有球员在场外发表了一些不当言论才会被罚款，一个赛季或许都不会出现一次因为犯规而被罚款的情况。然而火箭和湖人这一场比赛就诞生了两个因为犯规而被罚款的情况，合起来一共被罚款4.5万美元，这足够他们在场外被处罚两次了。可为什么大莫里斯的罚款会被考辛斯多那么多呢？一个3.5万美金，另一个只被罚了1万美金。  在当时那场比赛中，考辛斯和大莫里斯都是因为一次技术犯规以及一次恶意犯规而被罚出场外，可他们的恶意犯规也存在区别。大莫里斯当时被吹罚了一级恶意犯规，而考辛斯对詹姆斯头部击打的行为只是被吹罚了二级恶意犯规。明明大莫里斯和考辛斯的行为都差不多，而且大莫里斯只是将对手推倒，可考辛斯是直接击打对手头部，那为什么大莫里斯还会比考辛斯被罚得更多呢？  这个恶意犯规一级和二级的区别其实不能只看球员犯规的严重性，这还需要看球员犯规的意图，很明显大莫里斯就是故意将对手推倒在地，而考辛斯很可能是无意中打到詹姆斯的头部。如果考辛斯之前没有和大莫里斯发生冲突，或许这一次击打詹姆斯的头部只会被判罚一个违体犯规。当然考辛斯本来就是联盟中恶意犯规的专业户，裁判或许早就对他有意见了，吹一个二级恶意犯规也正常。  现在的各种体育联盟似乎都有点太尊重裁判了，球员们无法用自己的方式去影响比赛，大莫里斯和考辛斯这种吵架放在上世纪八十年代可能都不会被吹罚犯规，因为那时候乔丹和坏孩子军团的对碰要可怕很多。不仅是NBA存在这种情况，CBA其实也有很多这些问题。裁判可以直接影响比赛，只要裁判愿意的话，那么他就可以操控任意一场比赛的结果。  湖人和火箭很可能会因为这一次比赛而产生恩怨，一直都以总冠军为目标的火箭肯定想要击败湖人，只要击败了湖人，那火箭就有信心和机会冲击总冠军了。不过考辛斯和大莫里斯只是队内的角色球员，他们的矛盾很难影响到两支球队的胜负结果。当然比赛还是要存在这些火药味的，不然的话比赛就毫无趣味了。  不知道大家对于这件事情有没有什么别的看法和意见呢？欢迎在下面评论交流一下。',
+    1,
+    1,
+    0,
+    0)
+
+
+
+
+```python
+# sample_count = get_sample_num(data_path, train_file_name)
+# sample_count
+```
+
+
+```python
+def get_sample_y(data_path, file_names):
+    labelA_list = []
+    labelB_list = []
+    it = get_data_iterator(data_path, file_names)
+    for source, target, cat_source, cat_target, labelA, labelB in tqdm(it):
+        if labelA != -1:
+        labelA_list.append(labelA)
+        if labelB != -1:
+        labelB_list.append(labelB)
+    return labelA_list, labelB_list
+```
+
+
+```python
+# np.unique(labelA_list), labelA_list
+```
+
+
+```python
+labelA_list, labelB_list = get_sample_y(data_path, train_file_name)
+labelA_class_weights = class_weight.compute_class_weight('balanced', np.unique(labelA_list), np.array(labelA_list))
+labelB_class_weights = class_weight.compute_class_weight('balanced', np.unique(labelB_list), np.array(labelB_list))
+labelA_class_weights, labelB_class_weights
+```
+
+    168714it [00:14, 11346.69it/s]
+    /data1/wangchenyue/zsd/code/sohu2021/conda_env/lib/python3.7/site-packages/sklearn/utils/validation.py:72: FutureWarning: Pass classes=[0 1], y=[0 0 1 ... 1 0 1] as keyword args. From version 1.0 (renaming of 0.25) passing these as positional arguments will result in an error
+    &quot;will result in an error&quot;, FutureWarning)
+    /data1/wangchenyue/zsd/code/sohu2021/conda_env/lib/python3.7/site-packages/sklearn/utils/validation.py:72: FutureWarning: Pass classes=[0 1], y=[0 0 1 ... 1 0 0] as keyword args. From version 1.0 (renaming of 0.25) passing these as positional arguments will result in an error
+    &quot;will result in an error&quot;, FutureWarning)
+
+
+
+
+
+    (array([0.94664122, 1.05973338]), array([0.56295201, 4.47127937]))
+
+
+
+
+```python
+tokenizer = BertTokenizer.from_pretrained(bert_path)
+```
+
+
+```python
+def _get_indices(text, text_pair=None):
+    return tokenizer.encode_plus(text=text,
+                            text_pair=text_pair,
+                            max_length=text_max_length, 
+                            add_special_tokens=True, 
+                            padding='max_length', 
+#                             truncation_strategy='longest_first', 
+                            truncation=True,
+#                                          return_tensors='tf',
+                            return_token_type_ids=True
+                            )
+```
+
+
+```python
+def get_keras_bert_iterator_notwhile(data_path, file_names, tokenizer):
+    data_it = get_data_iterator(data_path, file_names)
+    for source, target, cat_source, cat_target, labelA, labelB in data_it:
+        data_source = _get_indices(text=source)
+        data_target = _get_indices(text=target)
+#             print(indices, type(indices), len(indices))
+        seg_source = jieba.lcut(source)
+        seg_target = jieba.lcut(target)
+        bm25 = calculate_bm25_similarity(bm25Model, seg_source, seg_target)
+        tf_cosine = calculate_tf_cosine_similarity(seg_source, seg_target)
+        tfidf_cosine = calculate_tfidf_cosine_similarity(seg_source, seg_target, bm25Model.idf)
+        id = &quot;&quot;
+        yield data_source['input_ids'], data_source['token_type_ids'], data_source['attention_mask'], \
+            data_target['input_ids'], data_target['token_type_ids'], data_target['attention_mask'], \
+            bm25, tf_cosine, tfidf_cosine, \
+            cat_source, cat_target, \
+            labelA, labelB, id
+```
+
+
+```python
+it = get_keras_bert_iterator_notwhile(data_path, train_file_name, tokenizer)
+```
+
+
+```python
+# next(it)
+```
+
+
+```python
+def to_tfrecord(it, output_path):
+#     it = get_keras_bert_iterator_notwhile(data_path, train_file_name, tokenizer)
+    with tf.io.TFRecordWriter(output_path) as tfrecord_writer:
+        for ids_texta, token_type_ids_texta, attention_mask_texta, \
+            ids_textb, token_type_ids_textb, attention_mask_textb, \
+            bm25, tf_cosine, tfidf_cosine, \
+            cat_texta, cat_textb, \
+            labelA, labelB, id in tqdm(it):
+
+            &quot;&quot;&quot; 2. 定义features &quot;&quot;&quot;
+            example = tf.train.Example(
+                features = tf.train.Features(
+                    feature = {
+                        'ids_texta': tf.train.Feature(
+                            int64_list=tf.train.Int64List(value=ids_texta)),
+                        'token_type_ids_texta': tf.train.Feature(
+                            int64_list=tf.train.Int64List(value=token_type_ids_texta)),
+                        'attention_mask_texta': tf.train.Feature(
+                            int64_list=tf.train.Int64List(value=attention_mask_texta)),
+                        'ids_textb': tf.train.Feature(
+                            int64_list=tf.train.Int64List(value=ids_textb)),
+                        'token_type_ids_textb': tf.train.Feature(
+                            int64_list=tf.train.Int64List(value=token_type_ids_textb)),
+                        'attention_mask_textb': tf.train.Feature(
+                            int64_list=tf.train.Int64List(value=attention_mask_textb)),
+                        'bm25': tf.train.Feature(
+                            float_list=tf.train.FloatList(value=[bm25])),
+                        'tf_cosine': tf.train.Feature(
+                            float_list=tf.train.FloatList(value=[tf_cosine])),
+                        'tfidf_cosine': tf.train.Feature(
+                            float_list=tf.train.FloatList(value=[tfidf_cosine])),
+                        'cat_texta': tf.train.Feature(
+                            int64_list=tf.train.Int64List(value=[cat_texta])),
+                        'cat_textb': tf.train.Feature(
+                            int64_list=tf.train.Int64List(value=[cat_textb])),
+                        'labelA': tf.train.Feature(
+                            int64_list=tf.train.Int64List(value=[labelA])),
+                        'labelB': tf.train.Feature(
+                            int64_list=tf.train.Int64List(value=[labelB])),
+                        'id': tf.train.Feature(
+                            bytes_list=tf.train.BytesList(value=[id.encode('utf-8')])),
+                    }))
+
+            &quot;&quot;&quot; 3. 序列化,写入&quot;&quot;&quot;
+            serialized = example.SerializeToString()
+            tfrecord_writer.write(serialized)
+```
+
+
+```python
+# it = get_keras_bert_iterator_notwhile(data_path, train_file_name, tokenizer)
+# to_tfrecord(it, &quot;data/shuffle_total_file.tfrecord&quot;)
+```
+
+
+```python
+# it = get_test_keras_bert_iterator(data_path, &quot;test_with_id.txt&quot;)
+# to_tfrecord(it, &quot;data/test_file.tfrecord&quot;)
+```
+
+
+```python
+def parse_from_single_example(example_proto, need_id):
+    &quot;&quot;&quot; 从example message反序列化得到当初写入的内容 &quot;&quot;&quot;
+    # 描述features
+    desc = {
+        'ids_texta': tf.io.FixedLenFeature([512], dtype=tf.int64),
+        'token_type_ids_texta': tf.io.FixedLenFeature([512], dtype=tf.int64),
+        'attention_mask_texta': tf.io.FixedLenFeature([512], dtype=tf.int64),
+        'ids_textb': tf.io.FixedLenFeature([512], dtype=tf.int64),
+        'token_type_ids_textb': tf.io.FixedLenFeature([512], dtype=tf.int64),
+        'attention_mask_textb': tf.io.FixedLenFeature([512], dtype=tf.int64),
+        'bm25': tf.io.FixedLenFeature([1], dtype=tf.float32),
+        'tf_cosine': tf.io.FixedLenFeature([1], dtype=tf.float32),
+        'tfidf_cosine': tf.io.FixedLenFeature([1], dtype=tf.float32),
+        'cat_texta': tf.io.FixedLenFeature([1], dtype=tf.int64),
+        'cat_textb': tf.io.FixedLenFeature([1], dtype=tf.int64),
+        'labelA': tf.io.FixedLenFeature([1], dtype=tf.int64),
+        'labelB': tf.io.FixedLenFeature([1], dtype=tf.int64),
+        'id': tf.io.FixedLenFeature([], dtype=tf.string),
+    }
+    # 使用tf.io.parse_single_example反序列化
+    example = tf.io.parse_single_example(example_proto, desc)
+    
+    data = {
+        'ids_texta': example['ids_texta'],
+        'token_type_ids_texta': example['token_type_ids_texta'],
+        'attention_mask_texta': example['attention_mask_texta'],
+        'ids_textb': example['ids_textb'],
+        'token_type_ids_textb': example['token_type_ids_textb'],
+        'attention_mask_textb': example['attention_mask_textb'],
+        'bm25': example['bm25'],
+        'tf_cosine': example['tf_cosine'],
+        'tfidf_cosine': example['tfidf_cosine'],
+        'cat_texta': example['cat_texta'],
+        'cat_textb': example['cat_textb'],
+    }
+    label = {
+        'labelA': example['labelA'],
+        'labelB': example['labelB'],
+    }
+    if not need_id:
+        return data, label
+    return data, label, example['id']
+```
+
+
+```python
+dataset = tf.data.TFRecordDataset([&quot;data/test_file.tfrecord&quot;])
+```
+
+    /data1/wangchenyue/zsd/code/sohu2021/conda_env/lib/python3.7/site-packages/tensorflow/python/data/ops/dataset_ops.py:3504: UserWarning: Even though the tf.config.experimental_run_functions_eagerly option is set, this option does not apply to tf.data functions. tf.data functions are still traced and executed as graphs.
+    &quot;Even though the tf.config.experimental_run_functions_eagerly &quot;
+
+
+
+```python
+data_iter = iter(dataset)
+first_example = next(data_iter)
+```
+
+
+```python
+data = parse_from_single_example(first_example, need_id=False)
+```
+
+
+```python
+# data['ids_texta'].numpy(), data['ids_texta'].numpy().shape
+```
+
+
+```python
+def get_dataset(file_list, epochs, batch_size, need_id=False):
+    return tf.data.TFRecordDataset(file_list) \
+        .map(partial(parse_from_single_example, need_id=need_id), multiprocessing.cpu_count()-2) \
+        .repeat(epochs) \
+        .shuffle(buffer_size=batch_size, reshuffle_each_iteration=True) \
+        .batch(batch_size) \
+        .prefetch(buffer_size=batch_size*2)
+```
+
+
+```python
+dataset = get_dataset(&quot;data/shuffle_total_file.tfrecord&quot;, epochs=1, batch_size=1)
+dataset
+```
+
+
+
+
+    &lt;PrefetchDataset shapes: ({ids_texta: (None, 512), token_type_ids_texta: (None, 512), attention_mask_texta: (None, 512), ids_textb: (None, 512), token_type_ids_textb: (None, 512), attention_mask_textb: (None, 512), bm25: (None, 1), tf_cosine: (None, 1), tfidf_cosine: (None, 1), cat_texta: (None, 1), cat_textb: (None, 1)}, {labelA: (None, 1), labelB: (None, 1)}), types: ({ids_texta: tf.int64, token_type_ids_texta: tf.int64, attention_mask_texta: tf.int64, ids_textb: tf.int64, token_type_ids_textb: tf.int64, attention_mask_textb: tf.int64, bm25: tf.float32, tf_cosine: tf.float32, tfidf_cosine: tf.float32, cat_texta: tf.int64, cat_textb: tf.int64}, {labelA: tf.int64, labelB: tf.int64})&gt;
+
+
+
+
+```python
+# next(iter(dataset))
+```
+
+
+```python
+def get_dataset_length(file_list):
+    dataset = get_dataset(file_list, epochs=1, batch_size=1)
+    count = 0
+    for _ in tqdm(iter(dataset)):
+        count += 1
+    return count
+```
+
+
+```python
+train_dataset_len = get_dataset_length(&quot;data/shuffle_total_file.tfrecord&quot;)
+train_dataset_len
+```
+
+    168714it [00:51, 3283.78it/s]
+
+
+
+
+
+    168714
+
+
+
+
+```python
+
+```
+
+
+```python
+
+```
+
+
+```python
+def save_test_result(model, result_file):
+    it = get_dataset(&quot;data/test_file.tfrecord&quot;, epochs=1, batch_size=1, need_id=True)
+    with open(result_file, 'w', encoding='utf-8') as f:
+        f.write(f&quot;id,label\n&quot;)
+        for data, _, id in tqdm(it):
+        predict = model.predict(data)
+        if id[0].numpy()[-1] == 'a':
+            predict_cls = 1 if predict['labelA'][0][0] &gt; 0.5 else 0
+        elif id[0].numpy()[-1] == 'b':
+            predict_cls = 1 if predict['labelB'][0][0] &gt; 0.5 else 0
+        else:
+            print(id)
+            continue
+        f.write(f&quot;{id},{predict_cls}\n&quot;)
+        #       count += 1
+        #       print(f&quot;\b\b\b\b\b\b{count}&quot;, end=&quot;&quot;)
+```
+
+
+```python
+
+```
+
+
+```python
+
+```
+
+
+```python
+
+```
+
+
+```python
+
+```
+
+## 定义模型
+
+
+```python
+def variant_focal_loss(gamma=2., alpha=0.5, rescale = False):
+
+    gamma = float(gamma)
+    alpha = float(alpha)
+
+    def focal_loss_fixed(y_true, y_pred):
+        # print(y_true)
+        &quot;&quot;&quot;
+        Focal loss for bianry-classification
+        FL(p_t)=-rescaled_factor*alpha_t*(1-p_t)^{gamma}log(p_t)
+        
+        Notice: 
+        y_pred is probability after sigmoid
+
+        Arguments:
+            y_true {tensor} -- groud truth label, shape of [batch_size, 1]
+            y_pred {tensor} -- predicted label, shape of [batch_size, 1]
+
+        Keyword Arguments:
+            gamma {float} -- (default: {2.0})  
+            alpha {float} -- (default: {0.5})
+
+        Returns:
+            [tensor] -- loss.
+        &quot;&quot;&quot;
+        epsilon = 1.e-9  
+        y_true = tf.convert_to_tensor(y_true, tf.float32)
+        y_pred = tf.convert_to_tensor(y_pred, tf.float32)
+        model_out = tf.clip_by_value(y_pred, epsilon, 1.-epsilon)  # to advoid numeric underflow
+        
+        # compute cross entropy ce = ce_0 + ce_1 = - (1-y)*log(1-y_hat) - y*log(y_hat)
+        ce_0 = tf.multiply(tf.subtract(1., y_true), -tf.math.log(tf.subtract(1., model_out)))
+        ce_1 = tf.multiply(y_true, -tf.math.log(model_out))
+
+        # compute focal loss fl = fl_0 + fl_1
+        # obviously fl &lt; ce because of the down-weighting, we can fix it by rescaling
+        # fl_0 = -(1-y_true)*(1-alpha)*((y_hat)^gamma)*log(1-y_hat) = (1-alpha)*((y_hat)^gamma)*ce_0
+        fl_0 = tf.multiply(tf.pow(model_out, gamma), ce_0)
+        fl_0 = tf.multiply(1.-alpha, fl_0)
+        # fl_1= -y_true*alpha*((1-y_hat)^gamma)*log(y_hat) = alpha*((1-y_hat)^gamma*ce_1
+        fl_1 = tf.multiply(tf.pow(tf.subtract(1., model_out), gamma), ce_1)
+        fl_1 = tf.multiply(alpha, fl_1)
+        fl = tf.add(fl_0, fl_1)
+        f1_avg = tf.reduce_mean(fl)
+        
+        if rescale:
+            # rescale f1 to keep the quantity as ce
+            ce = tf.add(ce_0, ce_1)
+            ce_avg = tf.reduce_mean(ce)
+            rescaled_factor = tf.divide(ce_avg, f1_avg + epsilon)
+            f1_avg = tf.multiply(rescaled_factor, f1_avg)
+        
+        return f1_avg
+    
+    return focal_loss_fixed
+```
+
+
+```python
+def f1_loss(y_true, y_pred):
+    # y_true:真实标签0或者1；y_pred:为正类的概率
+    loss = 2 * tf.reduce_sum(y_true * y_pred) / tf.reduce_sum(y_true + y_pred) + K.epsilon()
+    return -loss
+```
+
+
+```python
+def transform_y(y_true, y_pred):
+    mask_value = tf.constant(-1)
+    mask_y_true = tf.not_equal(tf.cast(y_true, dtype=tf.int32), tf.cast(mask_value, dtype=tf.int32))
+#     print(f&quot;mask_y_true:{mask_y_true}&quot;)
+#     y_true_ = tf.cond(tf.equal(y_true, mask_value), lambda: 0, lambda: y_true)
+    y_true_ = tf.cast(y_true, dtype=tf.int32) * tf.cast(mask_y_true, dtype=tf.int32)
+    y_pred_ = tf.cast(y_pred, dtype=tf.float32) * tf.cast(mask_y_true, dtype=tf.float32)
+#     print(f&quot;y_true_:{y_true_}, y_pred_:{y_pred_}&quot;)
+    
+    return tf.cast(y_true_, dtype=tf.float32), tf.cast(y_pred_, dtype=tf.float32)
+```
+
+
+```python
+def my_binary_crossentropy(y_true, y_pred, class_weights):
+#     print(f&quot;y_true: {y_true}&quot;)
+    mask_value = tf.constant(-1)
+#     mask_y_true = tf.not_equal(tf.cast(y_true, dtype=tf.int32), tf.cast(mask_value, dtype=tf.int32))
+    
+#     mask = tf.zeros(shape=y_true.shape)
+    zero_value = tf.constant(0)
+#     print(f&quot;cond0: {tf.equal(y_true, mask_value)}&quot;)
+#     print(f&quot;cond1: {tf.equal(y_true, zero_value)}&quot;)
+#     weight = [tf.cond(tf.equal(x, mask_value), lambda: 0, tf.cond(tf.equal(x, zero_value), lambda: class_weights[0], lambda: class_weights[1])) for x in y_true]
+    weight = [0 if x[0]==-1 else class_weights[x[0]] for x in y_true]
+#     print(f&quot;weight: {weight}&quot;)
+    
+    bin_loss = binary_crossentropy(y_true, y_pred)
+#     print(f&quot;bin_loss: {bin_loss}&quot;)
+#     f1_loss = f1_loss(y_true, y_pred)
+#     loss = bin_loss + f1_loss
+    
+    loss_ = tf.cast(bin_loss, dtype=tf.float32) * tf.cast(weight, dtype=tf.float32)
+#     print(f&quot;loss_: {loss_}&quot;)
+
+    return loss_
+```
+
+
+```python
+def my_binary_crossentropy_A(y_true, y_pred):
+    return my_binary_crossentropy(y_true, y_pred, labelA_class_weights)
+
+def my_binary_crossentropy_B(y_true, y_pred):
+    return my_binary_crossentropy(y_true, y_pred, labelB_class_weights)
+```
+
+
+```python
+def tarnsform_metrics(y_true, y_pred):
+    y_true_, y_pred_ = y_true.numpy(), y_pred.numpy()
+    for i in range(y_true_.shape[0]):
+        for j in range(y_true_.shape[1]):
+            if y_true_[i][j] == -1:
+                y_true_[i][j] = 0
+                y_pred_[i][j] = random.choice([0, 1])
+            if y_pred_[i][j] &gt; 0.5:
+                y_pred_[i][j] = 1
+            else:
+                y_pred_[i][j] = 0
+    return y_true_, y_pred_
+```
+
+
+```python
+def my_binary_accuracy(y_true, y_pred):
+#     print(&quot;my_binary_accuracy&quot;)
+#     print(f&quot;y_true:{y_true}, y_pred:{y_pred}&quot;)
+    
+    y_true_, y_pred_ = tarnsform_metrics(y_true, y_pred)
+#     print(f&quot;y_true_:{y_true_}, y_pred_:{y_pred_}&quot;)
+
+    accuracy = binary_accuracy(y_true_, y_pred_)
+    return accuracy
+```
+
+
+```python
+def my_f1_score(y_true, y_pred):
+#     print(&quot;my_f1_score&quot;)
+#     print(f&quot;y_true:{y_true}, y_pred:{y_pred}&quot;)
+    
+    y_true_, y_pred_ = tarnsform_metrics(y_true, y_pred)
+#     print(f&quot;y_true_:{y_true_}, y_pred_:{y_pred_}&quot;)
+
+    return f1_score(y_true_, y_pred_, average='macro')
+```
+
+
+```python
+def get_model():
+    K.clear_session()
+    
+    bert_model = TFBertModel.from_pretrained(bert_path, from_pt=True, trainable=True)
+    for l in bert_model.layers:
+        l.trainable = True
+
+    input_ids_texta = Input(shape=(None,), dtype='int32', name='input_ids_texta')
+    input_token_type_ids_texta = Input(shape=(None,), dtype='int32', name='input_token_type_ids_texta')
+    input_attention_mask_texta = Input(shape=(None,), dtype='int32', name='input_attention_mask_texta')
+    input_ids_textb = Input(shape=(None,), dtype='int32', name='input_ids_textb')
+    input_token_type_ids_textb = Input(shape=(None,), dtype='int32', name='input_token_type_ids_textb')
+    input_attention_mask_textb = Input(shape=(None,), dtype='int32', name='input_attention_mask_textb')
+    input_token_type_ids_textb = Input(shape=(None,), dtype='int32', name='input_token_type_ids_textb')
+    input_bm25 = Input(shape=(1), dtype='float32', name='input_bm25')
+    input_tf_cosine = Input(shape=(1), dtype='float32', name='input_tf_cosine')
+    input_tfidf_cosine = Input(shape=(1), dtype='float32', name='input_tfidf_cosine')
+    input_cat_texta = Input(shape=(1), dtype='float32', name='input_cat_texta')
+    input_cat_textb = Input(shape=(1), dtype='float32', name='input_cat_textb')
+
+    bert_output_texta = bert_model({'input_ids':input_ids_texta, 'token_type_ids':input_token_type_ids_texta, 'attention_mask':input_attention_mask_texta}, return_dict=False, training=True)
+    projection_logits_texta = bert_output_texta[0]
+    bert_cls_texta = Lambda(lambda x: x[:, 0])(projection_logits_texta) # 取出[CLS]对应的向量用来做分类
+
+    bert_output_textb = bert_model({'input_ids':input_ids_textb, 'token_type_ids':input_token_type_ids_textb, 'attention_mask':input_attention_mask_textb}, return_dict=False, training=True)
+    projection_logits_textb = bert_output_textb[0]
+    bert_cls_textb = Lambda(lambda x: x[:, 0])(projection_logits_textb) # 取出[CLS]对应的向量用来做分类
+    
+    subtracted = Subtract()([bert_cls_texta, bert_cls_textb])
+    cos = Dot(axes=1, normalize=True)([bert_cls_texta, bert_cls_textb]) # dot=1按行点积，normalize=True输出余弦相似度
+
+    bert_cls = concatenate([bert_cls_texta, bert_cls_textb, subtracted, cos, input_bm25, input_tf_cosine, input_tfidf_cosine, input_cat_texta, input_cat_textb], axis=-1)
+    
+    dense_A_0 = Dense(256, activation='relu')(bert_cls)
+    dropout_A_0 = Dropout(0.2)(dense_A_0)
+    dense_A_1 = Dense(32, activation='relu')(dropout_A_0)
+    dropout_A_1 = Dropout(0.2)(dense_A_1)
+    output_A = Dense(1, activation='sigmoid', name='output_A')(dropout_A_1)
+    
+    dense_B_0 = Dense(256, activation='relu')(bert_cls)
+    dropout_B_0 = Dropout(0.2)(dense_B_0)
+    dense_B_1 = Dense(32, activation='relu')(dropout_B_0)
+    dropout_B_1 = Dropout(0.2)(dense_B_1)
+    output_B = Dense(1, activation='sigmoid', name='output_B')(dropout_B_1)
+
+    input_data = {
+        'ids_texta':input_ids_texta,
+        'token_type_ids_texta':input_token_type_ids_texta,
+        'attention_mask_texta':input_attention_mask_texta,
+        'ids_textb':input_ids_textb,
+        'token_type_ids_textb':input_token_type_ids_textb,
+        'attention_mask_textb':input_attention_mask_textb,
+        'bm25':input_bm25,
+        'tf_cosine':input_tf_cosine,
+        'tfidf_cosine':input_tfidf_cosine,
+        'cat_texta':input_cat_texta,
+        'cat_textb':input_cat_textb,
+    }
+    output_data = {
+        'labelA':output_A,
+        'labelB':output_B,
+    }
+    model = Model(input_data, output_data)
+    model.compile(
+#                   loss=my_binary_crossentropy,
+#                   loss={
+#                       'output_A':my_binary_crossentropy_A,
+#                       'output_B':my_binary_crossentropy_B,
+#                   },
+                loss={
+                    'labelA':my_binary_crossentropy_A,
+                    'labelB':my_binary_crossentropy_B,
+                },
+#                   loss='binary_crossentropy',
+#                   loss=binary_crossentropy,
+                optimizer=Adam(1e-5),    #用足够小的学习率
+                metrics=[my_binary_accuracy, my_f1_score]
+#                   metrics='accuracy'
+                )
+    print(model.summary())
+    return model
+```
+
+
+```python
+early_stopping = EarlyStopping(monitor='loss', patience=3)   #早停法，防止过拟合
+plateau = ReduceLROnPlateau(monitor=&quot;loss&quot;, verbose=1, factor=0.5, patience=2) #当评价指标不在提升时，减少学习率
+checkpoint = ModelCheckpoint(check_point_path, monitor='loss', verbose=2, save_best_only=True, save_weights_only=True) #保存最好的模型
+tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=f&quot;./logs/{datetime.now().strftime('%Y%m%d-%H%M%S')}&quot;, update_freq=50)
+```
+
+## 模型训练
+
+
+```python
+def get_step(sample_count, batch_size):
+    step = sample_count // batch_size
+    if sample_count % batch_size != 0:
+        step += 1
+    return step
+```
+
+
+```python
+model = get_model()
+plot_model(model, &quot;keras_bert_transformers_two_text_input_SubStract_bm25cosine_1.png&quot;, show_shapes=True)
+```
+
+    Some weights of the PyTorch model were not used when initializing the TF 2.0 model TFBertModel: ['cls.predictions.decoder.weight', 'cls.seq_relationship.weight', 'cls.predictions.transform.dense.weight', 'cls.seq_relationship.bias', 'cls.predictions.transform.LayerNorm.weight', 'cls.predictions.bias', 'bert.embeddings.position_ids', 'cls.predictions.decoder.bias', 'cls.predictions.transform.dense.bias', 'cls.predictions.transform.LayerNorm.bias']
+    - This IS expected if you are initializing TFBertModel from a PyTorch model trained on another task or with another architecture (e.g. initializing a TFBertForSequenceClassification model from a BertForPreTraining model).
+    - This IS NOT expected if you are initializing TFBertModel from a PyTorch model that you expect to be exactly identical (e.g. initializing a TFBertForSequenceClassification model from a BertForSequenceClassification model).
+    All the weights of TFBertModel were initialized from the PyTorch model.
+    If your task is similar to the task the model of the checkpoint was trained on, you can already use TFBertModel for predictions without further training.
+
+
+    Model: &quot;model&quot;
+    __________________________________________________________________________________________________
+    Layer (type)                    Output Shape         Param #     Connected to                     
+    ==================================================================================================
+    input_attention_mask_texta (Inp [(None, None)]       0                                            
+    __________________________________________________________________________________________________
+    input_ids_texta (InputLayer)    [(None, None)]       0                                            
+    __________________________________________________________________________________________________
+    input_token_type_ids_texta (Inp [(None, None)]       0                                            
+    __________________________________________________________________________________________________
+    input_attention_mask_textb (Inp [(None, None)]       0                                            
+    __________________________________________________________________________________________________
+    input_ids_textb (InputLayer)    [(None, None)]       0                                            
+    __________________________________________________________________________________________________
+    input_token_type_ids_textb (Inp [(None, None)]       0                                            
+    __________________________________________________________________________________________________
+    tf_bert_model (TFBertModel)     TFBaseModelOutputWit 102267648   input_attention_mask_texta[0][0] 
+                                                                    input_ids_texta[0][0]            
+                                                                    input_token_type_ids_texta[0][0] 
+                                                                    input_attention_mask_textb[0][0] 
+                                                                    input_ids_textb[0][0]            
+                                                                    input_token_type_ids_textb[0][0] 
+    __________________________________________________________________________________________________
+    lambda (Lambda)                 (None, 768)          0           tf_bert_model[0][0]              
+    __________________________________________________________________________________________________
+    lambda_1 (Lambda)               (None, 768)          0           tf_bert_model[1][0]              
+    __________________________________________________________________________________________________
+    subtract (Subtract)             (None, 768)          0           lambda[0][0]                     
+                                                                    lambda_1[0][0]                   
+    __________________________________________________________________________________________________
+    dot (Dot)                       (None, 1)            0           lambda[0][0]                     
+                                                                    lambda_1[0][0]                   
+    __________________________________________________________________________________________________
+    input_bm25 (InputLayer)         [(None, 1)]          0                                            
+    __________________________________________________________________________________________________
+    input_tf_cosine (InputLayer)    [(None, 1)]          0                                            
+    __________________________________________________________________________________________________
+    input_tfidf_cosine (InputLayer) [(None, 1)]          0                                            
+    __________________________________________________________________________________________________
+    input_cat_texta (InputLayer)    [(None, 1)]          0                                            
+    __________________________________________________________________________________________________
+    input_cat_textb (InputLayer)    [(None, 1)]          0                                            
+    __________________________________________________________________________________________________
+    concatenate (Concatenate)       (None, 2310)         0           lambda[0][0]                     
+                                                                    lambda_1[0][0]                   
+                                                                    subtract[0][0]                   
+                                                                    dot[0][0]                        
+                                                                    input_bm25[0][0]                 
+                                                                    input_tf_cosine[0][0]            
+                                                                    input_tfidf_cosine[0][0]         
+                                                                    input_cat_texta[0][0]            
+                                                                    input_cat_textb[0][0]            
+    __________________________________________________________________________________________________
+    dense (Dense)                   (None, 256)          591616      concatenate[0][0]                
+    __________________________________________________________________________________________________
+    dense_2 (Dense)                 (None, 256)          591616      concatenate[0][0]                
+    __________________________________________________________________________________________________
+    dropout_37 (Dropout)            (None, 256)          0           dense[0][0]                      
+    __________________________________________________________________________________________________
+    dropout_39 (Dropout)            (None, 256)          0           dense_2[0][0]                    
+    __________________________________________________________________________________________________
+    dense_1 (Dense)                 (None, 32)           8224        dropout_37[0][0]                 
+    __________________________________________________________________________________________________
+    dense_3 (Dense)                 (None, 32)           8224        dropout_39[0][0]                 
+    __________________________________________________________________________________________________
+    dropout_38 (Dropout)            (None, 32)           0           dense_1[0][0]                    
+    __________________________________________________________________________________________________
+    dropout_40 (Dropout)            (None, 32)           0           dense_3[0][0]                    
+    __________________________________________________________________________________________________
+    output_A (Dense)                (None, 1)            33          dropout_38[0][0]                 
+    __________________________________________________________________________________________________
+    output_B (Dense)                (None, 1)            33          dropout_40[0][0]                 
+    ==================================================================================================
+    Total params: 103,467,394
+    Trainable params: 103,467,394
+    Non-trainable params: 0
+    __________________________________________________________________________________________________
+    None
+
+
+
+
+
+    
+![png](output_79_2.png)
+    
+
+
+
+
+```python
+model.load_weights(check_point_path)
+```
+
+
+
+
+    &lt;tensorflow.python.training.tracking.util.CheckpointLoadStatus at 0x7f71b2093690&gt;
+
+
+
+
+```python
+# batch_size = 2
+# epochs = 10
+
+# train_dataset_iterator = batch_iter(data_path, train_file_name, tokenizer, batch_size)
+# train_step = get_step(sample_count, batch_size)
+
+# model.fit(
+#     train_dataset_iterator,
+#     # steps_per_epoch=10,
+#     steps_per_epoch=train_step,
+#     epochs=epochs,
+# #       validation_data=dev_dataset_iterator,
+#   # validation_steps=2,
+# #       validation_steps=dev_step,
+# #     validation_split=0.2,
+# #     class_weight={
+# #         'output_A':labelA_class_weights,
+# #         'output_B':labelB_class_weights,
+# #     },
+#     callbacks=[early_stopping, plateau, checkpoint, tensorboard_callback],
+#     verbose=1
+# )
+
+# model.save_weights(weights_path)
+# # model_json = model.to_json()
+# # with open(config_path, 'w', encoding='utf-8') as file:
+# #     file.write(model_json)
+
+# save_test_result(model, result_path)
+```
+
+
+```python
+# model = get_model()
+# # with open(config_path, 'r', encoding='utf-8') as json_file:
+# #     loaded_model_json = json_file.read()
+# # model = model_from_json(loaded_model_json)
+# model.load_weights(check_point_path)
+# save_test_result(model, &quot;trained_model_substract_1/multi_keras_bert_sohu_test_result_epoch6.csv&quot;)
+```
+
+
+```python
+batch_size = 2
+epochs = 10
+
+train_dataset_iterator = get_dataset(&quot;data/shuffle_total_file.tfrecord&quot;, epochs=epochs, batch_size=batch_size)
+train_step = get_step(train_dataset_len, batch_size)
+
+for epoch in range(epochs):
+    model.fit(
+        train_dataset_iterator,
+        steps_per_epoch=train_step,
+        epochs=1,
+        callbacks=[early_stopping, plateau, checkpoint, tensorboard_callback],
+        verbose=1
+    )
+
+    model.save_weights(weights_path)
+
+    save_test_result(model, f&quot;{result_path}.epoch_{epoch}.csv&quot;)
+```
+
+
+```python
+
+```
+
+
+```python
+
+```
+
+
+```python
+
+```
+
+
+```python
+
+```
+
+# 模型加载及测试
+
+## load_weights
+
+## load_model
+
+
+```python
+
+```
+
+
+```python
+
+```
+
+
+```python
+
+```
+
+
+```python
+
+```
+
+
+```python
+
+```
+
+
+```python
+
+```
+</code></pre>
+
+    </div>
+
+    
+<div class="post-reward">
+  <input type="checkbox" name="reward" id="reward" hidden />
+  <label class="reward-button" for="reward">赞赏支持</label>
+  <div class="qr-code">
+    
+    <label class="qr-code-image" for="reward">
+        <img class="image" src="/images/money_weixin_20200719212002.png">
+        <span>微信打赏</span>
+      </label>
+    <label class="qr-code-image" for="reward">
+        <img class="image" src="/images/alipay_20200801211208.png">
+        <span>支付宝打赏</span>
+      </label>
+  </div>
+</div><footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a>
+          <a href="/tags/tfrecord/">tfrecord</a>
+          <a href="/tags/%E6%95%B0%E6%8D%AE%E9%9B%86/">数据集</a>
+          <a href="/tags/keras/">keras</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/monitor_stock_system/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">股票量化监控系统</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
+        <a class="next" href="/post/choose_layer_output/">
+            <span class="next-text nav-default">获取模型的中间层输出</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        <div id="gitalk-container"></div>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js" crossorigin="anonymous"></script>
+    <script type="text/javascript">
+      var gitalk = new Gitalk({
+        id: '2021-05-05 02:42:58 \x2b0800 CST',
+        title: '使用tfrecord构建数据集',
+        clientID: '5ea75f603117948d8d37',
+        clientSecret: '26c617c6bce9a975c2a65a68f1ca2a2cc7dde587',
+        repo: 'blog',
+        owner: 'zhangsheng377',
+        admin: ['zhangsheng377'],
+        body: decodeURI(location.href)
+      });
+      gitalk.render('gitalk-container');
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://github.com/gitalk/gitalk">comments powered by gitalk.</a></noscript>
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:435878393@qq.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://www.linkedin.com/in/zhangshengdong/" class="iconfont icon-linkedin" title="linkedin"></a>
+      <a href="https://github.com/zhangsheng377/" class="iconfont icon-github" title="github"></a>
+  <a href="https://www.zhangshengdong.com/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  <div class="busuanzi-footer">
+    <span id="busuanzi_container_site_pv"> 本站总访问量 <span id="busuanzi_value_site_pv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> 次 </span>
+      <span class="division">|</span>
+    <span id="busuanzi_container_site_uv"> 本站总访客数 <span id="busuanzi_value_site_uv"><img src="/img/spinner.svg" alt="spinner.svg"/></span> 人 </span>
+  </div>
+
+  <span class="copyright-year">
+    &copy; 
+    2019 - 
+    2022<span class="heart"><i class="iconfont icon-heart"></i></span><span><a href="https://beian.miit.gov.cn/" target="_blank">苏ICP备15009593号-1</a></span>
+  </span>
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+
+
+
+<script type="text/javascript" src="/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js"></script>
+  <script type="text/javascript">
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        tags: 'ams',
+        }
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3.0.5/es5/tex-mml-chtml.js" integrity="sha256-HGLuEfFcsUJGhvB8cQ8nr0gai9EucOOaIxFw7qxmd+w=" crossorigin="anonymous"></script>
+
+<script id="baidu_analytics">
+  var _hmt = _hmt || [];
+  (function() {
+    if (window.location.hostname === 'localhost') return;
+    var hm = document.createElement("script"); hm.async = true;
+    hm.src = "https://hm.baidu.com/hm.js?c602db2501643f661d9789f9e9707386";
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(hm, s);
+  })();
+</script>
+
+
+
+
+
+
+</body>
+</html>

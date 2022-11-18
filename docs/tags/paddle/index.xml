@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>paddle on 张胜东的博客</title>
+    <link>https://www.zhangshengdong.com/tags/paddle/</link>
+    <description>Recent content in paddle on 张胜东的博客</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>&lt;a href=&#34;https://beian.miit.gov.cn/&#34; target=&#34;_blank&#34;&gt;苏ICP备15009593号-1&lt;/a&gt;</copyright>
+    <lastBuildDate>Sun, 17 May 2020 01:47:08 +0800</lastBuildDate>
+    
+	<atom:link href="https://www.zhangshengdong.com/tags/paddle/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>树莓派上使用paddle预训练模型</title>
+      <link>https://www.zhangshengdong.com/post/raspberry_and_paddle/</link>
+      <pubDate>Sun, 17 May 2020 01:47:08 +0800</pubDate>
+      
+      <guid>https://www.zhangshengdong.com/post/raspberry_and_paddle/</guid>
+      <description>树莓派安装paddlelite; x86电脑上安装paddlehub，并将paddlehub中的预训练模型转换为paddlelite格式，使之</description>
+    </item>
+    
+  </channel>
+</rss>
