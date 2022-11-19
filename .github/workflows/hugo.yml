@@ -53,10 +53,10 @@ jobs:
 #            --minify \
 #            --baseURL "${{ steps.pages.outputs.base_url }}/"
         run: hugo --minify
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v1
-        with:
-          path: ./public
+#       - name: Upload artifact
+#         uses: actions/upload-pages-artifact@v1
+#         with:
+#           path: ./public
 
   # Deployment job
   deploy:
@@ -74,7 +74,7 @@ jobs:
         with:
           deploy_key: ${{ secrets.ACTIONS_DEPLOY_KEY }} # 这里的 ACTIONS_DEPLOY_KEY 则是上面设置 Private Key的变量名
           external_repository: BZ-coding/BZ-coding.github.io # Pages 远程仓库 
-          publish_dir: ""
+          publish_dir: "./public"
           keep_files: false # remove existing files
           publish_branch: master  # deploying branch
           commit_message: ${{ github.event.head_commit.message }}
