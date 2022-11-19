@@ -57,6 +57,10 @@ jobs:
 #         uses: actions/upload-pages-artifact@v1
 #         with:
 #           path: ./public
+      - name: Display
+        run: |
+          echo "github.workspace is ${{ github.workspace }}"
+          ls ${{ github.workspace }}
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
