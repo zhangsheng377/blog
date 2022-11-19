@@ -52,7 +52,11 @@ jobs:
 #          hugo \
 #            --minify \
 #            --baseURL "${{ steps.pages.outputs.base_url }}/"
-        run: hugo --minify --verbose
+        run: |
+          echo "pwd is "
+          pwd
+          ls
+          hugo --minify --verbose
 #       - name: Upload artifact
 #         uses: actions/upload-pages-artifact@v1
 #         with:
