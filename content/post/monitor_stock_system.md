@@ -6,7 +6,7 @@ draft: false
 keywords: []
 description: ""
 tags: [股票, 量化, 监控, 推送, 微信, redis, 爬虫]
-categories: []
+categories: [工程]
 author: ""
 
 # You can also close(false) or open(true) something for this content.

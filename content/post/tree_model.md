@@ -6,7 +6,7 @@ draft: false
 keywords: []
 description: ""
 tags: [树模型, 决策树, ID3, C4.5, CART,  AdaBoost]
-categories: []
+categories: [算法]
 author: ""
 
 # You can also close(false) or open(true) something for this content.

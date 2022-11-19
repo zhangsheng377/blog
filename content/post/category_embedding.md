@@ -6,7 +6,7 @@ draft: false
 keywords: []
 description: ""
 tags: [深度学习, 类别特征, embedding, 拼接, keras]
-categories: []
+categories: [算法]
 author: ""
 
 # You can also close(false) or open(true) something for this content.

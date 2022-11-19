@@ -6,7 +6,7 @@ draft: false
 keywords: []
 description: ""
 tags: [深度学习, tfrecord, 数据集, keras]
-categories: []
+categories: [算法]
 author: ""
 
 # You can also close(false) or open(true) something for this content.

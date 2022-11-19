@@ -6,7 +6,7 @@ draft: false
 keywords: []
 description: ""
 tags: [时序分解, 股票, tushare, 微信公众号]
-categories: []
+categories: [工程]
 author: ""
 
 # You can also close(false) or open(true) something for this content.

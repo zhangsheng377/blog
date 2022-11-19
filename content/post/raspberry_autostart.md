@@ -6,7 +6,7 @@ draft: false
 keywords: []
 description: ""
 tags: [树莓派, linux, shell]
-categories: []
+categories: [工程]
 author: ""
 
 # You can also close(false) or open(true) something for this content.

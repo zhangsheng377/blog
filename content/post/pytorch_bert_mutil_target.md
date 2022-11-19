@@ -6,7 +6,7 @@ draft: false
 keywords: []
 description: ""
 tags: [pytorch, bert, 多分类, 多目标]
-categories: []
+categories: [算法]
 author: ""
 
 # You can also close(false) or open(true) something for this content.

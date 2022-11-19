@@ -6,7 +6,7 @@ draft: false
 keywords: []
 description: ""
 tags: [esp32, arduino, 蓝牙]
-categories: []
+categories: [工程]
 author: ""
 
 # You can also close(false) or open(true) something for this content.

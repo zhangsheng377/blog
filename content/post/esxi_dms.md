@@ -6,7 +6,7 @@ draft: false
 keywords: []
 description: ""
 tags: [esxi, 黑群晖, nfs]
-categories: []
+categories: [工程]
 author: ""
 
 # You can also close(false) or open(true) something for this content.

@@ -3,3 +3,4 @@ public/
 resources/_gen
 *.vscode
 /static/images/Thumbs.db
+/.hugo_build.lock

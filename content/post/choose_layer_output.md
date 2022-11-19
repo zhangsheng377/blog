@@ -6,7 +6,7 @@ draft: false
 keywords: []
 description: ""
 tags: [深度学习, 模型, 中间层, 输出, keras]
-categories: []
+categories: [算法]
 author: ""
 
 # You can also close(false) or open(true) something for this content.

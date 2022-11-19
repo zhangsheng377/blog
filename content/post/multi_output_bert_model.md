@@ -6,7 +6,7 @@ draft: false
 keywords: []
 description: ""
 tags: [深度学习, 多输出, 参数共享, 模型, keras, bert]
-categories: []
+categories: [算法]
 author: ""
 
 # You can also close(false) or open(true) something for this content.
