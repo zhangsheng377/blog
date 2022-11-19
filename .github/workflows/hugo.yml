@@ -61,6 +61,8 @@ jobs:
         run: |
           echo "github.workspace is ${{ github.workspace }}"
           ls ${{ github.workspace }}
+          echo "github.workspace public is ${{ github.workspace }}/public"
+          ls ./public
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
