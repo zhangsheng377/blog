@@ -126,7 +126,8 @@ def uploader_v1():
     f = request.files['upload_file']
     logging.info(request.files)
 
-    upload_file_path = os.path.join(save_path, f.filename)
+    file_name = f.filename.replace(' ', '')
+    upload_file_path = os.path.join(save_path, file_name)
     f.save(upload_file_path)
     
     logging.info(upload_file_path)
