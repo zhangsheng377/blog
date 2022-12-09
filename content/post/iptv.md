@@ -113,7 +113,7 @@ sequenceDiagrams:
 http://x.x.x.x:y/udp/239.49.8.19:9614
 ```
 
-亲测好用。
+接下来，打开<http://epg.51zmt.top:8000/>网站，把修改好的m3u文件上传，就可以得到匹配上台标的m3u文件。
 
 ## 播放器
 
@@ -145,5 +145,7 @@ http://x.x.x.x:y/udp/239.49.8.19:9614
 依然是进入插件页，选择PVR客户端，安装PVR IPTV Simple Client插件。然后进入插件配置，将m3u位置改为本地，然后选择nfs。。。
 
 导入后，即可正常观看iptv啦。
+
+若想要节目单的话，可以在PVR IPTV Simple Client插件的设置中，找到节目单指南标签，填上<http://epg.51zmt.top:8000/cc.xml.gz>，即可匹配到电子节目单信息了。
 
 ![vlc](/images/iptv_tv.jpg)
