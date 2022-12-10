@@ -113,8 +113,6 @@ sequenceDiagrams:
 http://x.x.x.x:y/udp/239.49.8.19:9614
 ```
 
-接下来，打开<http://epg.51zmt.top:8000/>网站，把修改好的m3u文件上传，就可以得到匹配上台标的m3u文件。
-
 ## 播放器
 
 ### pc：vlc等
@@ -146,6 +144,31 @@ http://x.x.x.x:y/udp/239.49.8.19:9614
 
 导入后，即可正常观看iptv啦。
 
+![vlc](/images/iptv_tv.jpg)
+
 若想要节目单的话，可以在PVR IPTV Simple Client插件的设置中，找到节目单指南标签，填上<http://epg.51zmt.top:8000/cc.xml.gz>，即可匹配到电子节目单信息了。
 
-![vlc](/images/iptv_tv.jpg)
+当然，我们还可以再把台标也给加上。具体操作是，打开<http://epg.51zmt.top:8000/>网站，把修改好的m3u文件上传，就可以得到匹配上台标的m3u文件。
+但是这个文件里会把没匹配上的台名称信息丢掉，所以我们需要把台标信息加回到原先的m3u文件中。
+
+```python
+m3u_context = []
+with open('江苏电信-组播-全部_zsd.m3u.bak', 'r', encoding='utf-8') as m3u_file, open('江苏电信-组播-全部_zsd_epg.m3u', 'r', encoding='utf-8') as epg_file:
+    for m3u_line, epg_line in zip(m3u_file.readlines(), epg_file.readlines()):
+        m3u_elements = m3u_line.split(' ')
+        epg_elements = epg_line.split(' ')
+        
+        if len(epg_elements) < 4:
+            m3u_context.append(m3u_line)
+            continue
+            
+        logo = 'tvg-logo=""'
+        if epg_elements[3] != logo:
+            logo = epg_elements[3]
+        m3u_elements.insert(3, logo)
+        
+        m3u_context.append(' '.join(m3u_elements))
+
+with open('江苏电信-组播-全部_zsd.m3u', 'w', encoding='utf-8') as m3u_file:
+    m3u_file.writelines(m3u_context)
+```
