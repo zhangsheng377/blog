@@ -136,3 +136,46 @@ ws.Run "zzz\server.bat /start",0
 ## HA设置自动化
 
 这个其实没啥好说的，就是在HA的自动化里，配置上数值状态sensor的条件，执行行为设置为wifi开关，就可以啦。
+
+具体代码如下：
+surface充电:
+
+```yaml
+alias: surface充电
+description: ""
+trigger:
+  - platform: numeric_state
+    entity_id: sensor.arest_sensor_battery
+    below: 30
+condition: []
+action:
+  - type: turn_on
+    device_id: xxx
+    entity_id: switch.surface_socket_1
+    domain: switch
+initial_state: true
+mode: restart
+```
+
+surface停止充电:
+
+```yaml
+alias: surface停止充电
+description: ""
+trigger:
+  - platform: state
+    entity_id:
+      - sensor.arest_sensor_battery
+    to: unavailable
+  - platform: numeric_state
+    entity_id: sensor.arest_sensor_battery
+    above: 85
+condition: []
+action:
+  - type: turn_off
+    device_id: xxx
+    entity_id: switch.surface_socket_1
+    domain: switch
+initial_state: true
+mode: restart
+```
