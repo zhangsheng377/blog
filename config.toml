@@ -148,6 +148,7 @@ copyright = '<a href="https://beian.miit.gov.cn/" target="_blank">苏ICP备15009
     repo = "blog"               # The repo to store comments
     clientId = "5ea75f603117948d8d37"           # Your client ID
     clientSecret = "26c617c6bce9a975c2a65a68f1ca2a2cc7dde587"       # Your client secret
+    proxy = "https://vercel.prohibitorum.top/github_access_token"
 
   # Valine.
   # You can get your appid and appkey from https://leancloud.cn
