@@ -53,7 +53,13 @@ sequenceDiagrams:
 
 由于我并不想额外再弄个树莓派一类的一直插电，毕竟目前就这一个surface充电的需求，所以我是部署了HA的docker。
 
-这样的话，集成涂鸦依旧非常方便，直接在集成中搜索tuya，找一些教程，在涂鸦上注册以下开发者，在HA上填入token、用户名等，就把上文的wifi开关接入HA啦。
+~~这样的话，集成涂鸦依旧非常方便，直接在集成中搜索tuya，找一些教程，在涂鸦上注册以下开发者，在HA上填入token、用户名等，就把上文的wifi开关接入HA啦。~~
+
+涂鸦官方只给1个月的远程连接体验，之后就连不上了不给用了。。。这种样子如何能忍？所以我选用<https://github.com/rospogrigio/localtuya>
+
+部署非常简单，在docker映射的/config目录里创建custom_components文件夹，把项目里的对应目录扔进去就行。然后在ha的集成里添加这个本地继承插件。
+
+唯一麻烦的就是获取local key。这个是在<https://iot.tuya.com/cloud/explorer> 涂鸦的云开发-->API调试-->通用设备能力-->通用设备管理-->获取设备信息 中，把device_id填进去，就能得到local key了。
 
 ## surface电量上传HA
 
