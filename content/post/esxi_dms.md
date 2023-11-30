@@ -138,6 +138,8 @@ set sata_args='DiskIdxMap=0c00 SataPortMap=24'
 
 ### linux服务器上挂载nfs
 
+#### 挂载nfs
+
 sudo apt install nfs-common
 
 df 可以查看有没有被挂载
@@ -151,3 +153,51 @@ sudo chmod 777 /mnt/nfs
 卸载nfs：
 
 sudo umount /mnt/nfs
+
+#### linux开机自启动
+
+https://blog.csdn.net/feiying0canglang/article/details/124695749
+
+1. 创建rc-local.service文件
+
+```shell
+sudo cp /lib/systemd/system/rc-local.service /etc/systemd/system
+```
+
+然后修改/etc/systemd/system/rc-local.service，在文件最下方添加如下两行：
+
+```shell
+[Install]   
+WantedBy=multi-user.target   
+Alias=rc-local.service
+```
+
+2. 创建rc.local文件
+
+创建/etc/rc.local，里边写自己想要运行的命令。例：
+
+```shell
+#!/bin/sh
+mount -t nfs 192.168.10.36:/volume1/nfs /mnt/nfs
+exit 0
+```
+
+给/etc/rc.local加上可执行权限 
+
+```shell
+sudo chmod +x /etc/rc.local
+```
+
+3. systemctl命令
+
+启动服务
+
+```shell
+sudo systemctl start rc-local.service
+```
+
+查看服务状态
+
+```shell
+sudo systemctl status rc-local.service
+```
