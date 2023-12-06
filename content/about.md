@@ -137,7 +137,7 @@ comment: false
   3. 神经网络关于特征的模型自解释方法：利用模型对于特征的梯度，结合巧妙地特征工程构造出的背景样本和MSE Loss，即可计算出各用户特征输入关于模型打分结果的影响度。
 
   4. 参加晟腾特战队：
-     * 负责开源项目大模型加速库 <https://gitee.com/ascend/AscendSpeed> 的调优部分。
+     * 负责开源项目大模型加速库 <https://gitee.com/ascend/AscendSpeed> 的调优部分，并成为该项目的committer。
      * 向PEFT开源社区贡献了一个关键独立特性：分布式LoRA <https://github.com/huggingface/peft/pull/1092> 。
 
 -------------------------------------------------------------------
