@@ -138,11 +138,14 @@ comment: false
 
   4. 参加晟腾特战队：
      * 负责开源项目大模型加速库 <https://gitee.com/ascend/AscendSpeed> 的调优部分，并成为该项目的committer。
-     * 向PEFT开源社区贡献了一个关键独立特性：分布式LoRA <https://github.com/huggingface/peft/pull/1092> 。
+     * 向PEFT开源社区贡献了一个关键独立特性：分布式LoRA <https://github.com/huggingface/peft/pull/1092> 已经在peft0.7.0版本发布：
+        ![peft0.7.0](/images/peft_lora_0.png)
+        ![peft0.7.0](/images/peft_lora_1.png)
+        <https://github.com/huggingface/peft/releases/tag/v0.7.0>
 
 -------------------------------------------------------------------
 -------------------------------------------------------------------
 
-[pdf版简历](/resume_20231206.pdf)
+[pdf版简历](/resume_20231212.pdf)
 
 本科时期的旧博客:<a href="http://zhangshengdong29.lofter.com/view" target="_blank"> http://zhangshengdong29.lofter.com/view </a>
