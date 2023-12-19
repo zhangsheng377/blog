@@ -140,7 +140,7 @@ comment: false
 
 * **主要项目**：
 
-  1. 负责开源项目大模型加速库 <https://gitee.com/ascend/AscendSpeed> 的调优部分，并成为该项目的committer。主要是带领团队进行大模型训练和调优方面的特性开发，并支撑客户训练大模型。
+  1. 负责开源项目大模型加速库 <https://gitee.com/ascend/AscendSpeed> 的调优部分，并成为该项目的committer。主要是带领团队进行大模型训练和调优方面的特性开发，并支撑客户训练大模型。多次向Megatron-LM、Megatron-DeepSpeed和PEFT库贡献代码。
 
   2. 向PEFT开源社区贡献了一个关键独立特性：分布式LoRA <https://github.com/huggingface/peft/pull/1092> 已经在peft0.7.0版本发布：
     ![peft0.7.0](/images/peft_lora_0.png)
