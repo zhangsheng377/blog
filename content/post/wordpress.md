@@ -71,6 +71,8 @@ services:
       - /mnt/nfs/zsd_server/docker/data/blog/wordpress_data:/var/www/html
     ports:
       - 80:80
+      - 443:443
+    network_mode: "host"
     logging:
       options:
         max-size: "10m"
