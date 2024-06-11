@@ -146,6 +146,10 @@ comment: false
     ![peft0.7.0](/images/peft_lora_0.png)
     ![peft0.7.0](/images/peft_lora_1.png)
     <https://github.com/huggingface/peft/releases/tag/v0.7.0>
+  
+  3. 向Accelerate开源社区贡献了一个关键独立特性：支持nvidia官方megatron的MegatronLMPlugin <https://github.com/huggingface/accelerate/pull/2501> 已经在accelerate0.31.0版本发布：
+    ![accelerate0.31.0](/images/accelerate_megatron.png)
+    <https://github.com/huggingface/accelerate/releases/tag/v0.31.0>
 
 -------------------------------------------------------------------
 -------------------------------------------------------------------
