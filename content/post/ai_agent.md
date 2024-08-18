@@ -57,6 +57,8 @@ ai_agent其实就是让大模型可以调用工具。但调用工具的前提是
 
 以上创新点都会在下面详细过程中提到。
 
+具体可见仓库：<https://github.com/BZ-coding/ai_agent>
+
 ## 我做了啥
 
 要训练ai_agent，首先要做的就是弄到训练语料。但我翻了翻互联网，发现能找到的并且能用的react语料那是真的没有。所以我就准备自己生成训练语料。
@@ -172,6 +174,3 @@ https://github.com/BZ-coding/ai_agent/blob/main/finetune_react_model/utils/datas
 虽然ollama官方文档里显示modelfile可以配置ADAPTER，但我尝试后，发现推理时ollama直接报错。
 
 所以最终决定，还是把LoRA的参数merge到原始模型上，产生一个新模型，再用llama.cpp的脚本convert_hf_to_gguf.py转成gguf格式，最终载入到ollama里。
-
-
-具体可见仓库：<https://github.com/BZ-coding/ai_agent>
