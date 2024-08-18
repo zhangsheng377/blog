@@ -67,18 +67,28 @@ ai_agent其实就是让大模型可以调用工具。但调用工具的前提是
 
 其实用langchain加载本地模型的方式，倒也能跑起来ai_agent，但由于中文的llama3并不能很好的遵从react格式，特别表现在大模型总是会把"Action: "输出成中文标点"Action："，然后langchain就会报错说找不到tool，这就很令人崩溃。而且在langchain的使用过程中也发现各种封装带来的不方便：比如我要想加上自己wrap的tool，直接load_tools竟然会报错，官方的解决方案竟是直接以list形式追加在load_tools的返回值后面。而且langchain也没有匹配llama3的模板，现象是llama3有概率一直说个不停。
 
-所以，以上的一切不方便，加上ai_agent的流程其实并不难，最红让我决定，写一套自己的[ai_agent流程](https://github.com/BZ-coding/ai_agent/blob/main/utils/ai_agent.py)：
+所以，以上的一切不方便，加上ai_agent的流程其实并不难，最终让我决定，写一套自己的[ai_agent流程](https://github.com/BZ-coding/ai_agent/blob/main/utils/ai_agent.py)：
 1. 定义tool的文本描述格式
-  此处参考了qwen的格式，我觉得该格式比langchain的格式描述更清晰，最主要的是，该格式几乎支持一切tool的输入格式，非常灵活。
+
+    此处参考了qwen的格式，我觉得该格式比langchain的格式描述更清晰，最主要的是，该格式几乎支持一切tool的输入格式，非常灵活。
+
 2. 定义agent的prompt
-  此处不管是qwen还是langchain，prompt的格式都几乎一致，当然我也跟他们一致。
+
+    此处不管是qwen还是langchain，prompt的格式都几乎一致，当然我也跟他们一致。
+
 3. 解析大模型的输出
-  这点我对qwen的代码做了改进优化了解析各关键字（Action:、Action Input:、Observation:）的逻辑，能够更好的支持一些极端场景。
+
+    这点我对qwen的代码做了改进优化了解析各关键字（Action:、Action Input:、Observation:）的逻辑，能够更好的支持一些极端场景。
+
 4. 调用tool
-  此处得益于tool的描述文本，将输入参数的格式定义为json，使得支持任意参数的输入。同时我对各tool又封装了一层，用来解析json格式的参数。
+
+    此处得益于tool的描述文本，将输入参数的格式定义为json，使得支持任意参数的输入。同时我对各tool又封装了一层，用来解析json格式的参数。
+
 5. 将tool结果拼回大模型输入
-  这点就是很正常的再追加一轮多轮对话而已。但有点不方便的是，原来按我的设计，该轮对话的role应该是tool，但我用的统一后端是ollama，它加入了对于role的校验且只支持system、user、assistant这三个。关于这个问题，我[跟ollama进行了交涉](https://github.com/ollama/ollama/issues/6322)，但交涉的结果是ollama拒绝修改为可自定义。所以我只好把该轮对话的role改成assistant了。
-  再一个就是我对整体的输出做了流式输出的可选项，并且为了适配我后面人工校验语料的需求，做了各部分（大模型Thought反思和调用工具）的独立开关，可以从任意一步开始继续对话。
+
+    这点就是很正常的再追加一轮多轮对话而已。但有点不方便的是，原来按我的设计，该轮对话的role应该是tool，但我用的统一后端是ollama，它加入了对于role的校验且只支持system、user、assistant这三个。关于这个问题，我[跟ollama进行了交涉](https://github.com/ollama/ollama/issues/6322)，但交涉的结果是ollama拒绝修改为可自定义。所以我只好把该轮对话的role改成assistant了。
+
+    再一个就是我对整体的输出做了流式输出的可选项，并且为了适配我后面人工校验语料的需求，做了各部分（大模型Thought反思和调用工具）的独立开关，可以从任意一步开始继续对话。
 
 ![](https://github.com/BZ-coding/ai_agent/blob/main/utils/my_ai_agent.png)
 
