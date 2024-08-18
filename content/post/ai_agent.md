@@ -92,7 +92,7 @@ ai_agent其实就是让大模型可以调用工具。但调用工具的前提是
 
     再一个就是我对整体的输出做了流式输出的可选项，并且为了适配我后面人工校验语料的需求，做了各部分（大模型Thought反思和调用工具）的独立开关，可以从任意一步开始继续对话。
 
-![](https://github.com/BZ-coding/ai_agent/blob/main/utils/my_ai_agent.png)
+![](https://github.com/BZ-coding/ai_agent/blob/main/utils/my_ai_agent.png?raw=true)
 
 ### 大模型自生成微调语料全流程
 
@@ -130,7 +130,7 @@ https://github.com/BZ-coding/ai_agent/blob/main/generate_finetune_sample/02_chec
 
 网页是用gradio写的，可以加载问题，并调用上文自建的ai_agent流程，逐步的显示每一轮对话，还可以任意的删改每一条输出，并接着修改后的内容继续进行ai_agent对话。最后，可以将对话的完整内容保存下来，形成一条ai_agent微调语料；或者直接把该条问题样本删除。
 
-![](https://github.com/BZ-coding/ai_agent/blob/main/generate_finetune_sample/gradio_screenshot.gif)
+![](https://github.com/BZ-coding/ai_agent/blob/main/generate_finetune_sample/gradio_screenshot.gif?raw=true)
 
 https://github.com/BZ-coding/ai_agent/blob/main/generate_finetune_sample/04_manual_annotate_samples_gradio.py
 
