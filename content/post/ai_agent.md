@@ -140,6 +140,9 @@ https://github.com/BZ-coding/ai_agent/blob/main/generate_finetune_sample/04_manu
 
 并且就算是这样，我也训练不了长度大于9000的样本，所以只能把他们做成eval数据集。
 
+训练过程&各实验：
+https://wandb.ai/bz-zhangshengdong/finetune_react_model/workspace
+
 #### 多轮对话的训练方法
 
 在这里想跟大家讨论一下多轮对话的训练方法。
