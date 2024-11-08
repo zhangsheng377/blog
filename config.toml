@@ -1,7 +1,7 @@
 baseURL = "https://www.zhangshengdong.com"
 languageCode = "zh-cn"
 defaultContentLanguage = "zh-cn"                             # en / zh-cn / ... (This field determines which i18n file to use)
-title = "张胜东的博客 feedId:74974426547593219+userId:74452307170145280"
+title = "张胜东的博客"
 preserveTaxonomyNames = true
 enableRobotsTXT = true
 enableEmoji = true
