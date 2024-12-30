@@ -146,14 +146,21 @@ comment: false
     ![peft0.7.0](/images/peft_lora_0.png)
     ![peft0.7.0](/images/peft_lora_1.png)
     <https://github.com/huggingface/peft/releases/tag/v0.7.0>
+    该分布式LoRA方案已达理论最优，领先于半年之后发表的S-LoRA论文。
   
   3. 向Accelerate开源社区贡献了一个关键独立特性：支持nvidia官方megatron的MegatronLMPlugin <https://github.com/huggingface/accelerate/pull/2501> 已经在accelerate0.31.0版本发布：
     ![accelerate0.31.0](/images/accelerate_megatron.png)
     <https://github.com/huggingface/accelerate/releases/tag/v0.31.0>
+    主导负责OpenMind生态社区分布式与训练特性的设计与开发工作，成为OpenMind套件的核心差异化竞争力，支持晟腾的社区生态发展。
+    Accelerate对接megatron特性同步反哺官方开源社区。
+
+  4. 负责我司行业大模型的微调部分。作为开源蓝军路线的领导人，提出并尝试了模拟退火、细化二三级子领域能力分类、数据平权采样、基于裁判模型的预料质量评估、重复训练波动分析、数据精细化管理方案等有效实践，并积极分享，主力红军路线成功。
+  
+  5. 负责我司行业大模型评测部分的裁判模型的设计与开发。提出了从nginx的工程设计，到规则与大模型共存的评测方案，以及将rag引入评测系统，以此增强评测系统对于错误多样性的适应性。
 
 -------------------------------------------------------------------
 -------------------------------------------------------------------
 
-[pdf版简历](/resume_20240612.pdf)
+[pdf版简历](/resume_20241231.pdf)
 
 本科时期的旧博客:<a href="http://zhangshengdong29.lofter.com/view" target="_blank"> http://zhangshengdong29.lofter.com/view </a>
