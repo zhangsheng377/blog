@@ -43,7 +43,7 @@ sequenceDiagrams:
 
 在家里自己用OpenR1准备从qwen-base训出个R1模型来，结果跑了demo数据，发现前100多步的loss几乎都是0： 
 
-![grpo训练记录](/static/images/grpo_train.png)
+![grpo训练记录](/images/grpo_train.png)
 
 在搜索相关资料时，发现Hugging Face的TRL库中也有类似的问题讨论：
 
@@ -59,7 +59,7 @@ sequenceDiagrams:
 
 GRPO（Group Relative Policy Optimization）损失函数：
 
-![grpo loss](/static/images/grpo_loss.png)
+![grpo loss](/images/grpo_loss.png)
 
 [GRPO Trainer](https://huggingface.co/docs/trl/grpo_trainer)
 
@@ -170,7 +170,7 @@ loss = ((per_token_loss * completion_mask).sum(dim=1) / completion_mask.sum(dim=
 
 换言之，其实**GRPO Loss就等于βKL**。只不过advantages可以在梯度计算中保留（见上文的.detach()）。
 
-![grpo kl](/static/images/grpo_kl.png)
+![grpo kl](/images/grpo_kl.png)
 
 而上文说到，第一步的KL是0，所以**第一步的loss一定是0**.
 
