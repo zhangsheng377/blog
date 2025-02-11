@@ -63,7 +63,7 @@ GRPO（Group Relative Policy Optimization）损失函数：
 
 [GRPO Trainer](https://huggingface.co/docs/trl/grpo_trainer)
 
-可以发现，grpo的loss是可近似看作：
+可以发现，grpo的loss可近似看作：
 
 \[ \text{Loss} \approx \frac{\pi_\theta}{\pi_\theta} \cdot A - \beta \cdot \text{KL} \]
 
@@ -125,6 +125,7 @@ per_token_kl = torch.exp(ref_per_token_logps - per_token_logps) - (ref_per_token
 1. 首先按照分组Group，对组内各样本（一个问题prompt生成num_generations个回答）进行标准化；
 
 2. 在最后计算loss时进行累加求均值的操作。
+
 而具体的代码实现则是：
 
 ```python
