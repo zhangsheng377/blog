@@ -154,6 +154,12 @@ sudo chmod 777 /mnt/nfs
 
 sudo umount /mnt/nfs
 
+#### smb
+
+sudo apt install cifs-utils
+
+sudo mount -t cifs //192.168.10.70/zsd_server /mnt/smb_fn/zsd_server -o username=xxx,password=xxx
+
 #### linux开机自启动
 
 https://blog.csdn.net/feiying0canglang/article/details/124695749
