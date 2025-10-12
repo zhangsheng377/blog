@@ -88,7 +88,7 @@ comment: false
 
 ### 华为 数据通信网络协议开发部 `2018.7-2020.5`
 
-* **主要项目**：
+#### **主要项目**：
 
   1. **独立设计 Trunk 软件选口算法**，使用分层的 avl 管理端口资源，使板级异常的主备切换耗时从原来的几百毫秒，降低至几毫秒。
 
@@ -102,7 +102,7 @@ comment: false
 
   6. 日常分享技术总结，并在内网发博客 10 余篇，累计 UV 阅读量 3000 多人。
 
-* **个人项目**：
+#### **个人项目**：
 
   1. 参加 科赛Kesci 的 「二分类算法」提供银行精准营销解决方案 比赛，**取得全球100+名次**，获得一张100美元AWS代金券。
 
@@ -110,25 +110,25 @@ comment: false
 
   在浏览器算法团队，负责NLP模型和搜索直达的排序模型。
 
-* **主要项目**：
+#### **主要项目**：
 
   1. 优质文章模型（浏览器每日精选栏目）：经bert得文章embedding(即文章的语义信息)，再拼接上文章的结构信息（段落、字数、图片数、来源、作者等，经过embedding和标准化），接上双塔网络，判断文章优质与否，以及属于哪个优质类别。
 
-  2. 层次文章分类模型：根据各层次分类之间天然的关联性，同时学习多个label，设计多任务的Bert模型（将一级分类网络的最后一级输出，拼上之前bert输出的embedding，再进二级分类网络，以此类推），在学习阶段就即可自动进行层次分类校准。并且，在推断时，可以获取各层分类类别的概率，采用beam search，进行有限度的扩展搜索。
+  2. **层次文章分类模型**：根据各层次分类之间天然的关联性，同时学习多个label，设计多任务的Bert模型（将一级分类网络的最后一级输出，拼上之前bert输出的embedding，再进二级分类网络，以此类推），在学习阶段就即可自动进行层次分类校准。并且，在推断时，可以获取各层分类类别的概率，采用beam search，进行有限度的扩展搜索。
 
-  3. 搜索直达功能的排序模型：打通FTRL模型上线，在产品诞生之初快速赋能；后切换到DCN模型，自动进行特征交叉；现转向ESMM模型，多任务，同时训练 CTR 和 CVR 指标，以期真正提升 CTCVR 业务指标。
+  3. **搜索直达功能的排序模型**：打通FTRL模型上线，在产品诞生之初快速赋能；后切换到DCN模型，自动进行特征交叉；现转向ESMM模型，多任务，同时训练 CTR 和 CVR 指标，以期真正提升 CTCVR 业务指标。
 
   4. 同时做过 文章地域模型、时效模型、负面文章模型、友商吹捧文章模型等，主管NLP领域的分类模型。
 
-* **个人项目**：
+#### **个人项目**：
 
   1. 编写股票监控平台。采用docker部署爬虫模块、量化指标算法模块、订阅分发模块等，各模块之间使用rabbitmq和redis，以及mongodb连接。爬虫模块爬取股票数据存入通用数据库接口（mongodb），并缓存至redis；算法模块监控rabbitmq，从而处理数据并将报警信息存入redis；订阅分发模块监控到有报警信息后主动向微信订阅用户推送；同时部署有微信服务器，完成与微信用户的交互。[https://www.zhangshengdong.com/post/monitor_stock_system/](https://www.zhangshengdong.com/post/monitor_stock_system/)
 
 ### 华为 NAIE AI模型与训练服务部 `2021.9-至今`
 
-  在用户体验团队，承担算法SE（架构师）角色，负责设计与实现电信领域用户体验相关模型。
+  在用户体验团队，承担**算法SE（架构师）角色**，负责设计与实现电信领域用户体验相关模型。
 
-* **主要项目**：
+#### **主要项目**：
   
   1. 基站信号仿真大模型：输入地形各图层数据及基站位置等参数，输出地图各处基站信号强度。模型结构借鉴cv领域双流网络思想，采用白盒（可微电磁传播公式）和黑盒（大规模卷积网络）双流的思路。
 
@@ -136,31 +136,55 @@ comment: false
 
   3. 神经网络关于特征的模型自解释方法：利用模型对于特征的梯度，结合巧妙地特征工程构造出的背景样本和MSE Loss，即可计算出各用户特征输入关于模型打分结果的影响度。
 
-晟腾特战队：
+**晟腾特战队**：
 
-* **主要项目**：
+#### **主要项目**：
 
-  1. 负责开源项目大模型加速库 <https://gitee.com/ascend/AscendSpeed> 的调优部分，并成为该项目的committer。主要是带领团队进行大模型训练和调优方面的特性开发，并支撑客户训练大模型。多次向Megatron-LM、Megatron-DeepSpeed和PEFT库贡献代码。
+* 2023年：
 
-  2. 向PEFT开源社区贡献了一个关键独立特性：分布式LoRA <https://github.com/huggingface/peft/pull/1092> 已经在peft0.7.0版本发布：
+  1. 负责开源项目大模型加速库 <https://gitee.com/ascend/AscendSpeed> 的调优部分，并成为该项目的**committer**。主要是带领团队进行**大模型训练和调优方面的特性开发**，并支撑客户训练大模型。多次**向Megatron-LM、Megatron-DeepSpeed和PEFT库贡献代码**。
+
+  2. **向PEFT开源社区贡献了一个关键独立特性：分布式LoRA** <https://github.com/huggingface/peft/pull/1092> 已经在peft0.7.0版本发布：
     ![peft0.7.0](/images/peft_lora_0.png)
     ![peft0.7.0](/images/peft_lora_1.png)
     <https://github.com/huggingface/peft/releases/tag/v0.7.0>
     该分布式LoRA方案已达理论最优，领先于半年之后发表的S-LoRA论文。
-  
-  3. 向Accelerate开源社区贡献了一个关键独立特性：支持nvidia官方megatron的MegatronLMPlugin <https://github.com/huggingface/accelerate/pull/2501> 已经在accelerate0.31.0版本发布：
+
+* 2024年：
+
+  1. **向Accelerate开源社区贡献了一个关键独立特性：支持nvidia官方megatron的MegatronLMPlugin** <https://github.com/huggingface/accelerate/pull/2501> 已经在accelerate0.31.0版本发布：
     ![accelerate0.31.0](/images/accelerate_megatron.png)
     <https://github.com/huggingface/accelerate/releases/tag/v0.31.0>
     主导负责OpenMind生态社区分布式与训练特性的设计与开发工作，成为OpenMind套件的核心差异化竞争力，支持晟腾的社区生态发展。
     Accelerate对接megatron特性同步反哺官方开源社区。
 
-  4. 负责我司行业大模型的微调部分。作为开源蓝军路线的领导人，提出并尝试了模拟退火、dpo、细化二三级子领域能力分类、数据平权采样、基于裁判模型的语料质量评估、重复训练波动分析、数据精细化管理方案等有效实践，并积极分享，助力红军路线成功。
+  2. **负责我司行业大模型的微调部分**。作为开源蓝军路线的领导人，提出并尝试了模拟退火、dpo、细化二三级子领域能力分类、数据平权采样、基于裁判模型的语料质量评估、重复训练波动分析、数据精细化管理方案等有效实践，并积极分享，助力红军路线成功。
   
-  5. 负责我司自动化评测系统的设计与开发。设计打分流程，引入few-shot和cot，以及将rag引入评测系统，以此增强评测系统对于错误多样性的适应性。并且使用裁判模型作为rm奖励模型，打通dpo训练流程。
+  3. **负责我司自动化评测系统的设计与开发**。设计打分流程，引入few-shot和cot，以及将rag引入评测系统，以此增强评测系统对于错误多样性的适应性。并且使用裁判模型作为rm奖励模型，打通dpo训练流程。
+
+* 2025年：
+
+  1. **负责我司行业大模型的RL部分**。
+      * 主要承担我司RL框架的穿刺，及强化学习算法开发与迭代。
+      * 在NPU上复现了R1-zero https://www.zhangshengdong.com/post/grpo_repetition/ 和DeepScaler，在领域RL方面构建了Reward裁判模型集群，采用rest接口式打分，并做了cache等优化。
+      * 在算法方面提出了**动态权重采样**（通过调整样本的采样权重维持打分方差/熵，进而提升模型探索）；
+      * **统一SFT与RL**，在RL的rollout中预置思维链，可以起到加速模型效果提升、稳定训练的作用，该技术在qwen3中也被采用；
+      * 提出采用**全局窗口均分**的方案，避免grpo系列算法固有的“矮子里拔将军”的问题。
+      * **推理预算在RL训练中的应用**，受到qwen的推理预算功能的启发，由于RL训练中受资源限制会有一些超长样本，放入训练会造成打分异常，而使用推理预算功能进行二次推理，即可挽救回一些样本，从而提升训练效率，并且缩短模型回答。
+      * 提出**异步DAPO**的加速方案，通过并行化rollout和reward流水，不仅可以打满vllm实例的推理显存，还能显著提升训练效率。
+      * 应对loss尖刺（loss spike）的问题，因为观测到grad_norm和loss spike的相关性，所以提出通过缓存模型权重从而实现**跳过grad异常的update**的方案。
+
+#### **个人项目**：
+
+  1. 提出将Rag召回的文档进行与问题相关的提炼的方案 https://github.com/BZ-coding/rag 。
+  2. 将Llama3训练出ReAct能力 https://github.com/BZ-coding/ai_agent 。
+  3. 外置推理框架 https://github.com/BZ-coding/O1 ，在O1出来的时候就做过分析，提出除了内生的反思能力路径之外，还有可以一条通过外置推理框架进行强推理约束的道路，其本质与今天的DeepSearch框架很像。
+  4. 提出在RL训练中关键token的重要性 https://github.com/zhangsheng377/TRM ，与近来的CISPO等论文的思路接近。
+  5. **Thought and Draw（一个让大语言模型学会思考并绘制图像的实验项目）** https://github.com/zhangsheng377/thought_and_draw ，提出**万物皆Token，图像即语言**的思路。但很不幸，与最近Google的nano模型思路撞车。
 
 -------------------------------------------------------------------
 -------------------------------------------------------------------
 
-[pdf版简历](/resume_20250101.pdf)
+[pdf版简历](/resume_20251013.pdf)
 
 本科时期的旧博客:<a href="http://zhangshengdong29.lofter.com/view" target="_blank"> http://zhangshengdong29.lofter.com/view </a>
